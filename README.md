@@ -101,7 +101,7 @@ public class TestActivity extends FDActivity<TestContract.View, TestContract.Pre
 }
 ```
 #### Step 5.恭喜，您完成了FDroid入门任务。
-##### 接下来，你的任务有自定义FDApi编写网络请求、学习使用L/T/SP工具类、全局对话框的使用等等。
+##### 接下来，你的任务有自定义FDApi编写网络请求、学习使用L/T/SP工具类、全局对话框的使用等等。教程正在制作。。。
 
 ## 一键生成MVP模板
 ### FDActivity模板：点我下载
