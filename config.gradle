@@ -1,0 +1,13 @@
+// Define versions in a single place
+ext {
+    // Sdk and tools
+    compileSdkVersion = 25
+    buildToolsVersion = "25.0.1"
+    minSdkVersion = 17
+    targetSdkVersion = 25
+    versionCode = 1
+    versionName = "1.0"
+
+    // App dependencies
+    supportLibraryVersion = "25.1.0"
+}
