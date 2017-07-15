@@ -24,16 +24,16 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     private byte mVisibleFlag;// 可见标志
 
     /**
-     * 实现Fragment数据的懒加载
+     * 实现用户是否可见回调
      */
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (mVisibleFlag == 0) return;
-        if (getUserVisibleHint()) {
+        if (isVisibleToUser && isResumed()) {
             onVisible(mVisibleFlag == 1);
             mVisibleFlag = 2;
-        } else {
+        } else if (!isVisibleToUser) {
             onInvisible();
         }
     }
@@ -50,6 +50,25 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
      * 用户不可见
      */
     public void onInvisible() {
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getUserVisibleHint()) {
+            setUserVisibleHint(true);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        setUserVisibleHint(false);
+    }
+
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        setUserVisibleHint(!hidden);
     }
 
     @SuppressWarnings("unchecked")
