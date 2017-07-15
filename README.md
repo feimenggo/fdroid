@@ -103,3 +103,23 @@ public class TestActivity extends FDActivity<TestContract.View, TestContract.Pre
 #### Step 5.恭喜，您完成了FDroid入门任务。
 ##### 接下来，你的任务有自定义FDApi编写网络请求、学习使用L/T/SP工具类、全局对话框的使用等等。
 
+## 一键生成MVP模板
+### FDActivity模板：点我下载
+#### Android Studio Template的使用，请自行度娘哦。
+## License
+
+```  
+Copyright 2017 youth5201314
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
