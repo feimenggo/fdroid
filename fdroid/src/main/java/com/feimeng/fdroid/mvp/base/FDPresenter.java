@@ -131,6 +131,10 @@ public abstract class FDPresenter<V extends FDView> {
         void withoutNetwork(String alisa);
     }
 
+    public <T> Observable<T> withNet(Observable<T> task) {
+        return withNet(null, task);
+    }
+
     public <T> Observable<T> withNet(final String alisa, Observable<T> task) {
         final Observable<T> checkNet = Observable.create(new Observable.OnSubscribe<T>() {
             @Override
@@ -153,7 +157,7 @@ public abstract class FDPresenter<V extends FDView> {
             @Override
             public void call(Subscriber<? super T> subscriber) {
                 if (!NetworkUtil.isConnectingToInternet(getContext())) {
-                    if (network != null) network.withoutNetwork("");
+                    if (network != null) network.withoutNetwork(null);
                     subscriber.onError(null);
                     return;
                 }
