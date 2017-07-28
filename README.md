@@ -25,7 +25,7 @@ allprojects {
 ```groovy
 dependencies {
   //...
-  compile 'com.github.feimenggo:fdroid:1.0.1'
+  compile 'com.github.feimenggo:fdroid:1.0.2'
 }
 ```
 #### Step 3.自定义Application继承FDApp.java
@@ -109,7 +109,7 @@ public class TestActivity extends FDActivity<TestContract.View, TestContract.Pre
 ## License
 
 ```  
-Copyright 2017 youth5201314
+Copyright 2017 feimeng
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
