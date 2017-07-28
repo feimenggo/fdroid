@@ -90,22 +90,22 @@ public abstract class FDPresenter<V extends FDView> {
      * 显示对话框
      */
     public void showDialog(String message) {
-        if (mView != null)
-            if (mView instanceof FDActivity)
-                ((FDActivity) mView).showLoadingDialog(message);
-            else if (mView instanceof FDFragment)
-                ((FDFragment) mView).showLoadingDialog(message);
+        if (mView == null) return;
+        if (mView instanceof FDActivity)
+            ((FDActivity) mView).showLoadingDialog(message);
+        else if (mView instanceof FDFragment)
+            ((FDFragment) mView).showLoadingDialog(message);
     }
 
     /**
      * 隐藏对话框
      */
     public void hideDialog() {
-        if (mView != null)
-            if (mView instanceof FDActivity)
-                ((FDActivity) mView).hideLoadingDialog();
-            else if (mView instanceof FDFragment)
-                ((FDFragment) mView).hideLoadingDialog();
+        if (mView == null) return;
+        if (mView instanceof FDActivity)
+            ((FDActivity) mView).hideLoadingDialog();
+        else if (mView instanceof FDFragment)
+            ((FDFragment) mView).hideLoadingDialog();
     }
 
     /**
@@ -123,16 +123,21 @@ public abstract class FDPresenter<V extends FDView> {
     }
 
     public interface OnWithoutNetwork {
-        void withoutNetWork();
+        /**
+         * 网络不可用
+         *
+         * @param alisa 调用别名
+         */
+        void withoutNetwork(String alisa);
     }
 
-    public <T> Observable<T> withNet(Observable<T> task) {
+    public <T> Observable<T> withNet(final String alisa, Observable<T> task) {
         final Observable<T> checkNet = Observable.create(new Observable.OnSubscribe<T>() {
             @Override
             public void call(Subscriber<? super T> subscriber) {
                 if (!NetworkUtil.isConnectingToInternet(getContext())) {
-                    if (isActive() && mView instanceof FDViewNet) {
-                        ((FDViewNet) mView).withoutNetwork();
+                    if (isActive() && mView instanceof OnWithoutNetwork) {
+                        ((OnWithoutNetwork) mView).withoutNetwork(alisa);
                     }
                     subscriber.onError(null);
                     return;
@@ -148,7 +153,7 @@ public abstract class FDPresenter<V extends FDView> {
             @Override
             public void call(Subscriber<? super T> subscriber) {
                 if (!NetworkUtil.isConnectingToInternet(getContext())) {
-                    if (network != null) network.withoutNetWork();
+                    if (network != null) network.withoutNetwork("");
                     subscriber.onError(null);
                     return;
                 }

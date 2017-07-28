@@ -20,12 +20,15 @@ public class HeaderInterceptor implements Interceptor {
 
     @Override
     public okhttp3.Response intercept(Chain chain) throws IOException {
-        Request.Builder builder = chain.request().newBuilder();
+        Request request = chain.request();
+        Request.Builder builder = request.newBuilder();
         for (HeaderParam headerParam : mHeader) {
-            if (headerParam.isRepeat())
-                builder.addHeader(headerParam.getKey(), headerParam.getValue());
-            else
-                builder.header(headerParam.getKey(), headerParam.getValue());
+            if (request.headers().get(headerParam.getKey()) == null) {
+                if (headerParam.isReplace())
+                    builder.header(headerParam.getKey(), headerParam.getValue());
+                else
+                    builder.addHeader(headerParam.getKey(), headerParam.getValue());
+            }
         }
         return chain.proceed(builder.build());
     }

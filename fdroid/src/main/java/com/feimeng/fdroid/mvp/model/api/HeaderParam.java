@@ -7,7 +7,7 @@ package com.feimeng.fdroid.mvp.model.api;
 public class HeaderParam {
     private String key;
     private String value;
-    private boolean repeat;
+    private boolean replace;
 
     /**
      * 请求头
@@ -22,14 +22,14 @@ public class HeaderParam {
     /**
      * 请求头
      *
-     * @param key    键
-     * @param value  值
-     * @param repeat 同名请求，是否覆盖
+     * @param key     键
+     * @param value   值
+     * @param replace 同名请求，是否覆盖
      */
-    public HeaderParam(String key, String value, boolean repeat) {
+    public HeaderParam(String key, String value, boolean replace) {
         this.key = key;
         this.value = value;
-        this.repeat = repeat;
+        this.replace = replace;
     }
 
     public String getKey() {
@@ -40,8 +40,8 @@ public class HeaderParam {
         return value;
     }
 
-    public boolean isRepeat() {
-        return repeat;
+    public boolean isReplace() {
+        return replace;
     }
 
     @Override
