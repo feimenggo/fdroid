@@ -17,6 +17,7 @@ import android.widget.ListView;
 
 import com.feimeng.fdroid.base.FDActivity;
 
+import java.util.Iterator;
 import java.util.Stack;
 
 /**
@@ -106,10 +107,12 @@ public class ActivityPageManager {
      * @param activity 保留的Activity
      */
     public void finishAllActivity(Activity activity) {
-        for (FDActivity fdActivity : activityStack) {
+        Iterator<FDActivity> iterator = activityStack.iterator();
+        while (iterator.hasNext()) {
+            FDActivity fdActivity = iterator.next();
             if (activity != null && fdActivity == activity) continue;
             fdActivity.finish();
-            activityStack.remove(fdActivity);
+            iterator.remove();
         }
     }
 
