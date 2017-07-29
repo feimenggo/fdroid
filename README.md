@@ -25,12 +25,12 @@ allprojects {
 ```groovy
 dependencies {
   //...
-  compile 'com.github.feimenggo:fdroid:1.0.2'
+  compile 'com.github.feimenggo:fdroid:1.0.4'
 }
 ```
 #### Step 3.自定义Application继承FDApp.java
 ```java
-public class FDApp extends Application {
+public class BaseApp extends FDApp {
     @Override
     protected void config() {
 	// 此处可以进行您项目其它库的初始化
