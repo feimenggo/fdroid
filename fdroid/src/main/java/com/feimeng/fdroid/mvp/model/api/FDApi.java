@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.HttpException;
@@ -89,6 +90,20 @@ public class FDApi {
         if (mMockData != null && !mMockData.isEmpty())
             clientBuilder.addInterceptor(new MockInterceptor(mMockData));
         return clientBuilder.build();
+    }
+
+    protected RequestBody json(Object... params) {
+        JsonRequestBody body = JsonRequestBody.getInstance();
+        String key = null;
+        for (Object param : params) {
+            if (key == null) {
+                key = (String) param;
+            } else {
+                body.put(key, param);
+                key = null;
+            }
+        }
+        return body.build();
     }
 
     protected OkHttpClient getOkHttpClient() {
