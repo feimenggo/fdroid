@@ -19,7 +19,6 @@ public class JsonRequestBody {
 
     private JsonRequestBody() {
         mThreadLocal = new ThreadLocal<>();
-        mThreadLocal.set(new HashMap<String, Object>());
         mJsonType = MediaType.parse("application/json;charset=UTF-8");
         mGson = new Gson();
     }
@@ -37,6 +36,10 @@ public class JsonRequestBody {
 
     public JsonRequestBody put(String key, Object value) {
         Map<String, Object> map = mThreadLocal.get();
+        if (map == null) {
+            map = new HashMap<>();
+            mThreadLocal.set(map);
+        }
         map.put(key, value);
         return this;
     }
