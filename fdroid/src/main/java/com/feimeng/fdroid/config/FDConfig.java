@@ -5,6 +5,10 @@ package com.feimeng.fdroid.config;
  * Created by feimeng on 2017/2/27.
  */
 public class FDConfig {
+    public static boolean DEBUG = false;// 激活debug模式(异常处理器)
+
+    public static String SP_NAME = "fdroid";// SharedPreferences文件名
+
     public static boolean SHOW_HTTP_LOG = false;
     public static boolean SHOW_TOAST = true;
     public static boolean SHOW_LOG = true;
@@ -14,7 +18,6 @@ public class FDConfig {
     public static short READ_TIMEOUT = 20;// 读取超时时间 单位：秒
 
     public static boolean SHOW_HTTP_EXCEPTION_INFO = false;// 是否显示HTTP异常信息
-    public static String SP_NAME = "fdroid";// SharedPreferences文件名
     public static String INFO_TIMEOUT_EXCEPTION = "连接超时";// 提示信息 连接超时
     public static String INFO_CONNECT_EXCEPTION = "连接错误";// 提示信息 连接错误
     public static String INFO_HTTP_EXCEPTION = "无响应";// 提示信息 响应错误

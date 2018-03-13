@@ -12,31 +12,35 @@ import com.feimeng.fdroid.utils.UE;
  * 全局Application
  * Created by feimeng on 2017/1/20.
  */
-public class FDApp extends Application {
+public abstract class FDApp extends Application {
+    private static FDApp sInstance;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        initCore();// 核心初始化
         config();
-        // 核心初始化
-        initCore();
     }
 
     /**
      * 配置
      */
-    protected void config() {
-
-    }
+    protected abstract void config();
 
     private void initCore() {
-        // 初始化Toast、Log、SharedPreferences
+        sInstance = this;
+        // 初始化 Toast、Log、SharedPreferences
         // Toast
-        if (FDConfig.SHOW_TOAST) T.init(true);
+        T.init(FDConfig.SHOW_TOAST);
         // Log
-        if (FDConfig.SHOW_LOG) L.init(true, L.V);
+        L.init(FDConfig.SHOW_LOG, L.V);
         // 增强用户体验效果工具
         UE.init(getApplicationContext());
         // 共享参数
         SP.init(getApplicationContext(), FDConfig.SP_NAME);
+    }
+
+    public static FDApp getInstance() {
+        return sInstance;
     }
 }
