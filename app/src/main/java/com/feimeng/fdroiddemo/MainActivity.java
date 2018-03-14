@@ -3,6 +3,7 @@ package com.feimeng.fdroiddemo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -12,12 +13,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         findViewById(R.id.crash).setOnClickListener(this);
     }
-
+    TextView a;
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.crash:
-                throw new RuntimeException("自定义异常：这是自己抛出的异常");
+               a.setText("");
         }
     }
 }

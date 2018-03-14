@@ -13,6 +13,11 @@ import com.feimeng.fdroid.utils.L;
  */
 public class BaseApp extends FDApp {
     @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
         L.d("Application启动" + Math.random());
@@ -22,7 +27,7 @@ public class BaseApp extends FDApp {
             @Override
             public void uncaughtException(CrashHandler crashHandler, Context context, Thread thread, Throwable exception) {
                 L.d("我不让你蹦！");
-                crashHandler.restartActivity(new Intent(context, CrashActivity.class).putExtra("feimeng", "lalala"));
+                crashHandler.restartActivity(new Intent(context, CrashActivity.class).putExtra("feimeng", "ok"));
             }
         });
     }

@@ -4,6 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.feimeng.fdroid.base.FDApp;
+
 public class CrashActivity extends AppCompatActivity {
 
     @Override
@@ -11,6 +13,6 @@ public class CrashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crash);
         String lalala = getIntent().getStringExtra("feimeng");
-        Toast.makeText(this, lalala, Toast.LENGTH_LONG).show();
+        Toast.makeText(FDApp.getInstance().getApplicationContext(), lalala, Toast.LENGTH_LONG).show();
     }
 }
