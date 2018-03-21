@@ -56,7 +56,8 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     public void onResume() {
         super.onResume();
         if (getUserVisibleHint()) {
-            setUserVisibleHint(true);
+            onVisible(false);
+//            setUserVisibleHint(true);
         }
     }
 
@@ -64,12 +65,13 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     public void onPause() {
         super.onPause();
         if (getUserVisibleHint()) {
-            setUserVisibleHint(false);
+            onInvisible();
+//            setUserVisibleHint(false);
         }
     }
 
+    @Override
     public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
         setUserVisibleHint(!hidden);
     }
 
