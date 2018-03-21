@@ -89,6 +89,10 @@ public abstract class FDPresenter<V extends FDView> {
     /**
      * 显示对话框
      */
+    public void showDialog() {
+        showDialog("拼命加载中...");
+    }
+
     public void showDialog(String message) {
         if (mView == null) return;
         if (mView instanceof FDActivity)

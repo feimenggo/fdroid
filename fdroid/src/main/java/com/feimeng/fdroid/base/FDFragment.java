@@ -55,9 +55,9 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     @Override
     public void onResume() {
         super.onResume();
-        if (getUserVisibleHint()) {
-            setUserVisibleHint(true);
-        }
+//        if (getUserVisibleHint()) {
+        setUserVisibleHint(true);
+//        }
     }
 
     @Override
