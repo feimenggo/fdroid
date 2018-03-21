@@ -56,7 +56,12 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     public void onResume() {
         super.onResume();
         if (getUserVisibleHint()) {
-            onVisible(false);
+            if (mVisibleFlag == 1) {
+                onVisible(true);
+                mVisibleFlag = 2;
+            } else {
+                onVisible(false);
+            }
 //            setUserVisibleHint(true);
         }
     }
