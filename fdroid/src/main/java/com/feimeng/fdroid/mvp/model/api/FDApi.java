@@ -265,33 +265,34 @@ public class FDApi {
 
             @Override
             public void onError(Throwable e) {
-                if (e == null) return;
-                if (e instanceof APIException) {
-                    APIException exception = (APIException) e;
-                    ApiError error;
-                    switch (exception.code) {
-                        case JSON_EMPTY:
-                            error = ApiError.CLIENT;
-                            break;
-                        default:
-                            error = ApiError.ACTION;
+                if (e != null) {
+                    if (e instanceof APIException) {
+                        APIException exception = (APIException) e;
+                        ApiError error;
+                        switch (exception.code) {
+                            case JSON_EMPTY:
+                                error = ApiError.CLIENT;
+                                break;
+                            default:
+                                error = ApiError.ACTION;
+                        }
+                        fdApiFinish.fail(error, exception.message);
+                    } else if (e instanceof SocketTimeoutException) {
+                        fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_TIMEOUT_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                    } else if (e instanceof ConnectException) {
+                        fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_CONNECT_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                    } else if (e instanceof HttpException) {
+                        fdApiFinish.fail(ApiError.SERVER, FDConfig.INFO_HTTP_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                    } else if (e instanceof JsonSyntaxException) {
+                        fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_JSON_SYNTAX_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                    } else if (e instanceof MalformedJsonException) {
+                        fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_MALFORMED_JSON_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                    } else if (e instanceof EOFException) {
+                        fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_EOF_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                    } else {
+                        fdApiFinish.fail(ApiError.UNKNOWN, FDConfig.INFO_UNKNOWN_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                        e.printStackTrace();
                     }
-                    fdApiFinish.fail(error, exception.message);
-                } else if (e instanceof SocketTimeoutException) {
-                    fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_TIMEOUT_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
-                } else if (e instanceof ConnectException) {
-                    fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_CONNECT_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
-                } else if (e instanceof HttpException) {
-                    fdApiFinish.fail(ApiError.SERVER, FDConfig.INFO_HTTP_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
-                } else if (e instanceof JsonSyntaxException) {
-                    fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_JSON_SYNTAX_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
-                } else if (e instanceof MalformedJsonException) {
-                    fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_MALFORMED_JSON_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
-                } else if (e instanceof EOFException) {
-                    fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_EOF_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
-                } else {
-                    fdApiFinish.fail(ApiError.UNKNOWN, FDConfig.INFO_UNKNOWN_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
-                    e.printStackTrace();
                 }
                 fdApiFinish.stop();
             }
