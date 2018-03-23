@@ -130,22 +130,22 @@ public abstract class FDPresenter<V extends FDView> {
         /**
          * 网络不可用
          *
-         * @param alisa 调用别名
+         * @param data 可传递的数据
          */
-        void withoutNetwork(String alisa);
+        void withoutNetwork(Object data);
     }
 
     public <T> Observable<T> withNet(Observable<T> task) {
-        return withNet(null, task);
+        return withNet(task, null);
     }
 
-    public <T> Observable<T> withNet(final String alisa, Observable<T> task) {
+    public <T> Observable<T> withNet(Observable<T> task, final Object data) {
         final Observable<T> checkNet = Observable.create(new Observable.OnSubscribe<T>() {
             @Override
             public void call(Subscriber<? super T> subscriber) {
                 if (!NetworkUtil.isConnectingToInternet(getContext())) {
                     if (isActive() && mView instanceof OnWithoutNetwork) {
-                        ((OnWithoutNetwork) mView).withoutNetwork(alisa);
+                        ((OnWithoutNetwork) mView).withoutNetwork(data);
                     }
                     subscriber.onError(null);
                     return;
@@ -157,11 +157,15 @@ public abstract class FDPresenter<V extends FDView> {
     }
 
     public <T> Observable<T> withNet(Observable<T> task, final OnWithoutNetwork network) {
+        return withNet(task, network, null);
+    }
+
+    public <T> Observable<T> withNet(Observable<T> task, final OnWithoutNetwork network, final Object data) {
         final Observable<T> checkNet = Observable.create(new Observable.OnSubscribe<T>() {
             @Override
             public void call(Subscriber<? super T> subscriber) {
                 if (!NetworkUtil.isConnectingToInternet(getContext())) {
-                    if (network != null) network.withoutNetwork(null);
+                    if (network != null) network.withoutNetwork(data);
                     subscriber.onError(null);
                     return;
                 }
