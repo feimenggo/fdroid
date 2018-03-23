@@ -136,7 +136,7 @@ public abstract class FDPresenter<V extends FDView> {
     }
 
     public <T> Observable<T> withNet(Observable<T> task) {
-        return withNet(task, null);
+        return withNet(task, false);
     }
 
     public <T> Observable<T> withNet(Observable<T> task, final Object data) {
