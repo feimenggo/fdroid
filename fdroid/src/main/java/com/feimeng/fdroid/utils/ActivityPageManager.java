@@ -14,6 +14,7 @@ import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import com.feimeng.fdroid.base.FDActivity;
 
@@ -152,7 +153,12 @@ public class ActivityPageManager {
         // supports the methods)
         try {
             if (view instanceof AdapterView) {
-                ((AdapterView) view).setOnItemClickListener(null);
+                if (view instanceof Spinner) {
+                    // 如果是Spinner则使用这个方法，否则会保异常：java.lang.RuntimeException: setOnItemClickListener cannot be used with a spinner.
+                    ((AdapterView) view).setOnItemSelectedListener(null);
+                } else {
+                    ((AdapterView) view).setOnItemClickListener(null);
+                }
             } else {
                 view.setOnClickListener(null);
             }

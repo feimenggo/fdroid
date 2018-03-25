@@ -122,6 +122,14 @@ public abstract class FDPresenter<V extends FDView> {
     /**
      * 指定在哪个生命周期方法调用时取消订阅
      */
+    public <T> Observable<T> lifecycle(@NonNull Observable<T> observable, @NonNull ActivityEvent event) {
+        return observable.compose(getActivity().<T>bindUntilEvent(event));
+    }
+
+    /**
+     * 指定在哪个生命周期方法调用时取消订阅，已过时 请使用  lifecycle(Observable<T> observable, ActivityEvent event)
+     */
+    @Deprecated
     public <T> Observable<T> untilEvent(@NonNull Observable<T> observable, @NonNull ActivityEvent event) {
         return observable.compose(getActivity().<T>bindUntilEvent(event));
     }
