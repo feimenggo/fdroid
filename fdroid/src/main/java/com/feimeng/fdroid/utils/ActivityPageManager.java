@@ -183,7 +183,7 @@ public class ActivityPageManager {
                 d.setCallback(null);
             }
             imageView.setImageDrawable(null);
-            imageView.setBackgroundDrawable(null);
+//            imageView.setBackgroundDrawable(null);
         }
 
         // destroy WebView

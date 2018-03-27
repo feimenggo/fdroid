@@ -110,7 +110,6 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
         ActivityPageManager.getInstance().finishAllActivity();
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -119,8 +118,8 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
         if (mPresenter != null) mPresenter.detach();
         else
             mPresenter = null;
+//        ActivityPageManager.unbindReferences(mContentView);
         // 移除Activity管理
-        ActivityPageManager.unbindReferences(mContentView);
         ActivityPageManager.getInstance().removeActivity(this);
         // 内容布局置空
         mContentView = null;
