@@ -76,7 +76,7 @@ public class FDApi {
     }
 
     /**
-     * 添加模拟数据
+     * 添加模拟数据 必须在getRetrofit()方法前调用
      *
      * @param api  拦截的API
      * @param data 返回的数据
@@ -136,7 +136,7 @@ public class FDApi {
      * 自定义异常，当接口返回的{@link FDResponse#isSuccess()}为false时，需要抛出此异常
      * eg：请求参数不全、用户令牌错误等
      */
-    public class APIException extends Exception {
+    public static class APIException extends Exception {
         static final int JSON_EMPTY = 90;
         int code;
         String message;
@@ -276,7 +276,8 @@ public class FDApi {
                             default:
                                 error = ApiError.ACTION;
                         }
-                        fdApiFinish.fail(error, exception.message);
+                        if (fdApiFinish.apiFail((APIException) e))
+                            fdApiFinish.fail(error, exception.message);
                     } else if (e instanceof SocketTimeoutException) {
                         fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_TIMEOUT_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
                     } else if (e instanceof ConnectException) {
