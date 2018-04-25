@@ -21,64 +21,6 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
      * 对话框
      */
     private Dialog mLoading;
-    private byte mVisibleFlag;// 可见标志
-
-    /**
-     * 实现用户是否可见回调
-     */
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (mVisibleFlag == 0) return;
-        if (isVisibleToUser && isResumed()) {
-            onVisible(mVisibleFlag == 1);
-            mVisibleFlag = 2;
-        } else if (!isVisibleToUser) {
-            onInvisible();
-        }
-    }
-
-    /**
-     * 用户可见
-     *
-     * @param isFirstVisible 是否是首次可见
-     */
-    public void onVisible(boolean isFirstVisible) {
-    }
-
-    /**
-     * 用户不可见
-     */
-    public void onInvisible() {
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (getUserVisibleHint()) {
-            if (mVisibleFlag == 1) {
-                onVisible(true);
-                mVisibleFlag = 2;
-            } else {
-                onVisible(false);
-            }
-//            setUserVisibleHint(true);
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (getUserVisibleHint()) {
-            onInvisible();
-//            setUserVisibleHint(false);
-        }
-    }
-
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        setUserVisibleHint(!hidden);
-    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -93,7 +35,6 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mVisibleFlag = 1;
         if (mPresenter != null && mPresenter.isActive()) mPresenter.init();
     }
 
@@ -113,13 +54,15 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
         return new FDialog(getActivity(), message);
     }
 
+    public void showLoadingDialog() {
+        showLoadingDialog("");
+    }
+
     /**
      * 显示对话框
      */
     public void showLoadingDialog(String message) {
-        if (mLoading == null) {
-            mLoading = drawDialog(message);
-        }
+        if (mLoading == null) mLoading = drawDialog(message);
         mLoading.show();
     }
 
@@ -138,8 +81,9 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
         super.onDestroy();
         hideLoadingDialog();
         // 解绑控制器
-        if (mPresenter != null) mPresenter.detach();
-        else
+        if (mPresenter != null) {
+            mPresenter.detach();
             mPresenter = null;
+        }
     }
 }

@@ -11,8 +11,6 @@ public interface FDApiFinish<T> {
 
     void success(T data);
 
-    void fail(ApiError error, String info);
-
     /**
      * 接口返回异常
      *
@@ -20,6 +18,8 @@ public interface FDApiFinish<T> {
      * @return 是否继续调用fail(ApiError error, String info)
      */
     boolean apiFail(FDApi.APIException exception);
+
+    void fail(ApiError error, String info);
 
     void stop();
 }
