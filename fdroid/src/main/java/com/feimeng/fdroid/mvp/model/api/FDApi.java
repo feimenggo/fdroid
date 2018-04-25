@@ -10,6 +10,7 @@ import com.feimeng.fdroid.mvp.model.api.bean.FDResponse;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.interceptor.HeaderInterceptor;
 import com.feimeng.fdroid.utils.interceptor.MockInterceptor;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.MalformedJsonException;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -104,6 +106,10 @@ public class FDApi {
             }
         }
         return body.build();
+    }
+
+    public RequestBody json(Object requestObj) {
+        return RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), new Gson().toJson(requestObj));
     }
 
     protected OkHttpClient getOkHttpClient() {

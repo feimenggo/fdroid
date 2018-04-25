@@ -34,9 +34,16 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         if (rootView == null) rootView = inflater.inflate(getLayoutRes(), container, false);
-//        if (rootView.getParent() != null) ((ViewGroup) rootView.getParent()).removeView(rootView);
-        initView(rootView, savedInstanceState);
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (!isViewCreated) {
+            isViewCreated = true;
+            initView(view, savedInstanceState);
+        }
     }
 
     @Override
@@ -57,7 +64,6 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        isViewCreated = true;
         // !isHidden() 默认为 true  在调用 hide show 的时候可以使用
         if (!isHidden() && getUserVisibleHint()) {
             // 这里的限制只能限制 A - > B 两层嵌套
