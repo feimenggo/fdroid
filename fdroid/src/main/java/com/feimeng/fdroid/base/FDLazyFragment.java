@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.feimeng.fdroid.mvp.base.FDPresenter;
 import com.feimeng.fdroid.mvp.base.FDView;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -25,16 +26,26 @@ import java.util.List;
  * https://blog.csdn.net/learningcoding/article/details/80044942
  */
 public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>> extends FDFragment<V, P> {
-    protected View rootView = null;
+    protected WeakReference<View> mRootView;
     private boolean mIsFirstVisible = true;
     private boolean isViewCreated = false;
     private boolean currentVisibleState = false;
 
+    public View getRootView() {
+        return mRootView.get();
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        if (rootView == null) rootView = inflater.inflate(getLayoutRes(), container, false);
-        return rootView;
+        if (mRootView == null || mRootView.get() == null) {
+            mRootView = new WeakReference<>(inflater.inflate(getLayoutRes(), container, false));
+        } else {
+            //缓存的rootView需要判断是否已经被加过parent， 如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
+            ViewGroup parent = (ViewGroup) getRootView().getParent();
+            if (parent != null) parent.removeView(mRootView.get());
+        }
+        return mRootView.get();
     }
 
     @Override
