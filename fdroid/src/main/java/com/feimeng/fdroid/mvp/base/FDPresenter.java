@@ -8,6 +8,7 @@ import com.feimeng.fdroid.base.FDFragment;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.NetworkUtil;
 import com.trello.rxlifecycle.android.ActivityEvent;
+import com.trello.rxlifecycle.android.FragmentEvent;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -116,22 +117,31 @@ public abstract class FDPresenter<V extends FDView> {
      * 保持与当前Activity生命周期同步，从而实现当前组件生命周期结束时，自动取消对Observable订阅
      */
     public <T> Observable<T> lifecycle(@NonNull Observable<T> observable) {
-        return observable.compose(getActivity().<T>bindToLifecycle());
+        if (mView == null) return observable;
+        if (mView instanceof FDFragment) {
+            return observable.compose(((FDFragment) mView).<T>bindToLifecycle());
+        }
+        return observable.compose(((FDActivity) mView).<T>bindToLifecycle());
     }
 
     /**
-     * 指定在哪个生命周期方法调用时取消订阅
+     * 指定在哪个生命周期方法调用时取消订阅 Activity
      */
     public <T> Observable<T> lifecycle(@NonNull Observable<T> observable, @NonNull ActivityEvent event) {
-        return observable.compose(getActivity().<T>bindUntilEvent(event));
+        if (mView != null && mView instanceof FDActivity) {
+            return observable.compose(((FDActivity) mView).<T>bindUntilEvent(event));
+        }
+        return observable;
     }
 
     /**
-     * 指定在哪个生命周期方法调用时取消订阅，已过时 请使用  lifecycle(Observable<T> observable, ActivityEvent event)
+     * 指定在哪个生命周期方法调用时取消订阅 Fragment
      */
-    @Deprecated
-    public <T> Observable<T> untilEvent(@NonNull Observable<T> observable, @NonNull ActivityEvent event) {
-        return observable.compose(getActivity().<T>bindUntilEvent(event));
+    public <T> Observable<T> lifecycle(@NonNull Observable<T> observable, @NonNull FragmentEvent event) {
+        if (mView != null && mView instanceof FDFragment) {
+            return observable.compose(((FDFragment) mView).<T>bindUntilEvent(event));
+        }
+        return observable;
     }
 
     public interface OnWithoutNetwork {
