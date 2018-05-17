@@ -2,7 +2,7 @@
 >优雅的Android MVP敏捷开发框架 ———— FDroid
 -------
 ## 特性
-- [x] `网络请求`：基于RxJava+Retrofit+Gson+FDroid的封装，支持对网络请求结果的统一处理、请求结果回调到UI线程、自动判断网络连接状态、自动管理生命周	期、模拟后台返回数据、自定义请求头、请求响应日志打印、每个阶段都可扩展等。
+- [x] `网络请求`：基于RxJava+Retrofit+Gson+FDroid的封装，支持对网络请求结果的统一处理、请求结果回调到UI线程、自动判断网络连接状态、自动管理生命周期、模拟后台返回数据、自定义请求头、请求响应日志打印、每个阶段都可扩展等。
 - [x] `MVP模式`：利用泛型深度解耦，为项目省掉一半代码；您不需要知道MVP实现细节，轻松使用MVP进行项目开发；
 - [x] `模板开发`：无需编写MVP的各层代码，利用Android Studio Template一键生成具有View+Contract+Presenter的Activity。模板下载：FDActivity
 - [x] `强大的控制层`：进行网络请求时，自动显隐等待对话框；使用FastTask类轻松进行耗时操作，自动回调到UI线程；
@@ -25,7 +25,7 @@ allprojects {
 ```groovy
 dependencies {
   //...
-  compile 'com.github.feimenggo:fdroid:1.0.4'
+  compile 'com.github.feimenggo:fdroid:2.3.1'
 }
 ```
 #### Step 3.自定义Application继承FDApp.java
@@ -104,7 +104,7 @@ public class TestActivity extends FDActivity<TestContract.View, TestContract.Pre
 ##### 接下来，你的任务有自定义FDApi编写网络请求、学习使用L/T/SP工具类、全局对话框的使用等等。教程正在制作。。。
 
 ## 一键生成MVP模板
-### FDActivity模板：点我下载
+### FDActivity模板：位于download目录
 #### Android Studio Template的使用，请自行度娘哦。
 ## License
 
