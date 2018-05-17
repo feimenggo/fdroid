@@ -69,18 +69,22 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
      * @return Dialog 对话框
      */
     protected Dialog drawDialog(String message) {
-        return new FDialog(this, message);
+        return new FDialog(this, message == null ? "" : message);
+    }
+
+    /**
+     * 显示对话框
+     */
+    public void showLoadingDialog() {
+        showLoadingDialog(null);
     }
 
     /**
      * 显示对话框
      */
     public void showLoadingDialog(String message) {
-        if (mLoading == null) {
-            mLoading = drawDialog(message);
-        }
-        if (!mLoading.isShowing())
-            mLoading.show();
+        if (mLoading == null) mLoading = drawDialog(message);
+        if (!mLoading.isShowing()) mLoading.show();
     }
 
     /**
@@ -115,9 +119,11 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
         super.onDestroy();
         hideLoadingDialog();
         // 解绑控制器
-        if (mPresenter != null) mPresenter.detach();
-        else
+        if (mPresenter != null) {
+            mPresenter.detach();
+        } else {
             mPresenter = null;
+        }
 //        ActivityPageManager.unbindReferences(mContentView);
         // 移除Activity管理
         ActivityPageManager.getInstance().removeActivity(this);

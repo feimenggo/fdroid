@@ -48,6 +48,16 @@ public class UE {
         return judgeResult.status;
     }
 
+    public boolean inputToast(EditText view, OnJudge judge) {
+        JudgeResult judgeResult = judge.condition(view.getText().toString());
+        if (!judgeResult.status) {
+            view.requestFocus();
+            view.startAnimation(mShakeAnim);
+            T.showS(view.getContext(), judgeResult.message);
+        }
+        return judgeResult.status;
+    }
+
     public interface OnJudge {
         JudgeResult condition(String content);
     }

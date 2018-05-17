@@ -51,11 +51,11 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
      * @return Dialog 对话框
      */
     protected Dialog drawDialog(String message) {
-        return new FDialog(getActivity(), message);
+        return new FDialog(getActivity(), message == null ? "" : message);
     }
 
     public void showLoadingDialog() {
-        showLoadingDialog("");
+        showLoadingDialog(null);
     }
 
     /**

@@ -9,7 +9,6 @@ import android.os.Environment;
 import android.os.Process;
 
 import com.feimeng.fdroid.base.FDApp;
-import com.feimeng.fdroid.config.FDConfig;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -106,10 +105,8 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     private void dumpExceptionToSDCard(Throwable exception) throws Exception {
         // 如果SD卡不存在或无法使用，则无法把异常信息写入SD卡
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            if (FDConfig.DEBUG) {
-                L.w(TAG, "sdcard unmounted,skip dump exception");
-                return;
-            }
+            L.w(TAG, "sdcard unmounted,skip dump exception");
+            return;
         }
         File dir = new File(path);
         if (!dir.exists()) {

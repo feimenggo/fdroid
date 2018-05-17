@@ -41,7 +41,7 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
         if (mRootView == null || mRootView.get() == null) {
             mRootView = new WeakReference<>(inflater.inflate(getLayoutRes(), container, false));
         } else {
-            //缓存的rootView需要判断是否已经被加过parent， 如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
+            // 缓存的rootView需要判断是否已经被加过parent， 如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
             ViewGroup parent = (ViewGroup) getRootView().getParent();
             if (parent != null) parent.removeView(mRootView.get());
         }
@@ -131,6 +131,7 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
         if (visible && isParentInvisible()) return;
 //        //此处是对子 Fragment 不可见的限制，因为 子 Fragment 先于父 Fragment回调本方法 currentVisibleState 置位 false
 //        // 当父 dispatchChildVisibleState 的时候第二次回调本方法 visible = false 所以此处 visible 将直接返回
+        if (!isViewCreated) return;
         if (currentVisibleState == visible) {
             return;
         }
@@ -191,6 +192,12 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (getView() != null) {
+            ViewGroup parent = (ViewGroup) getView().getParent();
+            if (parent != null) {
+                parent.removeView(getView());
+            }
+        }
         isViewCreated = false;
         mIsFirstVisible = true;
     }
