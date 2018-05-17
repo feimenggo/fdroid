@@ -12,7 +12,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.content.FileProvider;
 
-import com.feimeng.fdroid.R;
 import com.feimeng.fdroid.base.FDActivity;
 import com.feimeng.fdroid.utils.SP;
 
@@ -90,7 +89,7 @@ public class VersionUpgradeManager {
     public boolean upgrade(Context context, String apkName, String apkUrl) {
         if (mRunning) return true;
         if (mVersionInfo == null) {
-            mVersionInfo = new VersionInfo(context.getString(R.string.app_name) + "·新版本", "新功能", null);
+            mVersionInfo = new VersionInfo(context.getResources().getIdentifier("app_name", "string", context.getPackageName()) + "·新版本", "新功能", null);
         }
         mVersionInfo.setApkInfo(apkName, apkUrl);
         // 判断APK文件是否已下载
