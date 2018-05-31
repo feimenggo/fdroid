@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * SharedPreferences 工具类
@@ -40,8 +41,8 @@ public class SP {
             editor.putFloat(key, (Float) object);
         } else if (object instanceof Long) {
             editor.putLong(key, (Long) object);
-        } else {
-            editor.putString(key, object.toString());
+        } else if (object instanceof Set) {
+            editor.putStringSet(key, (Set<String>) object);
         }
         return SharedPreferencesCompat.apply(editor);
     }
@@ -64,6 +65,8 @@ public class SP {
             return sp.getFloat(key, (Float) defaultObject);
         } else if (defaultObject instanceof Long) {
             return sp.getLong(key, (Long) defaultObject);
+        } else if (defaultObject instanceof Set) {
+            return sp.getStringSet(key, (Set<String>) defaultObject);
         } else {
             return null;
         }
@@ -154,6 +157,10 @@ public class SP {
      */
     public static SharedPreferences.Editor getEdit() {
         return sp.edit();
+    }
+
+    public static SharedPreferences getSP() {
+        return sp;
     }
 
     /**

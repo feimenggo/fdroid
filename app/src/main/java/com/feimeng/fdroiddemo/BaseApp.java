@@ -3,7 +3,6 @@ package com.feimeng.fdroiddemo;
 import android.content.Context;
 
 import com.feimeng.fdroid.base.FDApp;
-import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.utils.L;
 
 /**
@@ -32,6 +31,5 @@ public class BaseApp extends FDApp {
 
     @Override
     protected void config() {
-        FDConfig.DEBUG = true;
     }
 }

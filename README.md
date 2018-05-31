@@ -25,7 +25,7 @@ allprojects {
 ```groovy
 dependencies {
   //...
-  compile 'com.github.feimenggo:fdroid:2.3.3'
+  compile 'com.github.feimenggo:fdroid:2.3.4'
 }
 ```
 #### Step 3.自定义Application继承FDApp.java

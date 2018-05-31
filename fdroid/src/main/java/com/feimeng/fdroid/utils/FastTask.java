@@ -12,6 +12,16 @@ import rx.schedulers.Schedulers;
  * Created by feimeng on 2017/6/10.
  */
 public abstract class FastTask<T> {
+    public Observable<T> fast() {
+        return Observable.create(new Observable.OnSubscribe<T>() {
+            @Override
+            public void call(Subscriber<? super T> subscriber) {
+                subscriber.onNext(task());
+                subscriber.onCompleted();
+            }
+        });
+    }
+
     public Subscription runCalc() {
         return Observable.create(new Observable.OnSubscribe<T>() {
             @Override
@@ -100,24 +110,24 @@ public abstract class FastTask<T> {
         /**
          * 任务开始
          */
-        void start() {
+        public void start() {
 
         }
 
         /**
          * 任务执行成功
          */
-        abstract void success(R data);
+        public abstract void success(R data);
 
         /**
          * 任务执行失败
          */
-        abstract void fail(Throwable throwable);
+        public abstract void fail(Throwable throwable);
 
         /**
          * 任务结束
          */
-        void stop() {
+        public void stop() {
 
         }
     }
