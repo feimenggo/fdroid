@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.feimeng.fdroid.config.FDConfig;
-import com.feimeng.fdroid.mvp.model.api.bean.ApiError;
 import com.feimeng.fdroid.mvp.model.api.bean.FDApiFinish;
 import com.feimeng.fdroid.mvp.model.api.bean.FDResponse;
 import com.feimeng.fdroid.utils.L;
@@ -221,7 +220,7 @@ public class FDApi {
     }
 
     /**
-     * 在IO线程中执行
+     * 在子线程中执行，主线程中回调
      */
     protected <T> Observable.Transformer<FDResponse<T>, T> applySchedulers() {
         return new Observable.Transformer<FDResponse<T>, T>() {
@@ -240,7 +239,25 @@ public class FDApi {
     }
 
     /**
-     * 在调用线程中执行
+     * 在子线程中执行并回调
+     */
+    protected <T> Observable.Transformer<FDResponse<T>, T> applySchedulersNew() {
+        return new Observable.Transformer<FDResponse<T>, T>() {
+            @Override
+            public Observable<T> call(Observable<FDResponse<T>> responseObservable) {
+                return responseObservable.subscribeOn(Schedulers.io())
+                        .flatMap(new Func1<FDResponse<T>, Observable<T>>() {
+                            @Override
+                            public Observable<T> call(FDResponse<T> tResponse) {
+                                return flatResponse(tResponse);
+                            }
+                        });
+            }
+        };
+    }
+
+    /**
+     * 在调用线程中执行并回调
      */
     protected <T> Observable.Transformer<FDResponse<T>, T> applySchedulersFixed() {
         return new Observable.Transformer<FDResponse<T>, T>() {
@@ -272,34 +289,33 @@ public class FDApi {
             @Override
             public void onError(Throwable e) {
                 if (e != null) {
+                    String error;
                     if (e instanceof APIException) {
-                        APIException exception = (APIException) e;
-                        ApiError error;
-                        switch (exception.code) {
-                            case JSON_EMPTY:
-                                error = ApiError.CLIENT;
-                                break;
-                            default:
-                                error = ApiError.ACTION;
+                        if (!fdApiFinish.apiFail((APIException) e)) {
+                            fdApiFinish.stop();
+                            return;
                         }
-                        if (fdApiFinish.apiFail((APIException) e))
-                            fdApiFinish.fail(error, exception.message);
+                        error = FDConfig.INFO_API_EXCEPTION;
                     } else if (e instanceof SocketTimeoutException) {
-                        fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_TIMEOUT_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                        error = FDConfig.INFO_TIMEOUT_EXCEPTION;
                     } else if (e instanceof ConnectException) {
-                        fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_CONNECT_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                        error = FDConfig.INFO_CONNECT_EXCEPTION;
                     } else if (e instanceof HttpException) {
-                        fdApiFinish.fail(ApiError.SERVER, FDConfig.INFO_HTTP_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                        error = FDConfig.INFO_HTTP_EXCEPTION;
                     } else if (e instanceof JsonSyntaxException) {
-                        fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_JSON_SYNTAX_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                        error = FDConfig.INFO_JSON_SYNTAX_EXCEPTION;
                     } else if (e instanceof MalformedJsonException) {
-                        fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_MALFORMED_JSON_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                        error = FDConfig.INFO_MALFORMED_JSON_EXCEPTION;
                     } else if (e instanceof EOFException) {
-                        fdApiFinish.fail(ApiError.CLIENT, FDConfig.INFO_EOF_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                        error = FDConfig.INFO_EOF_EXCEPTION;
                     } else {
-                        fdApiFinish.fail(ApiError.UNKNOWN, FDConfig.INFO_UNKNOWN_EXCEPTION + (FDConfig.SHOW_HTTP_EXCEPTION_INFO ? e.getMessage() : ""));
+                        error = FDConfig.INFO_UNKNOWN_EXCEPTION;
+                    }
+                    if (FDConfig.SHOW_HTTP_EXCEPTION_INFO) {
+                        error += e.getMessage();
                         e.printStackTrace();
                     }
+                    fdApiFinish.fail(e, error);
                 }
                 fdApiFinish.stop();
             }

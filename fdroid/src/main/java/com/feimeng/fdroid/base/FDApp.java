@@ -18,8 +18,8 @@ public abstract class FDApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        initCore();// 核心初始化
         config();
+        initCore();// 核心初始化
     }
 
     /**
@@ -29,15 +29,14 @@ public abstract class FDApp extends Application {
 
     private void initCore() {
         sInstance = this;
-        // 初始化 Toast、Log、SharedPreferences
         // Toast
         T.init(FDConfig.SHOW_TOAST);
         // Log
         L.init(FDConfig.SHOW_LOG, L.V);
         // 增强用户体验效果工具
-        UE.init(getApplicationContext());
-        // 共享参数
-        SP.init(getApplicationContext(), FDConfig.SP_NAME);
+        UE.init(this);
+        // 共享参数 SharedPreferences
+        SP.init(this, FDConfig.SP_NAME);
     }
 
     public static FDApp getInstance() {

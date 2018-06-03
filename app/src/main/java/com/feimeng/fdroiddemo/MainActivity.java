@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
 
                     @Override
-                    public void fail(ApiError error, String info) {
+                    public void fail(Throwable error, String info) {
                         T.showS(getApplicationContext(), "登录出错");
                         L.d(TAG, info);
                     }

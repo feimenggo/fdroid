@@ -29,6 +29,7 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
      * 对话框
      */
     private Dialog mLoading;
+    private int mLoadTimes = 0; // 加载次数
 
     @SuppressWarnings("unchecked")
     @Override
@@ -82,7 +83,8 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
     /**
      * 显示对话框
      */
-    public void showLoadingDialog(String message) {
+    public synchronized void showLoadingDialog(String message) {
+        mLoadTimes++;
         if (mLoading == null) mLoading = drawDialog(message);
         if (!mLoading.isShowing()) mLoading.show();
     }
@@ -90,11 +92,9 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
     /**
      * 隐藏对话框
      */
-    public void hideLoadingDialog() {
-        if (mLoading != null && mLoading.isShowing()) {
-            mLoading.dismiss();
-            mLoading = null;
-        }
+    public synchronized void hideLoadingDialog() {
+        if (--mLoadTimes > 0) return;
+        if (mLoading != null && mLoading.isShowing()) mLoading.dismiss();
     }
 
 
@@ -117,7 +117,10 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        hideLoadingDialog();
+        if (mLoading != null && mLoading.isShowing()) {
+            mLoading.dismiss();
+            mLoading = null;
+        }
         // 解绑控制器
         if (mPresenter != null) {
             mPresenter.detach();

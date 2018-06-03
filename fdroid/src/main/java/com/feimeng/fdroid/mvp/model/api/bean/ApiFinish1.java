@@ -6,7 +6,7 @@ package com.feimeng.fdroid.mvp.model.api.bean;
  */
 public abstract class ApiFinish1<T> extends ApiFinish2<T> {
     @Override
-    public void fail(ApiError error, String info) {
+    public void fail(Throwable error, String info) {
 
     }
 }

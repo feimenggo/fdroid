@@ -19,7 +19,7 @@ public interface FDApiFinish<T> {
      */
     boolean apiFail(FDApi.APIException exception);
 
-    void fail(ApiError error, String info);
+    void fail(Throwable error, String info);
 
     void stop();
 }
