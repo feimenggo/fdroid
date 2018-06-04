@@ -295,7 +295,9 @@ public class FDApi {
                             fdApiFinish.stop();
                             return;
                         }
-                        error = FDConfig.INFO_API_EXCEPTION;
+                        fdApiFinish.fail(e, e.getMessage());
+                        fdApiFinish.stop();
+                        return;
                     } else if (e instanceof SocketTimeoutException) {
                         error = FDConfig.INFO_TIMEOUT_EXCEPTION;
                     } else if (e instanceof ConnectException) {
@@ -312,7 +314,7 @@ public class FDApi {
                         error = FDConfig.INFO_UNKNOWN_EXCEPTION;
                     }
                     if (FDConfig.SHOW_HTTP_EXCEPTION_INFO) {
-                        error += e.getMessage();
+                        error += " " + e.getMessage();
                         e.printStackTrace();
                     }
                     fdApiFinish.fail(e, error);
