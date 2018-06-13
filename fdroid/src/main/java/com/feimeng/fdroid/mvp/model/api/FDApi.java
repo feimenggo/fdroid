@@ -315,6 +315,7 @@ public class FDApi {
                         error = FDConfig.INFO_EOF_EXCEPTION;
                     } else if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
                         fdApiFinish.success(null);
+                        fdApiFinish.stop();
                         return;
                     } else {
                         error = FDConfig.INFO_UNKNOWN_EXCEPTION;
