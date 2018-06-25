@@ -30,6 +30,7 @@ import io.reactivex.ObservableTransformer;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.exceptions.CompositeException;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
@@ -293,6 +294,14 @@ public class FDApi {
             public void onError(Throwable e) {
                 if (e != null) {
                     String error;
+                    if (e instanceof CompositeException) {
+                        for (Throwable throwable : ((CompositeException) e).getExceptions()) {
+                            if (throwable instanceof APIException) {
+                                e = throwable;
+                                break;
+                            }
+                        }
+                    }
                     if (e instanceof APIException) {
                         if (!fdApiFinish.apiFail((APIException) e)) {
                             fdApiFinish.stop();

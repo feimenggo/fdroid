@@ -99,7 +99,11 @@ public abstract class FastTask<T> {
 
         @Override
         public void onError(Throwable e) {
-            fail(e);
+            if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
+                success(null);
+            } else {
+                fail(e);
+            }
             stop();
         }
 
