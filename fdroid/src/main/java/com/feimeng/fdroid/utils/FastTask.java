@@ -24,14 +24,13 @@ public abstract class FastTask<T> {
         });
     }
 
-    public Disposable runCalc() {
-        return Observable.create(new ObservableOnSubscribe<T>() {
+    public void runCalc() {
+        runCalc(new Result<T>() {
             @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
+            public void success(T truck) {
+
             }
-        }).subscribeOn(Schedulers.computation()).subscribe();
+        });
     }
 
     public Disposable runCalc(Consumer<T> consumer) {
@@ -54,14 +53,12 @@ public abstract class FastTask<T> {
         }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
-    public Disposable runIO() {
-        return Observable.create(new ObservableOnSubscribe<T>() {
+    public void runIO() {
+        runIO(new Result<T>() {
             @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
+            public void success(T data) {
             }
-        }).subscribeOn(Schedulers.io()).subscribe();
+        });
     }
 
     public Disposable runIO(Consumer<T> consumer) {
@@ -84,7 +81,7 @@ public abstract class FastTask<T> {
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
-    public abstract T task();
+    public abstract T task() throws Exception;
 
     public abstract static class Result<R> implements Observer<R> {
         @Override
@@ -122,7 +119,7 @@ public abstract class FastTask<T> {
         /**
          * 任务执行成功
          */
-        public abstract void success(R data);
+        public abstract void success(R truck);
 
         /**
          * 任务执行失败
@@ -135,6 +132,48 @@ public abstract class FastTask<T> {
          */
         public void stop() {
 
+        }
+    }
+
+    public static class Truck<T> {
+        private T data;
+
+        private Truck(T data) {
+            this.data = data;
+        }
+
+        public static <T> Truck<T> success(T data) {
+            return new Truck<>(data);
+        }
+
+        public static Exception fail(String error) throws Exception {
+            throw new Exception(error);
+        }
+
+        public T getData() {
+            return data;
+        }
+    }
+
+    public static class TruckX<T, X> extends Truck<T> {
+        private X dataExt;
+
+        private TruckX(T data, X dataExt) {
+            super(data);
+            this.dataExt = dataExt;
+        }
+
+        public static <T, X> TruckX<T, X> success(T data, X dataExt) {
+            return new TruckX<>(data, dataExt);
+        }
+
+        @Override
+        public T getData() {
+            return super.getData();
+        }
+
+        public X getDataExt() {
+            return dataExt;
         }
     }
 }
