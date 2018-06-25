@@ -135,45 +135,29 @@ public abstract class FastTask<T> {
         }
     }
 
-    public static class Truck<T> {
+    public static class Truck<T, X> {
         private T data;
+        private X dataExt;
 
-        private Truck(T data) {
+        private Truck(T data, X dataExt) {
             this.data = data;
+            this.dataExt = dataExt;
         }
 
-        public static <T> Truck<T> success(T data) {
-            return new Truck<>(data);
-        }
-
-        public static Exception fail(String error) throws Exception {
-            throw new Exception(error);
+        public static <T, X> Truck<T, X> success(T data, X dataExt) {
+            return new Truck<>(data, dataExt);
         }
 
         public T getData() {
             return data;
         }
-    }
-
-    public static class TruckX<T, X> extends Truck<T> {
-        private X dataExt;
-
-        private TruckX(T data, X dataExt) {
-            super(data);
-            this.dataExt = dataExt;
-        }
-
-        public static <T, X> TruckX<T, X> success(T data, X dataExt) {
-            return new TruckX<>(data, dataExt);
-        }
-
-        @Override
-        public T getData() {
-            return super.getData();
-        }
 
         public X getDataExt() {
             return dataExt;
         }
+    }
+
+    public static Exception error(String error) throws Exception {
+        throw new Exception(error);
     }
 }
