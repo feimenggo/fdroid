@@ -15,12 +15,10 @@ public class JsonRequestBody {
     private static JsonRequestBody mInstance;
     private ThreadLocal<Map<String, Object>> mThreadLocal;
     private MediaType mJsonType;
-    private Gson mGson;
 
     private JsonRequestBody() {
         mThreadLocal = new ThreadLocal<>();
         mJsonType = MediaType.parse("application/json;charset=UTF-8");
-        mGson = new Gson();
     }
 
     public static JsonRequestBody getInstance() {
@@ -34,17 +32,22 @@ public class JsonRequestBody {
         return mInstance;
     }
 
-    public JsonRequestBody put(String key, Object value) {
+    public Map<String, Object> getMap() {
         Map<String, Object> map = mThreadLocal.get();
         if (map == null) {
             map = new HashMap<>();
             mThreadLocal.set(map);
+        } else {
+            map.clear();
         }
-        map.put(key, value);
-        return this;
+        return map;
     }
 
-    public RequestBody build() {
-        return RequestBody.create(mJsonType, mGson.toJson(mThreadLocal.get()));
+    public MediaType getJsonType() {
+        return mJsonType;
+    }
+
+    public RequestBody build(Gson gson) {
+        return RequestBody.create(mJsonType, gson.toJson(mThreadLocal.get()));
     }
 }

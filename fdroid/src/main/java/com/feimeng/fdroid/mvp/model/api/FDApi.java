@@ -33,7 +33,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.CompositeException;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -55,7 +54,16 @@ public class FDApi {
     private Map<String, String> mMockData;// 模拟请求
     private ResponseCodeInterceptorListener mResponseCodeInterceptorListener;
     private int[] mResponseCodes = new int[]{};
-    private static Retrofit retrofit;
+    private Retrofit retrofit;
+    private Gson mGson;
+
+    public FDApi() {
+        this(new Gson());
+    }
+
+    public FDApi(Gson gson) {
+        mGson = gson;
+    }
 
     protected Retrofit getRetrofit(String baseUrl) {
         if (retrofit == null) {
@@ -98,22 +106,31 @@ public class FDApi {
         return clientBuilder.build();
     }
 
-    protected RequestBody json(Object... params) {
+    public RequestBody json(Object... params) {
+        return json(mGson, params);
+    }
+
+    public RequestBody json(Gson gson, Object... params) {
         JsonRequestBody body = JsonRequestBody.getInstance();
+        Map<String, Object> map = body.getMap();
         String key = null;
         for (Object param : params) {
             if (key == null) {
                 key = (String) param;
             } else {
-                body.put(key, param);
+                map.put(key, param);
                 key = null;
             }
         }
-        return body.build();
+        return body.build(gson);
     }
 
     public RequestBody json(Object requestObj) {
-        return RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), new Gson().toJson(requestObj));
+        return json(mGson, requestObj);
+    }
+
+    public RequestBody json(Gson gson, Object requestObj) {
+        return RequestBody.create(JsonRequestBody.getInstance().getJsonType(), gson.toJson(requestObj));
     }
 
     protected OkHttpClient getOkHttpClient() {
@@ -147,7 +164,6 @@ public class FDApi {
      * eg：请求参数不全、用户令牌错误等
      */
     public static class APIException extends Exception {
-        static final int JSON_EMPTY = 90;
         int code;
         String message;
 
