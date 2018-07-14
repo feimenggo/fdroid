@@ -338,7 +338,7 @@ public class FDApi {
                         error = FDConfig.INFO_MALFORMED_JSON_EXCEPTION;
                     } else if (e instanceof EOFException) {
                         error = FDConfig.INFO_EOF_EXCEPTION;
-                    } else if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
+                    } else if (e instanceof NullPointerException && e.getMessage().contains("called with null")) {
                         fdApiFinish.success(null);
                         fdApiFinish.stop();
                         return;

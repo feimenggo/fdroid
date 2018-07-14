@@ -185,7 +185,7 @@ public abstract class FDPresenter<V extends FDView> {
             public void subscribe(ObservableEmitter<T> emitter) throws Exception {
                 if (!NetworkUtil.isConnectingToInternet(getContext())) {
                     if (network != null) network.withoutNetwork(data);
-                    emitter.onError(null);
+                    emitter.onError(new Exception("网络连接不可用"));
                     return;
                 }
                 emitter.onComplete();
