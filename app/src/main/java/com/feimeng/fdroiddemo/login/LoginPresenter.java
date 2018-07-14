@@ -1,16 +1,29 @@
 package com.feimeng.fdroiddemo.login;
 
-import com.feimeng.fdroid.utils.FastTask;
+import com.feimeng.fdroid.mvp.model.api.bean.ApiFinish2;
+import com.feimeng.fdroid.utils.T;
+import com.feimeng.fdroiddemo.api.ApiWrapper;
 
 public class LoginPresenter extends LoginContract.Presenter {
 
     @Override
     public void login() {
-        lifecycle(new FastTask<Void>() {
+        lifecycle(withNet(ApiWrapper.getInstance().login("10086", "123456"), new OnWithoutNetwork() {
             @Override
-            public Void task() {
-                return null;
+            public void withoutNetwork(Object data) {
+                T.showS(getContext(), "无网络连接");
             }
-        }.fast());
+        }))
+                .subscribe(ApiWrapper.subscriber(new ApiFinish2<Integer>() {
+                    @Override
+                    public void success(Integer data) {
+                        T.showS(getContext(), "登录成功");
+                    }
+
+                    @Override
+                    public void fail(Throwable error, String info) {
+                        T.showS(getContext(), "登录出错" + info);
+                    }
+                }));
     }
 }

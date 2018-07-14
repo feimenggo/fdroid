@@ -81,7 +81,7 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
     }
 
     /**
-     * 显示对话框
+     * 显示对话框 showLoadingDialog()和hideLoadingDialog()必须成对调用
      */
     public synchronized void showLoadingDialog(String message) {
         mLoadTimes++;

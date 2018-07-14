@@ -14,7 +14,7 @@ import retrofit2.http.POST;
  */
 public interface ApiService {
     @POST("user/login")
-    Observable<Response<Boolean>> login(@Body RequestBody requestBody);
+    Observable<Response<Integer>> login(@Body RequestBody requestBody);
 
     @POST("user/register")
     Observable<Response<Object>> register(@Body RequestBody requestBody);

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.feimeng.fdroid.base.FDActivity;
 import com.feimeng.fdroid.base.FDFragment;
+import com.feimeng.fdroid.mvp.model.api.WithoutNetworkException;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.NetworkUtil;
 import com.trello.rxlifecycle2.android.ActivityEvent;
@@ -166,7 +167,7 @@ public abstract class FDPresenter<V extends FDView> {
                     if (isActive() && mView instanceof OnWithoutNetwork) {
                         ((OnWithoutNetwork) mView).withoutNetwork(data);
                     }
-                    emitter.onError(null);
+                    emitter.onError(new WithoutNetworkException());
                     return;
                 }
                 emitter.onComplete();
@@ -185,7 +186,7 @@ public abstract class FDPresenter<V extends FDView> {
             public void subscribe(ObservableEmitter<T> emitter) throws Exception {
                 if (!NetworkUtil.isConnectingToInternet(getContext())) {
                     if (network != null) network.withoutNetwork(data);
-                    emitter.onError(new Exception("网络连接不可用"));
+                    emitter.onError(new WithoutNetworkException());
                     return;
                 }
                 emitter.onComplete();

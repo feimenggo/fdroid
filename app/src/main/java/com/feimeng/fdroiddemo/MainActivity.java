@@ -9,6 +9,7 @@ import com.feimeng.fdroid.mvp.model.api.bean.ApiFinish2;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroiddemo.api.ApiWrapper;
+import com.feimeng.fdroiddemo.login.LoginActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = MainActivity.class.getName();
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 a.setText("");
                 break;
             case R.id.login:
-                login();
+                LoginActivity.start(this);
                 break;
             case R.id.register:
                 register();
@@ -41,9 +42,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void login() {
         ApiWrapper.getInstance().login("10086", "123456")
-                .subscribe(ApiWrapper.subscriber(new ApiFinish2<Boolean>() {
+                .subscribe(ApiWrapper.subscriber(new ApiFinish2<Integer>() {
                     @Override
-                    public void success(Boolean data) {
+                    public void success(Integer data) {
                         T.showS(getApplicationContext(), "登录成功");
                         L.d(TAG, data);
                     }

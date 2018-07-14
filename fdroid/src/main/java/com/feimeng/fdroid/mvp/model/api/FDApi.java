@@ -326,6 +326,10 @@ public class FDApi {
                         fdApiFinish.fail(e, e.getMessage());
                         fdApiFinish.stop();
                         return;
+                    } else if (e instanceof WithoutNetworkException) {
+                        // 直接结束 会回调FDPresenter.OnWithoutNetwork.withoutNetwork()方法
+                        fdApiFinish.stop();
+                        return;
                     } else if (e instanceof SocketTimeoutException) {
                         error = FDConfig.INFO_TIMEOUT_EXCEPTION;
                     } else if (e instanceof ConnectException) {
@@ -338,7 +342,7 @@ public class FDApi {
                         error = FDConfig.INFO_MALFORMED_JSON_EXCEPTION;
                     } else if (e instanceof EOFException) {
                         error = FDConfig.INFO_EOF_EXCEPTION;
-                    } else if (e instanceof NullPointerException && e.getMessage().contains("called with null")) {
+                    } else if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
                         fdApiFinish.success(null);
                         fdApiFinish.stop();
                         return;
