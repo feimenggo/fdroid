@@ -14,21 +14,25 @@ import com.feimeng.fdroid.utils.UE;
  */
 public abstract class FDApp extends Application {
     private static FDApp sInstance;
+    private FDCoreThread mCoreThread = new FDCoreThread();
+
+    public static FDApp getInstance() {
+        return sInstance;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        config();
-        initCore();// 核心初始化
+        sInstance = this;
+        mCoreThread.start();
     }
 
     /**
-     * 配置
+     * 核心配置
      */
     protected abstract void config();
 
     private void initCore() {
-        sInstance = this;
         // Toast
         T.init(FDConfig.SHOW_TOAST);
         // Log
@@ -39,7 +43,28 @@ public abstract class FDApp extends Application {
         SP.init(this, FDConfig.SP_NAME);
     }
 
-    public static FDApp getInstance() {
-        return sInstance;
+    public FDCoreThread getCoreThread() {
+        return mCoreThread;
+    }
+
+    /**
+     * 等待核心线程执行完毕
+     */
+    public void waitCoreThread() {
+        if (getCoreThread().getState() != Thread.State.TERMINATED) {
+            try {
+                getCoreThread().join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class FDCoreThread extends Thread {
+        @Override
+        public void run() {
+            initCore();
+            config();
+        }
     }
 }
