@@ -24,13 +24,42 @@ public abstract class FDApp extends Application {
     public void onCreate() {
         super.onCreate();
         sInstance = this;
+        configBeforeCore();
         mCoreThread.start();
+        config();
     }
 
     /**
-     * 核心配置
+     * 配置 UI线程
      */
-    protected abstract void config();
+    protected void config() {
+
+    }
+
+    /**
+     * 配置 在Core执行之前 UI线程
+     */
+    protected void configBeforeCore() {
+
+    }
+
+    /**
+     * 配置 子线程
+     */
+    protected abstract void configAsync();
+
+    /**
+     * 等待核心线程执行完毕
+     */
+    public void waitCoreThread() {
+        try {
+            if (mCoreThread.getState() != Thread.State.TERMINATED) {
+                mCoreThread.join();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void initCore() {
         // Toast
@@ -43,28 +72,11 @@ public abstract class FDApp extends Application {
         SP.init(this, FDConfig.SP_NAME);
     }
 
-    public FDCoreThread getCoreThread() {
-        return mCoreThread;
-    }
-
-    /**
-     * 等待核心线程执行完毕
-     */
-    public void waitCoreThread() {
-        if (getCoreThread().getState() != Thread.State.TERMINATED) {
-            try {
-                getCoreThread().join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private class FDCoreThread extends Thread {
         @Override
         public void run() {
             initCore();
-            config();
+            configAsync();
         }
     }
 }
