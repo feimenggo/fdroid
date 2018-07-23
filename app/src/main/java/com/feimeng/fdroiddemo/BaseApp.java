@@ -36,4 +36,9 @@ public class BaseApp extends FDApp {
         FDConfig.SHOW_HTTP_LOG = true;
         FDConfig.SHOW_HTTP_EXCEPTION_INFO = true;
     }
+
+    @Override
+    protected void configAsync() {
+
+    }
 }

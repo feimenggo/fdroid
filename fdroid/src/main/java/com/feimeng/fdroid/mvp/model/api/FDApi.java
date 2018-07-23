@@ -311,10 +311,13 @@ public class FDApi {
                 if (e != null) {
                     String error;
                     if (e instanceof CompositeException) {
-                        for (Throwable throwable : ((CompositeException) e).getExceptions()) {
-                            if (throwable instanceof APIException) {
-                                e = throwable;
-                                break;
+                        List<Throwable> exceptions = ((CompositeException) e).getExceptions();
+                        if (exceptions.size() == 2) {
+                            for (Throwable throwable : exceptions) {
+                                if (!throwable.getClass().getName().contains("RxCacheException")) {
+                                    e = throwable;
+                                    break;
+                                }
                             }
                         }
                     }

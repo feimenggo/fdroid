@@ -29,6 +29,7 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
      * 对话框
      */
     private Dialog mLoading;
+    private boolean mStarted;
     private int mLoadTimes = 0; // 加载次数
 
     @SuppressWarnings("unchecked")
@@ -112,6 +113,22 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
      */
     public static void finishAll() {
         ActivityPageManager.getInstance().finishAllActivity();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mStarted = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mStarted = false;
+    }
+
+    public boolean isStarted() {
+        return mStarted;
     }
 
     @Override
