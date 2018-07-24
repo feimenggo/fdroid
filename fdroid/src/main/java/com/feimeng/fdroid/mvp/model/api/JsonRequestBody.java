@@ -12,7 +12,7 @@ import okhttp3.RequestBody;
  * Created by feimeng on 2018/2/2.
  */
 public class JsonRequestBody {
-    private static JsonRequestBody mInstance;
+    private static JsonRequestBody sInstance;
     private ThreadLocal<Map<String, Object>> mThreadLocal;
     private MediaType mJsonType;
 
@@ -22,14 +22,14 @@ public class JsonRequestBody {
     }
 
     public static JsonRequestBody getInstance() {
-        if (mInstance == null) {
+        if (sInstance == null) {
             synchronized (JsonRequestBody.class) {
-                if (mInstance == null) {
-                    mInstance = new JsonRequestBody();
+                if (sInstance == null) {
+                    sInstance = new JsonRequestBody();
                 }
             }
         }
-        return mInstance;
+        return sInstance;
     }
 
     public Map<String, Object> getMap() {
