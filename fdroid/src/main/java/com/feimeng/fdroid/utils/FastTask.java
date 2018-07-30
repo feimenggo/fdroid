@@ -99,7 +99,7 @@ public abstract class FastTask<T> {
             if (e != null && e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
                 success(null);
             } else {
-                fail(e);
+                fail(new NullPointerException("未知空异常"));
             }
             stop();
         }
