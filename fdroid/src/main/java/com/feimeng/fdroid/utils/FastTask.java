@@ -96,8 +96,8 @@ public abstract class FastTask<T> {
 
         @Override
         public void onError(Throwable e) {
-            if (e == null) {
-                fail(new NullPointerException("哎呀！出错咯。"));
+            if (e == null || e.getMessage() == null) {
+                fail(new NullPointerException("哎呀！出错了。"));
             } else if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
                 success(null);
             } else {

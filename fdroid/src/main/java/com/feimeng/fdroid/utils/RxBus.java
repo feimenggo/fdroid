@@ -1,6 +1,7 @@
 package com.feimeng.fdroid.utils;
 
 import io.reactivex.Flowable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.processors.FlowableProcessor;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.subscribers.SerializedSubscriber;
@@ -47,5 +48,9 @@ public class RxBus {
      */
     public boolean hasSubscribers() {
         return mBus.hasSubscribers();
+    }
+
+    public static void disposable(Disposable disposable) {
+        // 预留
     }
 }
