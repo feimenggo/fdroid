@@ -7,14 +7,6 @@ package com.feimeng.fdroid.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Spinner;
 
 import com.feimeng.fdroid.base.FDActivity;
 
@@ -26,7 +18,6 @@ import java.util.Stack;
  * Created by feimeng on 2017/1/20.
  */
 public class ActivityPageManager {
-
     private static Stack<FDActivity> activityStack;
     private static ActivityPageManager instance;
 
@@ -114,98 +105,6 @@ public class ActivityPageManager {
             if (activity != null && fdActivity == activity) continue;
             fdActivity.finish();
             iterator.remove();
-        }
-    }
-
-    public static void unbindReferences(View view) {
-        try {
-            if (view != null) {
-                view.destroyDrawingCache();
-                unbindViewReferences(view);
-                if (view instanceof ViewGroup) {
-                    unbindViewGroupReferences((ViewGroup) view);
-                }
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void unbindViewGroupReferences(ViewGroup viewGroup) {
-        int nrOfChildren = viewGroup.getChildCount();
-        for (int i = 0; i < nrOfChildren; i++) {
-            View view = viewGroup.getChildAt(i);
-            unbindViewReferences(view);
-            if (view instanceof ViewGroup)
-                unbindViewGroupReferences((ViewGroup) view);
-        }
-        try {
-            viewGroup.removeAllViews();
-        } catch (Throwable mayHappen) {
-            // AdapterViews, ListViews and potentially other ViewGroups don't
-            // support the removeAllViews operation
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    private static void unbindViewReferences(View view) {
-        // set all listeners to null (not every mView and not every API level
-        // supports the methods)
-        try {
-            if (view instanceof AdapterView) {
-                if (view instanceof Spinner) {
-                    // 如果是Spinner则使用这个方法，否则会保异常：java.lang.RuntimeException: setOnItemClickListener cannot be used with a spinner.
-                    ((AdapterView) view).setOnItemSelectedListener(null);
-                } else {
-                    ((AdapterView) view).setOnItemClickListener(null);
-                }
-            } else {
-                view.setOnClickListener(null);
-            }
-            view.setOnCreateContextMenuListener(null);
-            view.setOnFocusChangeListener(null);
-            view.setOnKeyListener(null);
-            view.setOnLongClickListener(null);
-        } catch (Throwable mayHappen) {
-            mayHappen.printStackTrace();
-        }
-
-        // set background to null
-        Drawable d = view.getBackground();
-        if (d != null) {
-            d.setCallback(null);
-        }
-
-        if (view instanceof ImageView) {
-            ImageView imageView = (ImageView) view;
-            d = imageView.getDrawable();
-            if (d != null) {
-                d.setCallback(null);
-            }
-            imageView.setImageDrawable(null);
-            imageView.setBackgroundDrawable(null);
-        }
-
-        // destroy WebView
-        if (view instanceof WebView) {
-            WebView webview = (WebView) view;
-            webview.stopLoading();
-            webview.clearFormData();
-            webview.clearDisappearingChildren();
-            webview.setWebChromeClient(null);
-            webview.setWebViewClient(null);
-            webview.destroyDrawingCache();
-            webview.destroy();
-        }
-
-        if (view instanceof ListView) {
-            ListView listView = (ListView) view;
-            try {
-                listView.removeAllViewsInLayout();
-            } catch (Throwable mayHappen) {
-                mayHappen.printStackTrace();
-            }
-            view.destroyDrawingCache();
         }
     }
 

@@ -3,6 +3,7 @@ package com.feimeng.fdroid.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.RequiresPermission;
 
 /**
  * 网络连接 工具类
@@ -15,18 +16,30 @@ public class NetworkUtil {
      * @param context 上下文
      * @return 当且仅当连上网络时返回true, 否则返回false。
      */
+    @RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
     public static boolean isConnectingToInternet(Context context) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = manager.getActiveNetworkInfo();
-        return info != null && info.isConnected();
+        if (context != null) {
+            ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (manager != null) {
+                NetworkInfo info = manager.getActiveNetworkInfo();
+                if (info != null) return info.isConnected();
+            }
+        }
+        return false;
     }
 
     /**
      * 当前网络是否是WiFi
      */
+    @RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
     public static boolean isWifi(Context context) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = manager.getActiveNetworkInfo();
-        return info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI;
+        if (context != null) {
+            ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (manager != null) {
+                NetworkInfo info = manager.getActiveNetworkInfo();
+                return info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI;
+            }
+        }
+        return false;
     }
 }

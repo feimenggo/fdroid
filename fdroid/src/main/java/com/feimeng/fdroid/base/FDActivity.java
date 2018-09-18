@@ -1,6 +1,7 @@
 package com.feimeng.fdroid.base;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
@@ -70,8 +71,11 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
      * @param message 提示的信息
      * @return Dialog 对话框
      */
-    protected Dialog drawDialog(String message) {
+    protected Dialog createLoadingDialog(@Nullable String message) {
         return new FDialog(this, message == null ? "" : message);
+    }
+
+    protected void updateLoadingDialog(@Nullable Dialog dialog, @Nullable String message) {
     }
 
     /**
@@ -81,12 +85,29 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
         showLoadingDialog(null);
     }
 
+    public void showLoadingDialog(String message) {
+        showLoadingDialog(message, true);
+    }
+
     /**
      * 显示对话框 showLoadingDialog()和hideLoadingDialog()必须成对调用
      */
-    public synchronized void showLoadingDialog(String message) {
+    public synchronized void showLoadingDialog(String message, boolean cancelable) {
         mLoadTimes++;
-        if (mLoading == null) mLoading = drawDialog(message);
+        if (mLoading == null) {
+            mLoading = createLoadingDialog(message);
+            mLoading.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    mLoadTimes = 0;
+                    mLoading = null;
+                    updateLoadingDialog(null, null);
+                }
+            });
+        } else {
+            updateLoadingDialog(mLoading, message);
+        }
+        mLoading.setCancelable(cancelable);
         if (!mLoading.isShowing()) mLoading.show();
     }
 
@@ -94,8 +115,14 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
      * 隐藏对话框
      */
     public synchronized void hideLoadingDialog() {
-        if (--mLoadTimes > 0) return;
+        mLoadTimes = Math.max(0, mLoadTimes - 1);
+        if (mLoadTimes > 0) return;
         if (mLoading != null && mLoading.isShowing()) mLoading.dismiss();
+    }
+
+    public synchronized void cancelLoadingDialog() {
+        mLoadTimes = 1;
+        hideLoadingDialog();
     }
 
 
@@ -132,8 +159,22 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("LoadTimes", mLoadTimes);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mLoadTimes = savedInstanceState.getInt("LoadTimes");
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        // 移除Activity管理
+        ActivityPageManager.getInstance().removeActivity(this);
         if (mLoading != null && mLoading.isShowing()) {
             mLoading.dismiss();
             mLoading = null;
@@ -141,12 +182,8 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
         // 解绑控制器
         if (mPresenter != null) {
             mPresenter.detach();
-        } else {
             mPresenter = null;
         }
-//        ActivityPageManager.unbindReferences(mContentView);
-        // 移除Activity管理
-        ActivityPageManager.getInstance().removeActivity(this);
         // 内容布局置空
         mContentView = null;
     }

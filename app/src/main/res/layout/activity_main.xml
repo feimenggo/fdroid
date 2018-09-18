@@ -32,4 +32,18 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/login"
         android:text="注册" />
+
+    <Button
+        android:id="@+id/showLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/login"
+        android:text="显示 加载中" />
+
+    <Button
+        android:id="@+id/hideLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/showLoading"
+        android:text="隐藏 加载中" />
 </RelativeLayout>

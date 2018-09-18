@@ -1,17 +1,20 @@
 package com.feimeng.fdroiddemo;
 
+import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.TextView;
 
+import com.feimeng.fdroid.base.FDActivity;
 import com.feimeng.fdroid.mvp.model.api.bean.ApiFinish2;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.T;
+import com.feimeng.fdroid.widget.FDialog;
 import com.feimeng.fdroiddemo.api.ApiWrapper;
 import com.feimeng.fdroiddemo.login.LoginActivity;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends FDActivity<MainContract.View, MainContract.Presenter> implements MainContract.View, View.OnClickListener {
     public static final String TAG = MainActivity.class.getName();
 
     @Override
@@ -21,6 +24,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.crash).setOnClickListener(this);
         findViewById(R.id.login).setOnClickListener(this);
         findViewById(R.id.register).setOnClickListener(this);
+        findViewById(R.id.showLoading).setOnClickListener(this);
+        findViewById(R.id.hideLoading).setOnClickListener(this);
+    }
+
+    @Override
+    protected Dialog createLoadingDialog(@Nullable String message) {
+        return new FDialog(this, message == null ? "" : message);
+    }
+
+    @Override
+    protected void updateLoadingDialog(@Nullable Dialog dialog, @Nullable String message) {
+        if (dialog != null) ((FDialog) dialog).setMessage(message);
+    }
+
+    @Override
+    protected MainContract.Presenter initPresenter() {
+        return new MainPresenter();
     }
 
     TextView a;
@@ -36,6 +56,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.register:
                 register();
+                break;
+            case R.id.showLoading:
+                showLoadingDialog("拼命加载中...", true);
+                showLoadingDialog("拼命加载中2...");
+                break;
+            case R.id.hideLoading:
+                hideLoadingDialog();
                 break;
         }
     }

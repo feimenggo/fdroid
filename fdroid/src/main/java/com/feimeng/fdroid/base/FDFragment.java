@@ -2,6 +2,7 @@ package com.feimeng.fdroid.base;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
@@ -21,6 +22,7 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
      * 对话框
      */
     private Dialog mLoading;
+    private int mLoadTimes = 0; // 加载次数
 
     @SuppressWarnings("unchecked")
     @Override
@@ -58,22 +60,38 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
         showLoadingDialog(null);
     }
 
-    /**
-     * 显示对话框
-     */
     public void showLoadingDialog(String message) {
+        showLoadingDialog(message, true);
+    }
+
+    /**
+     * 显示对话框 showLoadingDialog()和hideLoadingDialog()必须成对调用
+     */
+    public synchronized void showLoadingDialog(String message, boolean cancelable) {
+        mLoadTimes++;
         if (mLoading == null) mLoading = drawDialog(message);
-        mLoading.show();
+        mLoading.setCancelable(cancelable);
+        if (!mLoading.isShowing()) mLoading.show();
     }
 
     /**
      * 隐藏对话框
      */
-    public void hideLoadingDialog() {
-        if (mLoading != null && mLoading.isShowing()) {
-            mLoading.dismiss();
-            mLoading = null;
-        }
+    public synchronized void hideLoadingDialog() {
+        if (--mLoadTimes > 0) return;
+        if (mLoading != null && mLoading.isShowing()) mLoading.dismiss();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("LoadTimes", mLoadTimes);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) mLoadTimes = savedInstanceState.getInt("LoadTimes");
     }
 
     @Override

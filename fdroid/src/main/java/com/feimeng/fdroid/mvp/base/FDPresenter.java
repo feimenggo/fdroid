@@ -27,7 +27,7 @@ public abstract class FDPresenter<V extends FDView> {
      */
     public void attach(V view) {
         L.d("绑定视图->" + view);
-        this.mView = view;
+        mView = view;
         preInit();
     }
 
@@ -53,7 +53,6 @@ public abstract class FDPresenter<V extends FDView> {
     }
 
     protected void onDestroy() {
-
     }
 
     /**
@@ -93,7 +92,7 @@ public abstract class FDPresenter<V extends FDView> {
      * 显示对话框
      */
     public void showDialog() {
-        showDialog("拼命加载中...");
+        showDialog(null);
     }
 
     public void showDialog(String message) {
@@ -162,7 +161,7 @@ public abstract class FDPresenter<V extends FDView> {
     public <T> Observable<T> withNet(Observable<T> task, final Object data) {
         final Observable<T> checkNet = Observable.create(new ObservableOnSubscribe<T>() {
             @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+            public void subscribe(ObservableEmitter<T> emitter) {
                 if (!NetworkUtil.isConnectingToInternet(getContext())) {
                     if (isActive() && mView instanceof OnWithoutNetwork) {
                         ((OnWithoutNetwork) mView).withoutNetwork(data);
@@ -183,7 +182,7 @@ public abstract class FDPresenter<V extends FDView> {
     public <T> Observable<T> withNet(Observable<T> task, final OnWithoutNetwork network, final Object data) {
         final Observable<T> checkNet = Observable.create(new ObservableOnSubscribe<T>() {
             @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+            public void subscribe(ObservableEmitter<T> emitter) {
                 if (!NetworkUtil.isConnectingToInternet(getContext())) {
                     if (network != null) network.withoutNetwork(data);
                     emitter.onError(new WithoutNetworkException());
