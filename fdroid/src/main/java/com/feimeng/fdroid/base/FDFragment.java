@@ -1,6 +1,7 @@
 package com.feimeng.fdroid.base;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -52,8 +53,11 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
      * @param message 提示的信息
      * @return Dialog 对话框
      */
-    protected Dialog drawDialog(String message) {
+    protected Dialog createLoadingDialog(String message) {
         return new FDialog(getActivity(), message == null ? "" : message);
+    }
+
+    protected void updateLoadingDialog(@Nullable Dialog dialog, @Nullable String message) {
     }
 
     public void showLoadingDialog() {
@@ -69,7 +73,19 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
      */
     public synchronized void showLoadingDialog(String message, boolean cancelable) {
         mLoadTimes++;
-        if (mLoading == null) mLoading = drawDialog(message);
+        if (mLoading == null) {
+            mLoading = createLoadingDialog(message);
+            mLoading.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    mLoadTimes = 0;
+                    mLoading = null;
+                    updateLoadingDialog(null, null);
+                }
+            });
+        } else {
+            updateLoadingDialog(mLoading, message);
+        }
         mLoading.setCancelable(cancelable);
         if (!mLoading.isShowing()) mLoading.show();
     }
@@ -78,8 +94,14 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
      * 隐藏对话框
      */
     public synchronized void hideLoadingDialog() {
-        if (--mLoadTimes > 0) return;
+        mLoadTimes = Math.max(0, mLoadTimes - 1);
+        if (mLoadTimes > 0) return;
         if (mLoading != null && mLoading.isShowing()) mLoading.dismiss();
+    }
+
+    public synchronized void cancelLoadingDialog() {
+        mLoadTimes = 1;
+        hideLoadingDialog();
     }
 
     @Override

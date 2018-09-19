@@ -84,6 +84,12 @@ public abstract class FastTask<T> {
     public abstract T task() throws Exception;
 
     public abstract static class Result<R> implements Observer<R> {
+        private static ResultFail sFail;
+
+        public static void onFail(ResultFail fail) {
+            sFail = fail;
+        }
+
         @Override
         public void onSubscribe(Disposable d) {
             start();
@@ -97,11 +103,11 @@ public abstract class FastTask<T> {
         @Override
         public void onError(Throwable e) {
             if (e == null || e.getMessage() == null) {
-                fail(new NullPointerException("哎呀！出错了。"));
+                onFail(new NullPointerException("哎呀！出错了。"));
             } else if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
                 success(null);
             } else {
-                fail(e);
+                onFail(e);
             }
             stop();
         }
@@ -133,7 +139,18 @@ public abstract class FastTask<T> {
          * 任务结束
          */
         public void stop() {
+        }
 
+        public void info(String message) {
+        }
+
+        private void onFail(Throwable throwable) {
+            if (throwable instanceof Info) {
+                info(throwable.getMessage());
+            } else {
+                if (sFail != null && !sFail.onFail(throwable)) return;
+                fail(throwable);
+            }
         }
     }
 
@@ -161,5 +178,19 @@ public abstract class FastTask<T> {
 
     public static Exception error(String error) throws Exception {
         throw new Exception(error);
+    }
+
+    public static Info info(String info) throws Info {
+        throw new Info(info);
+    }
+
+    public interface ResultFail {
+        boolean onFail(Throwable throwable);
+    }
+
+    public static class Info extends Throwable {
+        public Info(String info) {
+            super(info);
+        }
     }
 }
