@@ -22,4 +22,6 @@ public interface FDApiFinish<T> {
     void fail(Throwable error, String info);
 
     void stop();
+
+    void info(String message);
 }

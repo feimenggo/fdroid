@@ -11,4 +11,8 @@ public abstract class ApiFinish<T> implements FDApiFinish<T> {
         // 返回true，将会调用 fail(ApiError error, String info);
         return true;
     }
+
+    @Override
+    public void info(String message) {
+    }
 }

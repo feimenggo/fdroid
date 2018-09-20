@@ -3,6 +3,7 @@ package com.feimeng.fdroid.mvp.model.api;
 import android.support.annotation.NonNull;
 
 import com.feimeng.fdroid.config.FDConfig;
+import com.feimeng.fdroid.exception.Info;
 import com.feimeng.fdroid.mvp.model.api.bean.FDApiFinish;
 import com.feimeng.fdroid.mvp.model.api.bean.FDResponse;
 import com.feimeng.fdroid.utils.L;
@@ -309,7 +310,6 @@ public class FDApi {
             @Override
             public void onError(Throwable e) {
                 if (e != null) {
-                    String error;
                     if (e instanceof CompositeException) {
                         List<Throwable> exceptions = ((CompositeException) e).getExceptions();
                         if (exceptions.size() == 2) {
@@ -322,41 +322,37 @@ public class FDApi {
                         }
                     }
                     if (e instanceof APIException) {
-                        if (!fdApiFinish.apiFail((APIException) e)) {
-                            fdApiFinish.stop();
-                            return;
-                        }
-                        fdApiFinish.fail(e, e.getMessage());
-                        fdApiFinish.stop();
-                        return;
+                        if (fdApiFinish.apiFail((APIException) e))
+                            fdApiFinish.fail(e, e.getMessage());
                     } else if (e instanceof WithoutNetworkException) {
                         // 直接结束 会回调FDPresenter.OnWithoutNetwork.withoutNetwork()方法
-                        fdApiFinish.stop();
-                        return;
-                    } else if (e instanceof SocketTimeoutException) {
-                        error = FDConfig.INFO_TIMEOUT_EXCEPTION;
-                    } else if (e instanceof ConnectException) {
-                        error = FDConfig.INFO_CONNECT_EXCEPTION;
-                    } else if (e instanceof HttpException) {
-                        error = FDConfig.INFO_HTTP_EXCEPTION;
-                    } else if (e instanceof JsonSyntaxException) {
-                        error = FDConfig.INFO_JSON_SYNTAX_EXCEPTION;
-                    } else if (e instanceof MalformedJsonException) {
-                        error = FDConfig.INFO_MALFORMED_JSON_EXCEPTION;
-                    } else if (e instanceof EOFException) {
-                        error = FDConfig.INFO_EOF_EXCEPTION;
+                    } else if (e instanceof Info) {
+                        fdApiFinish.info(e.getMessage());
                     } else if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
                         fdApiFinish.success(null);
-                        fdApiFinish.stop();
-                        return;
                     } else {
-                        error = FDConfig.INFO_UNKNOWN_EXCEPTION;
+                        String error;
+                        if (e instanceof SocketTimeoutException) {
+                            error = FDConfig.INFO_TIMEOUT_EXCEPTION;
+                        } else if (e instanceof ConnectException) {
+                            error = FDConfig.INFO_CONNECT_EXCEPTION;
+                        } else if (e instanceof HttpException) {
+                            error = FDConfig.INFO_HTTP_EXCEPTION;
+                        } else if (e instanceof JsonSyntaxException) {
+                            error = FDConfig.INFO_JSON_SYNTAX_EXCEPTION;
+                        } else if (e instanceof MalformedJsonException) {
+                            error = FDConfig.INFO_MALFORMED_JSON_EXCEPTION;
+                        } else if (e instanceof EOFException) {
+                            error = FDConfig.INFO_EOF_EXCEPTION;
+                        } else {
+                            error = FDConfig.INFO_UNKNOWN_EXCEPTION;
+                        }
+                        if (FDConfig.SHOW_HTTP_EXCEPTION_INFO) {
+                            error += " " + e.getMessage();
+                            e.printStackTrace();
+                        }
+                        fdApiFinish.fail(e, error);
                     }
-                    if (FDConfig.SHOW_HTTP_EXCEPTION_INFO) {
-                        error += " " + e.getMessage();
-                        e.printStackTrace();
-                    }
-                    fdApiFinish.fail(e, error);
                 }
                 fdApiFinish.stop();
             }

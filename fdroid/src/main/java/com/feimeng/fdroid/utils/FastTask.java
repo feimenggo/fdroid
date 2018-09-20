@@ -1,5 +1,7 @@
 package com.feimeng.fdroid.utils;
 
+import com.feimeng.fdroid.exception.Info;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -121,7 +123,6 @@ public abstract class FastTask<T> {
          * 任务开始
          */
         public void start() {
-
         }
 
         /**
@@ -186,11 +187,5 @@ public abstract class FastTask<T> {
 
     public interface ResultFail {
         boolean onFail(Throwable throwable);
-    }
-
-    public static class Info extends Throwable {
-        public Info(String info) {
-            super(info);
-        }
     }
 }

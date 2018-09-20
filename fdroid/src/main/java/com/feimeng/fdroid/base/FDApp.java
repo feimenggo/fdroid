@@ -1,12 +1,16 @@
 package com.feimeng.fdroid.base;
 
+import android.app.ActivityManager;
 import android.app.Application;
+import android.content.Context;
 
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.SP;
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroid.utils.UE;
+
+import java.util.List;
 
 /**
  * 全局Application
@@ -23,10 +27,12 @@ public abstract class FDApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        sInstance = this;
-        configBeforeCore();
-        mCoreThread.start();
-        config();
+        if (getPackageName().equals(getProcessName(this, android.os.Process.myPid()))) {
+            sInstance = this;
+            configBeforeCore();
+            mCoreThread.start();
+            config();
+        }
     }
 
     /**
@@ -78,5 +84,18 @@ public abstract class FDApp extends Application {
             initCore();
             configAsync();
         }
+    }
+
+    public String getProcessName(Context cxt, int pid) {
+        ActivityManager am = (ActivityManager) cxt.getSystemService(Context.ACTIVITY_SERVICE);
+        if (am == null) return null;
+        List<ActivityManager.RunningAppProcessInfo> runningApps = am.getRunningAppProcesses();
+        if (runningApps == null) return null;
+        for (ActivityManager.RunningAppProcessInfo processInfo : runningApps) {
+            if (processInfo.pid == pid) {
+                return processInfo.processName;
+            }
+        }
+        return null;
     }
 }
