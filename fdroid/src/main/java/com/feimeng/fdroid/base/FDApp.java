@@ -39,14 +39,12 @@ public abstract class FDApp extends Application {
      * 配置 UI线程
      */
     protected void config() {
-
     }
 
     /**
      * 配置 在Core执行之前 UI线程
      */
     protected void configBeforeCore() {
-
     }
 
     /**

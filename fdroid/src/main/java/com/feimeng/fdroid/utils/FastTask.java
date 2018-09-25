@@ -1,6 +1,7 @@
 package com.feimeng.fdroid.utils;
 
 import com.feimeng.fdroid.exception.Info;
+import com.trello.rxlifecycle2.LifecycleTransformer;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -12,8 +13,9 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * 方便的执行耗时任务，基于RxJava的封装
- * Created by feimeng on 2017/6/10.
+ * Author: Feimeng
+ * Time:   2017/6/10
+ * Description: 方便的执行耗时任务，基于RxJava的封装
  */
 public abstract class FastTask<T> {
     public Observable<T> fast() {
@@ -27,12 +29,13 @@ public abstract class FastTask<T> {
     }
 
     public void runCalc() {
-        runCalc(new Result<T>() {
+        Observable.create(new ObservableOnSubscribe<T>() {
             @Override
-            public void success(T truck) {
-
+            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                emitter.onNext(task());
+                emitter.onComplete();
             }
-        });
+        }).subscribeOn(Schedulers.computation()).subscribe();
     }
 
     public Disposable runCalc(Consumer<T> consumer) {
@@ -55,12 +58,24 @@ public abstract class FastTask<T> {
         }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
-    public void runIO() {
-        runIO(new Result<T>() {
+    public void runCalc(Observer<T> observer, LifecycleTransformer<T> lifecycleTransformer) {
+        Observable.create(new ObservableOnSubscribe<T>() {
             @Override
-            public void success(T data) {
+            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                emitter.onNext(task());
+                emitter.onComplete();
             }
-        });
+        }).compose(lifecycleTransformer).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+    }
+
+    public void runIO() {
+        Observable.create(new ObservableOnSubscribe<T>() {
+            @Override
+            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                emitter.onNext(task());
+                emitter.onComplete();
+            }
+        }).subscribeOn(Schedulers.io()).subscribe();
     }
 
     public Disposable runIO(Consumer<T> consumer) {
@@ -81,6 +96,16 @@ public abstract class FastTask<T> {
                 emitter.onComplete();
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+    }
+
+    public void runIO(Observer<T> observer, LifecycleTransformer<T> lifecycleTransformer) {
+        Observable.create(new ObservableOnSubscribe<T>() {
+            @Override
+            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                emitter.onNext(task());
+                emitter.onComplete();
+            }
+        }).compose(lifecycleTransformer).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
     public abstract T task() throws Exception;
@@ -187,5 +212,11 @@ public abstract class FastTask<T> {
 
     public interface ResultFail {
         boolean onFail(Throwable throwable);
+    }
+
+    public static class Void {
+        public static Void get() {
+            return new Void();
+        }
     }
 }
