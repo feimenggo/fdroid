@@ -213,10 +213,4 @@ public abstract class FastTask<T> {
     public interface ResultFail {
         boolean onFail(Throwable throwable);
     }
-
-    public static class Void {
-        public static Void get() {
-            return new Void();
-        }
-    }
 }

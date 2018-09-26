@@ -7,12 +7,15 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.feimeng.fdroid.base.FDActivity;
+import com.feimeng.fdroid.bean.Ignore;
 import com.feimeng.fdroid.mvp.model.api.bean.ApiFinish2;
+import com.feimeng.fdroid.utils.FastTask;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroid.widget.FDialog;
 import com.feimeng.fdroiddemo.api.ApiWrapper;
 import com.feimeng.fdroiddemo.login.LoginActivity;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 public class MainActivity extends FDActivity<MainContract.View, MainContract.Presenter> implements MainContract.View, View.OnClickListener {
     public static final String TAG = MainActivity.class.getName();
@@ -58,8 +61,20 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
                 register();
                 break;
             case R.id.showLoading:
-                showLoadingDialog("拼命加载中...", true);
-                showLoadingDialog("拼命加载中2...");
+                new FastTask<Ignore>() {
+                    @Override
+                    public Ignore task() throws Exception {
+                        Thread.sleep(2000);
+                        return Ignore.instance;
+                    }
+                }.runIO(new FastTask.Result<Ignore>() {
+                    @Override
+                    public void success(Ignore ignore) {
+                        L.d("nodawang", "hello");
+                    }
+                }, this.<Ignore>bindUntilEvent(ActivityEvent.PAUSE));
+//                showLoadingDialog("拼命加载中...", true);
+//                showLoadingDialog("拼命加载中2...");
                 break;
             case R.id.hideLoading:
                 hideLoadingDialog();

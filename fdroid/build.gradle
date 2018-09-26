@@ -26,11 +26,11 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
     // RxJava
-    api 'io.reactivex.rxjava2:rxjava:2.1.14'
-    api 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    api 'com.trello.rxlifecycle2:rxlifecycle:2.2.1'
-    api 'com.trello.rxlifecycle2:rxlifecycle-android:2.2.1'
-    api 'com.trello.rxlifecycle2:rxlifecycle-components:2.2.1'
+    api 'io.reactivex.rxjava2:rxjava:2.2.2'
+    api 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    api 'com.trello.rxlifecycle2:rxlifecycle:2.2.2'
+    api 'com.trello.rxlifecycle2:rxlifecycle-android:2.2.2'
+    api 'com.trello.rxlifecycle2:rxlifecycle-components:2.2.2'
     // Retrofit
     api 'com.squareup.retrofit2:retrofit:2.4.0'
     api 'com.squareup.retrofit2:converter-gson:2.4.0'
