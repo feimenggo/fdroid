@@ -1,7 +1,12 @@
 package com.feimeng.fdroid.utils;
 
+import com.feimeng.fdroid.base.FDActivity;
+import com.feimeng.fdroid.base.FDFragment;
 import com.feimeng.fdroid.exception.Info;
+import com.feimeng.fdroid.mvp.base.FDView;
 import com.trello.rxlifecycle2.LifecycleTransformer;
+import com.trello.rxlifecycle2.android.ActivityEvent;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -58,6 +63,24 @@ public abstract class FastTask<T> {
         }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
+    public void runCalc(Observer<T> observer, FDView fdView) {
+        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
+            @Override
+            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                emitter.onNext(task());
+                emitter.onComplete();
+            }
+        });
+        if (fdView != null) {
+            if (fdView instanceof FDActivity) {
+                observable = observable.compose(((FDActivity) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
+            } else if (fdView instanceof FDFragment) {
+                observable = observable.compose(((FDFragment) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
+            }
+        }
+        observable.subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+    }
+
     public void runCalc(Observer<T> observer, LifecycleTransformer<T> lifecycleTransformer) {
         Observable.create(new ObservableOnSubscribe<T>() {
             @Override
@@ -96,6 +119,24 @@ public abstract class FastTask<T> {
                 emitter.onComplete();
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+    }
+
+    public void runIO(Observer<T> observer, FDView fdView) {
+        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
+            @Override
+            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                emitter.onNext(task());
+                emitter.onComplete();
+            }
+        });
+        if (fdView != null) {
+            if (fdView instanceof FDActivity) {
+                observable = observable.compose(((FDActivity) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
+            } else if (fdView instanceof FDFragment) {
+                observable = observable.compose(((FDFragment) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
+            }
+        }
+        observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
     public void runIO(Observer<T> observer, LifecycleTransformer<T> lifecycleTransformer) {

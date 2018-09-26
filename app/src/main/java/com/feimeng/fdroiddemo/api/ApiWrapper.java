@@ -25,7 +25,7 @@ public class ApiWrapper extends FDApi {
         return api.login(json("phone", phone, "password", password)).compose(this.<Integer>applySchedulers());
     }
 
-    public Observable<Object> register(String phone, String password) {
-        return api.register(json("phone", phone, "password", password)).compose(this.<Object>applySchedulers());
+    public Observable<Void> register(String phone, String password) {
+        return api.register(json("phone", phone, "password", password)).compose(this.<Void>applySchedulers());
     }
 }

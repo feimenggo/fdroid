@@ -37,7 +37,7 @@
         android:id="@+id/showLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/login"
+        android:layout_below="@id/register"
         android:text="显示 加载中" />
 
     <Button

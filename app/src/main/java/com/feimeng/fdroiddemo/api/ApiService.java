@@ -17,5 +17,5 @@ public interface ApiService {
     Observable<Response<Integer>> login(@Body RequestBody requestBody);
 
     @POST("user/register")
-    Observable<Response<Object>> register(@Body RequestBody requestBody);
+    Observable<Response<Void>> register(@Body RequestBody requestBody);
 }
