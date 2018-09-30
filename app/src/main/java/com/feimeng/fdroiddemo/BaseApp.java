@@ -6,6 +6,9 @@ import com.feimeng.fdroid.base.FDApp;
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.utils.L;
 
+import io.reactivex.functions.Consumer;
+import io.reactivex.plugins.RxJavaPlugins;
+
 /**
  * Created by feimeng on 2018/3/13.
  */
@@ -35,6 +38,15 @@ public class BaseApp extends FDApp {
         FDConfig.SHOW_LOG = true;
         FDConfig.SHOW_HTTP_LOG = true;
         FDConfig.SHOW_HTTP_EXCEPTION_INFO = true;
+        RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Exception {
+                Thread thread = Thread.currentThread();
+                String name = thread.getName();
+                L.d("nodawang", "未捕获的异常" + name);
+                throwable.printStackTrace();
+            }
+        });
     }
 
     @Override

@@ -12,19 +12,18 @@ public class RxJavas {
     /**
      * 根据条件选择是否执行Observable
      *
-     * @param condition  true 执行,false 不执行
-     * @param observable 待执行的源事件
+     * @param defaultValue 默认数据
+     * @param observable   待执行的源事件
      */
-    public static <T> Observable<T> choose(final boolean condition, Observable<T> observable) {
-        return Observable.concat(Observable.create(new ObservableOnSubscribe<T>() {
+    public static <T> Observable<T> choose(final T defaultValue, Observable<T> observable) {
+        return Observable.create(new ObservableOnSubscribe<T>() {
             @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                if (!condition) emitter.onNext(null);
-                emitter.onComplete();
+            public void subscribe(ObservableEmitter<T> e) {
+                if (defaultValue != null) {
+                    e.onNext(defaultValue);
+                }
+                e.onComplete();
             }
-        }), observable).firstElement().toObservable();
-    }
-
-    public static class NULL {
+        }).switchIfEmpty(observable);
     }
 }

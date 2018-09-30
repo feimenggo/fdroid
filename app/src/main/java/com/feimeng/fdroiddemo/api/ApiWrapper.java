@@ -1,6 +1,7 @@
 package com.feimeng.fdroiddemo.api;
 
 import com.feimeng.fdroid.mvp.model.api.FDApi;
+import com.feimeng.fdroid.mvp.model.api.bean.Optional;
 
 import io.reactivex.Observable;
 
@@ -25,7 +26,7 @@ public class ApiWrapper extends FDApi {
         return api.login(json("phone", phone, "password", password)).compose(this.<Integer>applySchedulers());
     }
 
-    public Observable<Void> register(String phone, String password) {
-        return api.register(json("phone", phone, "password", password)).compose(this.<Void>applySchedulers());
+    public Observable<Optional<Void>> register(String phone, String password) {
+        return api.register(json("phone", phone, "password", password)).compose(this.<Void>applySchedulersNewOptional());
     }
 }

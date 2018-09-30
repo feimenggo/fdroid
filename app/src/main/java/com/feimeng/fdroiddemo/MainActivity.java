@@ -8,14 +8,18 @@ import android.widget.TextView;
 
 import com.feimeng.fdroid.base.FDActivity;
 import com.feimeng.fdroid.bean.Ignore;
-import com.feimeng.fdroid.mvp.model.api.bean.ApiFinish0;
 import com.feimeng.fdroid.mvp.model.api.bean.ApiFinish2;
+import com.feimeng.fdroid.mvp.model.api.bean.Optional;
 import com.feimeng.fdroid.utils.FastTask;
 import com.feimeng.fdroid.utils.L;
+import com.feimeng.fdroid.utils.RxJavas;
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroid.widget.FDialog;
 import com.feimeng.fdroiddemo.api.ApiWrapper;
 import com.feimeng.fdroiddemo.login.LoginActivity;
+
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Function;
 
 public class MainActivity extends FDActivity<MainContract.View, MainContract.Presenter> implements MainContract.View, View.OnClickListener {
     public static final String TAG = MainActivity.class.getName();
@@ -58,7 +62,8 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
                 LoginActivity.start(this);
                 break;
             case R.id.register:
-                register();
+                testChoose();
+//                register();
                 break;
             case R.id.showLoading:
                 new FastTask<Ignore>() {
@@ -82,6 +87,30 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
         }
     }
 
+    private void testChoose() {
+        Optional<Void> con = Optional.empty();
+        RxJavas.choose(con, ApiWrapper.getInstance().register("", ""))
+                .flatMap(new Function<Optional<Void>, ObservableSource<Integer>>() {
+                    @Override
+                    public ObservableSource<Integer> apply(Optional<Void> optional) throws Exception {
+                        return ApiWrapper.getInstance().login("10086", "123456");
+                    }
+                })
+                .subscribe(ApiWrapper.subscriber(new ApiFinish2<Integer>() {
+                    @Override
+                    public void success(Integer data) {
+                        T.showS(getApplicationContext(), "登录成功");
+                        L.d(TAG, data);
+                    }
+
+                    @Override
+                    public void fail(Throwable error, String info) {
+                        T.showS(getApplicationContext(), "登录出错");
+                        L.d(TAG, info);
+                    }
+                }));
+    }
+
     private void login() {
         ApiWrapper.getInstance().login("10086", "123456")
                 .subscribe(ApiWrapper.subscriber(new ApiFinish2<Integer>() {
@@ -100,22 +129,22 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
     }
 
     private void register() {
-        ApiWrapper.getInstance().register("10086", "123456")
-                .subscribe(ApiWrapper.subscriber(new ApiFinish0<Void>() {
-                    @Override
-                    public void start() {
-                    }
-
-                    @Override
-                    public void success(Void ignore) {
-                        T.showS(getApplicationContext(), "注册成功");
-                    }
-
-                    @Override
-                    public void fail(Throwable error, String info) {
-                        T.showS(getApplicationContext(), "注册出错");
-                        L.d(TAG, info);
-                    }
-                }));
+//        ApiWrapper.getInstance().register("10086", "123456")
+//                .subscribe(ApiWrapper.subscriber(new ApiFinish0<Void>() {
+//                    @Override
+//                    public void start() {
+//                    }
+//
+//                    @Override
+//                    public void success(Void ignore) {
+//                        T.showS(getApplicationContext(), "注册成功");
+//                    }
+//
+//                    @Override
+//                    public void fail(Throwable error, String info) {
+//                        T.showS(getApplicationContext(), "注册出错");
+//                        L.d(TAG, info);
+//                    }
+//                }));
     }
 }

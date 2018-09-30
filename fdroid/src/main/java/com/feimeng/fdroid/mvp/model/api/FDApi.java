@@ -6,6 +6,7 @@ import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.exception.Info;
 import com.feimeng.fdroid.mvp.model.api.bean.FDApiFinish;
 import com.feimeng.fdroid.mvp.model.api.bean.FDResponse;
+import com.feimeng.fdroid.mvp.model.api.bean.Optional;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.interceptor.HeaderInterceptor;
 import com.feimeng.fdroid.utils.interceptor.MockInterceptor;
@@ -240,6 +241,29 @@ public class FDApi {
         });
     }
 
+    private <T> Observable<Optional<T>> flatResponseOptional(final FDResponse<T> response) {
+        return Observable.create(new ObservableOnSubscribe<Optional<T>>() {
+            @Override
+            public void subscribe(ObservableEmitter<Optional<T>> emitter) throws Exception {
+                if (emitter.isDisposed()) return;
+                if (SHOW_HTTP_LOG) L.s(response);
+                // 请求结果
+                if (response.isSuccess()) {
+                    emitter.onNext(new Optional<>(response.getData()));
+                    // 请求完成
+                    emitter.onComplete();
+                } else {
+                    // 响应监听
+                    if (responseCodeInterceptor(response)) {
+                        emitter.onComplete();
+                        return;
+                    }
+                    emitter.onError(new APIException(response.getCode(), response.getInfo()));
+                }
+            }
+        });
+    }
+
     /**
      * 在子线程中执行，主线程中回调
      */
@@ -253,6 +277,25 @@ public class FDApi {
                             @Override
                             public ObservableSource<T> apply(FDResponse<T> tResponse) throws Exception {
                                 return flatResponse(tResponse);
+                            }
+                        });
+            }
+        };
+    }
+
+    /**
+     * 在子线程中执行，主线程中回调 包装结果
+     */
+    protected <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersOptional() {
+        return new ObservableTransformer<FDResponse<T>, Optional<T>>() {
+            @Override
+            public ObservableSource<Optional<T>> apply(Observable<FDResponse<T>> upstream) {
+                return upstream.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .flatMap(new Function<FDResponse<T>, ObservableSource<Optional<T>>>() {
+                            @Override
+                            public ObservableSource<Optional<T>> apply(FDResponse<T> tResponse) throws Exception {
+                                return flatResponseOptional(tResponse);
                             }
                         });
             }
@@ -278,6 +321,24 @@ public class FDApi {
     }
 
     /**
+     * 在子线程中执行并回调 包装结果
+     */
+    protected <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersNewOptional() {
+        return new ObservableTransformer<FDResponse<T>, Optional<T>>() {
+            @Override
+            public ObservableSource<Optional<T>> apply(Observable<FDResponse<T>> upstream) {
+                return upstream.subscribeOn(Schedulers.io())
+                        .flatMap(new Function<FDResponse<T>, ObservableSource<Optional<T>>>() {
+                            @Override
+                            public ObservableSource<Optional<T>> apply(FDResponse<T> tResponse) throws Exception {
+                                return flatResponseOptional(tResponse);
+                            }
+                        });
+            }
+        };
+    }
+
+    /**
      * 在调用线程中执行并回调
      */
     protected <T> ObservableTransformer<FDResponse<T>, T> applySchedulersFixed() {
@@ -288,6 +349,23 @@ public class FDApi {
                     @Override
                     public ObservableSource<T> apply(FDResponse<T> tResponse) throws Exception {
                         return flatResponse(tResponse);
+                    }
+                });
+            }
+        };
+    }
+
+    /**
+     * 在调用线程中执行并回调 包装结果
+     */
+    protected <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersFixedOptional() {
+        return new ObservableTransformer<FDResponse<T>, Optional<T>>() {
+            @Override
+            public ObservableSource<Optional<T>> apply(Observable<FDResponse<T>> upstream) {
+                return upstream.flatMap(new Function<FDResponse<T>, ObservableSource<Optional<T>>>() {
+                    @Override
+                    public ObservableSource<Optional<T>> apply(FDResponse<T> tResponse) throws Exception {
+                        return flatResponseOptional(tResponse);
                     }
                 });
             }
