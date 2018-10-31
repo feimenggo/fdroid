@@ -201,7 +201,6 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
             }
         }
         isViewCreated = false;
-        mIsFirstVisible = true;
     }
 
     /**
