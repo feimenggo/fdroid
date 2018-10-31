@@ -53,7 +53,11 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
         super.onViewCreated(view, savedInstanceState);
         if (!isViewCreated) {
             isViewCreated = true;
-            initView(view, savedInstanceState);
+            // 判断是否已经初始化
+            if (view.getTag() == null) {
+                initView(view, savedInstanceState);
+                view.setTag(true); // 已经初始化
+            }
         }
     }
 
@@ -132,9 +136,7 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
 //        //此处是对子 Fragment 不可见的限制，因为 子 Fragment 先于父 Fragment回调本方法 currentVisibleState 置位 false
 //        // 当父 dispatchChildVisibleState 的时候第二次回调本方法 visible = false 所以此处 visible 将直接返回
         if (!isViewCreated) return;
-        if (currentVisibleState == visible) {
-            return;
-        }
+        if (currentVisibleState == visible) return;
         currentVisibleState = visible;
         if (visible) {
             if (mIsFirstVisible) {

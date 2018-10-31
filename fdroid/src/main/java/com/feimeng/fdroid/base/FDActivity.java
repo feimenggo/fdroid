@@ -57,7 +57,6 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
         if (mPresenter != null && mPresenter.isActive()) mPresenter.init();
     }
 
-
     @Override
     public void setContentView(View view) {
         super.setContentView(view);
