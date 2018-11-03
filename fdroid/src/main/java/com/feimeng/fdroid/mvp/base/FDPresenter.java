@@ -4,8 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
+import android.support.v4.app.FragmentActivity;
 
 import com.feimeng.fdroid.base.FDActivity;
+import com.feimeng.fdroid.base.FDApp;
+import com.feimeng.fdroid.base.FDDialog;
 import com.feimeng.fdroid.base.FDFragment;
 import com.feimeng.fdroid.mvp.model.api.WithoutNetworkException;
 import com.feimeng.fdroid.utils.L;
@@ -72,7 +75,13 @@ public abstract class FDPresenter<V extends FDView> {
     public Context getContext() {
         if (mView == null) return null;
         if (mView instanceof FDFragment) {
-            return ((FDFragment) mView).getActivity().getApplicationContext();
+            FragmentActivity activity = ((FDFragment) mView).getActivity();
+            if (activity == null) return FDApp.getInstance();
+            return activity.getApplicationContext();
+        } else if (mView instanceof FDDialog) {
+            FragmentActivity activity = ((FDDialog) mView).getActivity();
+            if (activity == null) return FDApp.getInstance();
+            return activity.getApplicationContext();
         }
         return ((Context) mView).getApplicationContext();
     }
@@ -86,6 +95,8 @@ public abstract class FDPresenter<V extends FDView> {
         if (mView == null) return null;
         if (mView instanceof FDFragment) {
             return (FDActivity) ((FDFragment) mView).getActivity();
+        } else if (mView instanceof FDDialog) {
+            return (FDActivity) ((FDDialog) mView).getActivity();
         }
         return (FDActivity) mView;
     }
@@ -103,10 +114,13 @@ public abstract class FDPresenter<V extends FDView> {
 
     public void showDialog(String message, boolean cancelable) {
         if (mView == null) return;
-        if (mView instanceof FDActivity)
+        if (mView instanceof FDActivity) {
             ((FDActivity) mView).showLoadingDialog(message, cancelable);
-        else if (mView instanceof FDFragment)
+        } else if (mView instanceof FDFragment) {
             ((FDFragment) mView).showLoadingDialog(message, cancelable);
+        } else if (mView instanceof FDDialog) {
+            ((FDDialog) mView).showLoadingDialog(message, cancelable);
+        }
     }
 
     /**
@@ -114,10 +128,13 @@ public abstract class FDPresenter<V extends FDView> {
      */
     public void hideDialog() {
         if (mView == null) return;
-        if (mView instanceof FDActivity)
+        if (mView instanceof FDActivity) {
             ((FDActivity) mView).hideLoadingDialog();
-        else if (mView instanceof FDFragment)
+        } else if (mView instanceof FDFragment) {
             ((FDFragment) mView).hideLoadingDialog();
+        } else if (mView instanceof FDDialog) {
+            ((FDDialog) mView).hideLoadingDialog();
+        }
     }
 
     /**
@@ -127,6 +144,8 @@ public abstract class FDPresenter<V extends FDView> {
         if (mView == null) return observable;
         if (mView instanceof FDFragment) {
             return observable.compose(((FDFragment) mView).<T>bindToLifecycle());
+        } else if (mView instanceof FDDialog) {
+            return observable.compose(((FDDialog) mView).<T>bindToLifecycle());
         }
         return observable.compose(((FDActivity) mView).<T>bindToLifecycle());
     }
@@ -135,7 +154,7 @@ public abstract class FDPresenter<V extends FDView> {
      * 指定在哪个生命周期方法调用时取消订阅 Activity
      */
     public <T> Observable<T> lifecycle(@NonNull Observable<T> observable, @NonNull ActivityEvent event) {
-        if (mView != null && mView instanceof FDActivity) {
+        if (mView instanceof FDActivity) {
             return observable.compose(((FDActivity) mView).<T>bindUntilEvent(event));
         }
         return observable;
@@ -145,8 +164,10 @@ public abstract class FDPresenter<V extends FDView> {
      * 指定在哪个生命周期方法调用时取消订阅 Fragment
      */
     public <T> Observable<T> lifecycle(@NonNull Observable<T> observable, @NonNull FragmentEvent event) {
-        if (mView != null && mView instanceof FDFragment) {
+        if (mView instanceof FDFragment) {
             return observable.compose(((FDFragment) mView).<T>bindUntilEvent(event));
+        } else if (mView instanceof FDDialog) {
+            return observable.compose(((FDDialog) mView).<T>bindUntilEvent(event));
         }
         return observable;
     }
