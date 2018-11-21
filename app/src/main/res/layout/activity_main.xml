@@ -13,17 +13,10 @@
         android:text="FDroid MVP Framework" />
 
     <Button
-        android:id="@+id/crash"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/name"
-        android:text="立刻崩溃" />
-
-    <Button
         android:id="@+id/login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/crash"
+        android:layout_below="@id/name"
         android:text="登录" />
 
     <Button
@@ -32,6 +25,13 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/login"
         android:text="注册" />
+
+    <Button
+        android:id="@+id/getUserInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/login"
+        android:text="同步获取用户信息" />
 
     <Button
         android:id="@+id/showLoading"

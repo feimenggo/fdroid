@@ -5,6 +5,7 @@ import com.feimeng.fdroid.mvp.model.api.bean.Response;
 
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
+import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
@@ -18,4 +19,7 @@ public interface ApiService {
 
     @POST("user/register")
     Observable<Response<Void>> register(@Body RequestBody requestBody);
+
+    @POST("user/info")
+    Call<Response<Integer>> getUserInfo(@Body RequestBody requestBody);
 }

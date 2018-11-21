@@ -22,7 +22,6 @@
         </activity>
         <activity android:name=".login.LoginActivity" />
         <activity android:name=".login.TestActivity" />
-        <activity android:name=".CrashActivity" />
     </application>
 
 </manifest>

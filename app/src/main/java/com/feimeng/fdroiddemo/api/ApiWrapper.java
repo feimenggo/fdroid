@@ -15,6 +15,7 @@ public class ApiWrapper extends FDApi {
     private ApiWrapper() {
         addHttpMockData("user/login", "{\"code\":200,\"info\":\"成功\",\"data\":1}");
         addHttpMockData("user/register", "{\"code\":200,\"info\":\"成功\",\"data\":null}");
+        addHttpMockData("user/info", "{\"code\":210,\"info\":\"失败\",\"data\":null}");
         api = getRetrofit("http://www.baidu.com/").create(ApiService.class);
     }
 
@@ -28,5 +29,9 @@ public class ApiWrapper extends FDApi {
 
     public Observable<Optional<Void>> register(String phone, String password) {
         return api.register(json("phone", phone, "password", password)).compose(this.<Void>applySchedulersNewOptional());
+    }
+
+    public Integer getUserInfo(String phone, String password) throws Exception {
+        return call(api.getUserInfo(json("phone", phone, "password", password)));
     }
 }

@@ -4,10 +4,10 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.widget.TextView;
 
 import com.feimeng.fdroid.base.FDActivity;
 import com.feimeng.fdroid.bean.Ignore;
+import com.feimeng.fdroid.exception.ApiException;
 import com.feimeng.fdroid.mvp.model.api.bean.ApiFinish2;
 import com.feimeng.fdroid.mvp.model.api.bean.Optional;
 import com.feimeng.fdroid.utils.FastTask;
@@ -28,9 +28,9 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.crash).setOnClickListener(this);
         findViewById(R.id.login).setOnClickListener(this);
         findViewById(R.id.register).setOnClickListener(this);
+        findViewById(R.id.getUserInfo).setOnClickListener(this);
         findViewById(R.id.showLoading).setOnClickListener(this);
         findViewById(R.id.hideLoading).setOnClickListener(this);
     }
@@ -50,20 +50,18 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
         return new MainPresenter();
     }
 
-    TextView a;
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.crash:
-                a.setText("");
-                break;
             case R.id.login:
                 LoginActivity.start(this);
                 break;
             case R.id.register:
                 testChoose();
 //                register();
+                break;
+            case R.id.getUserInfo:
+                getUserInfoSync();
                 break;
             case R.id.showLoading:
                 new FastTask<Ignore>() {
@@ -85,6 +83,23 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
                 hideLoadingDialog();
                 break;
         }
+    }
+
+    private void getUserInfoSync() {
+        new FastTask<Ignore>() {
+            @Override
+            public Ignore task() throws Exception {
+                try {
+                    Integer aVoid = ApiWrapper.getInstance().getUserInfo("", "");
+                    L.d("nodawang", aVoid);
+                } catch (ApiException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return Ignore.instance;
+            }
+        }.runIO();
     }
 
     private void testChoose() {

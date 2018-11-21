@@ -3,6 +3,7 @@ package com.feimeng.fdroid.mvp.model.api;
 import android.support.annotation.NonNull;
 
 import com.feimeng.fdroid.config.FDConfig;
+import com.feimeng.fdroid.exception.ApiException;
 import com.feimeng.fdroid.exception.Info;
 import com.feimeng.fdroid.mvp.model.api.bean.FDApiFinish;
 import com.feimeng.fdroid.mvp.model.api.bean.FDResponse;
@@ -38,9 +39,11 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Converter;
 import retrofit2.HttpException;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -162,29 +165,6 @@ public class FDApi {
     }
 
     /**
-     * 自定义异常，当接口返回的{@link FDResponse#isSuccess()}为false时，需要抛出此异常
-     * eg：请求参数不全、用户令牌错误等
-     */
-    public static class APIException extends Exception {
-        int code;
-        String message;
-
-        public APIException(int code, String message) {
-            this.code = code;
-            this.message = message;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        @Override
-        public String getMessage() {
-            return message;
-        }
-    }
-
-    /**
      * 设置响应结果监听
      *
      * @param responseCodeInterceptorListener 响应结果码监听器
@@ -235,7 +215,7 @@ public class FDApi {
                         emitter.onComplete();
                         return;
                     }
-                    emitter.onError(new APIException(response.getCode(), response.getInfo()));
+                    emitter.onError(new ApiException(response.getCode(), response.getInfo()));
                 }
             }
         });
@@ -258,7 +238,7 @@ public class FDApi {
                         emitter.onComplete();
                         return;
                     }
-                    emitter.onError(new APIException(response.getCode(), response.getInfo()));
+                    emitter.onError(new ApiException(response.getCode(), response.getInfo()));
                 }
             }
         });
@@ -399,8 +379,8 @@ public class FDApi {
                             }
                         }
                     }
-                    if (e instanceof APIException) {
-                        if (fdApiFinish.apiFail((APIException) e))
+                    if (e instanceof ApiException) {
+                        if (fdApiFinish.apiFail((ApiException) e))
                             fdApiFinish.fail(e, e.getMessage());
                     } else if (e instanceof WithoutNetworkException) {
                         // 直接结束 会回调FDPresenter.OnWithoutNetwork.withoutNetwork()方法
@@ -441,5 +421,21 @@ public class FDApi {
                 fdApiFinish.stop();
             }
         };
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T call(Call<? extends FDResponse<T>> call) throws Exception {
+        retrofit2.Response<FDResponse<T>> callResponse = (Response<FDResponse<T>>) call.execute();
+        if (!callResponse.isSuccessful())
+            throw new ApiException(ApiException.CODE_REQUEST_UNSUCCESSFUL, "Request unsuccessful");
+        FDResponse<T> response = callResponse.body();
+        if (response == null)
+            throw new ApiException(ApiException.CODE_CONTENT_NULL, "Content is null");
+        if (response.isSuccess()) {
+            return response.getData();
+        }
+        if (responseCodeInterceptor(response))
+            throw new ApiException(ApiException.CODE_RESPONSE_INTERCEPTOR, "Response interceptor");
+        throw new ApiException(response.getCode(), response.getInfo());
     }
 }
