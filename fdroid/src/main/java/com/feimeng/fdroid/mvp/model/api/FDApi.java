@@ -55,8 +55,8 @@ import static com.feimeng.fdroid.config.FDConfig.SHOW_HTTP_LOG;
  * Created by feimeng on 2017/1/20.
  */
 public class FDApi {
-    private List<HeaderParam> mHeaderParam;// 自定义请求头
-    private Map<String, String> mMockData;// 模拟请求
+    private List<HeaderParam> mHeaderParam; // 自定义请求头
+    private Map<String, String> mMockData; // 模拟请求
     private ResponseCodeInterceptorListener mResponseCodeInterceptorListener;
     private int[] mResponseCodes = new int[]{};
     private Retrofit retrofit;
@@ -146,9 +146,9 @@ public class FDApi {
             logInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         }
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
-                .connectTimeout(FDConfig.CONNECT_TIMEOUT, TimeUnit.SECONDS)// 连接超时时间为15秒
-                .writeTimeout(FDConfig.WRITE_TIMEOUT, TimeUnit.SECONDS)// 写入超时时间
-                .readTimeout(FDConfig.READ_TIMEOUT, TimeUnit.SECONDS);// 读取超时时间
+                .connectTimeout(FDConfig.CONNECT_TIMEOUT, TimeUnit.SECONDS) // 连接超时时间为15秒
+                .writeTimeout(FDConfig.WRITE_TIMEOUT, TimeUnit.SECONDS) // 写入超时时间
+                .readTimeout(FDConfig.READ_TIMEOUT, TimeUnit.SECONDS); // 读取超时时间
         if (mHeaderParam != null && !mHeaderParam.isEmpty())
             clientBuilder.addInterceptor(new HeaderInterceptor(mHeaderParam));
         if (logInterceptor != null) clientBuilder.addInterceptor(logInterceptor);
@@ -424,7 +424,7 @@ public class FDApi {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T call(Call<? extends FDResponse<T>> call) throws Exception {
+    protected <T> T call(Call<? extends FDResponse<T>> call) throws Exception {
         retrofit2.Response<FDResponse<T>> callResponse = (Response<FDResponse<T>>) call.execute();
         if (!callResponse.isSuccessful())
             throw new ApiException(ApiException.CODE_REQUEST_UNSUCCESSFUL, "Request unsuccessful");

@@ -7,6 +7,7 @@ package com.feimeng.fdroid.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.feimeng.fdroid.base.FDActivity;
 
@@ -66,20 +67,19 @@ public class ActivityPageManager {
     /**
      * get current activity from Stack
      */
+    @Nullable
     public FDActivity currentActivity() {
-        return activityStack.lastElement();
+        return activityStack.size() == 0 ? null : activityStack.lastElement();
     }
 
     public void finishActivity() {
-        Activity activity = activityStack.lastElement();
-        finishActivity(activity);
+        finishActivity(currentActivity());
     }
 
     public void finishActivity(Activity activity) {
         if (activity != null) {
             activityStack.remove(activity);
             activity.finish();
-            activity = null;
         }
     }
 

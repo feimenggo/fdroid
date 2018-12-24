@@ -1,5 +1,5 @@
 # FDroid
->优雅的Android MVP敏捷开发框架 ———— FDroid
+>优雅的Android MVP开发框架 ———— FDroid
 -------
 ## 特性
 - [x] `网络请求`：基于RxJava+Retrofit+Gson+FDroid的封装，支持对网络请求结果的统一处理、请求结果回调到UI线程、自动判断网络连接状态、自动管理生命周期、模拟后台返回数据、自定义请求头、请求响应日志打印、每个阶段都可扩展等。
@@ -7,7 +7,6 @@
 - [x] `模板开发`：无需编写MVP的各层代码，利用Android Studio Template一键生成具有View+Contract+Presenter的Activity。模板下载：FDActivity
 - [x] `强大的控制层`：进行网络请求时，自动显隐等待对话框；使用FastTask类轻松进行耗时操作，自动回调到UI线程；
 - [x] `有用的FDFragment`：支持缓存rootView，防止重复加载布局；拥有是否对用户可见的操作；
-- [x] `版本升级`：一行代码实现APP版本升级。框架自带版本升级功能，不用自己实现版本升级逻辑。支持自动安装、强制升级、免流量安装等。
 - [x] `L/T/SP类`：对Log、Toast和SharedP进行的有趣封装；Log支持显示打印的位置；全局管理log和Toast的显隐；
 - [x] `丰富的工具包`：RxBus、FilePicker等，不停追加中。
 
@@ -25,7 +24,7 @@ allprojects {
 ```groovy
 dependencies {
   //...
-  api 'com.github.feimenggo:fdroid:3.1.20'
+  api 'com.github.feimenggo:fdroid:3.2.0'
 }
 ```
 #### Step 3.自定义Application继承FDApp.java

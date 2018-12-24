@@ -161,7 +161,7 @@ public abstract class FDPresenter<V extends FDView> {
     }
 
     /**
-     * 指定在哪个生命周期方法调用时取消订阅 Fragment
+     * 指定在哪个生命周期方法调用时取消订阅 Fragment/Dialog
      */
     public <T> Observable<T> lifecycle(@NonNull Observable<T> observable, @NonNull FragmentEvent event) {
         if (mView instanceof FDFragment) {

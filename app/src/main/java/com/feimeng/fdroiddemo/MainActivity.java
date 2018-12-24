@@ -64,19 +64,19 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
                 getUserInfoSync();
                 break;
             case R.id.showLoading:
-                new FastTask<Ignore>() {
-                    @Override
-                    public Ignore task() throws Exception {
-                        Thread.sleep(2000);
-                        return Ignore.instance;
-                    }
-                }.runIO(new FastTask.Result<Ignore>() {
-                    @Override
-                    public void success(Ignore ignore) {
-                        L.d("nodawang", "hello");
-                    }
-                }, this);
-//                showLoadingDialog("拼命加载中...", true);
+//                new FastTask<Ignore>() {
+//                    @Override
+//                    public Ignore task() throws Exception {
+//                        Thread.sleep(2000);
+//                        return Ignore.instance;
+//                    }
+//                }.runIO(new FastTask.Result<Ignore>() {
+//                    @Override
+//                    public void success(Ignore ignore) {
+//                        L.d("nodawang", "hello");
+//                    }
+//                }, this);
+                showLoadingDialog("拼命加载中...", true);
 //                showLoadingDialog("拼命加载中2...");
                 break;
             case R.id.hideLoading:
