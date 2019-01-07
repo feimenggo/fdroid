@@ -106,8 +106,9 @@ public class FDApi {
     }
 
     protected OkHttpClient startMock(OkHttpClient.Builder clientBuilder) {
-        if (mMockData != null && !mMockData.isEmpty())
+        if (mMockData != null && !mMockData.isEmpty()) {
             clientBuilder.addInterceptor(new MockInterceptor(mMockData));
+        }
         return clientBuilder.build();
     }
 

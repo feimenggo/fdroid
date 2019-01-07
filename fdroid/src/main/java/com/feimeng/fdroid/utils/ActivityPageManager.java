@@ -19,8 +19,8 @@ import java.util.Stack;
  * Created by feimeng on 2017/1/20.
  */
 public class ActivityPageManager {
-    private static Stack<FDActivity> activityStack;
     private static ActivityPageManager instance;
+    private static Stack<FDActivity> activityStack = new Stack<>();
 
     /**
      * constructor
@@ -37,9 +37,7 @@ public class ActivityPageManager {
      * get the AppManager instance, the AppManager is singleton.
      */
     public static ActivityPageManager getInstance() {
-        if (instance == null) {
-            instance = new ActivityPageManager();
-        }
+        if (instance == null) instance = new ActivityPageManager();
         return instance;
     }
 
@@ -47,9 +45,6 @@ public class ActivityPageManager {
      * add Activity to Stack
      */
     public void addActivity(FDActivity activity) {
-        if (activityStack == null) {
-            activityStack = new Stack<>();
-        }
         activityStack.add(activity);
     }
 
@@ -58,9 +53,6 @@ public class ActivityPageManager {
      * remove Activity from Stack
      */
     public void removeActivity(FDActivity activity) {
-        if (activityStack == null) {
-            activityStack = new Stack<>();
-        }
         activityStack.remove(activity);
     }
 
