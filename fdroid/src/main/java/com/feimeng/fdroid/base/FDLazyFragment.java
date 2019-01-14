@@ -50,7 +50,6 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         if (!isViewCreated) {
             isViewCreated = true;
             // 判断是否已经初始化
@@ -59,6 +58,7 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
                 view.setTag(true); // 已经初始化
             }
         }
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
