@@ -14,7 +14,7 @@ import com.feimeng.fdroid.utils.FastTask;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.RxJavas;
 import com.feimeng.fdroid.utils.T;
-import com.feimeng.fdroid.widget.FDialog;
+import com.feimeng.fdroid.widget.LoadingDialog;
 import com.feimeng.fdroiddemo.api.ApiWrapper;
 import com.feimeng.fdroiddemo.login.LoginActivity;
 
@@ -37,12 +37,12 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
 
     @Override
     protected Dialog createLoadingDialog(@Nullable String message) {
-        return new FDialog(this, message == null ? "" : message);
+        return new LoadingDialog(this, message == null ? "" : message);
     }
 
     @Override
     protected void updateLoadingDialog(@Nullable Dialog dialog, @Nullable String message) {
-        if (dialog != null) ((FDialog) dialog).setMessage(message);
+        if (dialog != null) ((LoadingDialog) dialog).setMessage(message);
     }
 
     @Override

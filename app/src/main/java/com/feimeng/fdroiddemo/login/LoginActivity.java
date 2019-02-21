@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 import com.feimeng.fdroid.base.FDActivity;
-import com.feimeng.fdroid.mvp.model.api.FDApi;
+import com.feimeng.fdroid.widget.LoadingDialog;
 import com.feimeng.fdroiddemo.R;
 
 public class LoginActivity extends FDActivity<LoginContract.View, LoginContract.Presenter> implements LoginContract.View, View.OnClickListener {
@@ -36,6 +36,10 @@ public class LoginActivity extends FDActivity<LoginContract.View, LoginContract.
 
     @Override
     protected void updateLoadingDialog(@Nullable Dialog dialog, @Nullable String message) {
-        if (dialog == null) FDApi.cancelApi("login");
+        if (dialog != null) {
+            if (dialog instanceof LoadingDialog) {
+                ((LoadingDialog) dialog).setMessage(message);
+            }
+        }
     }
 }

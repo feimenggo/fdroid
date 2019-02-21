@@ -11,7 +11,7 @@ import android.view.View;
 import com.feimeng.fdroid.mvp.base.FDPresenter;
 import com.feimeng.fdroid.mvp.base.FDView;
 import com.feimeng.fdroid.utils.ActivityPageManager;
-import com.feimeng.fdroid.widget.FDialog;
+import com.feimeng.fdroid.widget.LoadingDialog;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 /**
@@ -71,7 +71,7 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
      * @return Dialog 对话框
      */
     protected Dialog createLoadingDialog(@Nullable String message) {
-        return new FDialog(this, message == null ? "" : message);
+        return new LoadingDialog(this, message == null ? "" : message);
     }
 
     protected void updateLoadingDialog(@Nullable Dialog dialog, @Nullable String message) {
@@ -100,6 +100,7 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
                 public void onDismiss(DialogInterface dialog) {
                     mLoadTimes = 0;
                     mLoading = null;
+                    if (mPresenter != null) mPresenter.onDialogDismiss();
                     updateLoadingDialog(null, null);
                 }
             });
@@ -107,7 +108,6 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
             updateLoadingDialog(mLoading, message);
         }
         mLoading.setCancelable(cancelable);
-        mLoading.setCanceledOnTouchOutside(cancelable);
         if (!mLoading.isShowing()) mLoading.show();
     }
 

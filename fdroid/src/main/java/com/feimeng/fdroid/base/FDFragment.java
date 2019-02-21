@@ -9,7 +9,7 @@ import android.view.View;
 
 import com.feimeng.fdroid.mvp.base.FDPresenter;
 import com.feimeng.fdroid.mvp.base.FDView;
-import com.feimeng.fdroid.widget.FDialog;
+import com.feimeng.fdroid.widget.LoadingDialog;
 import com.trello.rxlifecycle2.components.support.RxFragment;
 
 /**
@@ -54,7 +54,7 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
      * @return Dialog 对话框
      */
     protected Dialog createLoadingDialog(String message) {
-        return new FDialog(getActivity(), message == null ? "" : message);
+        return new LoadingDialog(getActivity(), message == null ? "" : message);
     }
 
     protected void updateLoadingDialog(@Nullable Dialog dialog, @Nullable String message) {
@@ -80,6 +80,7 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
                 public void onDismiss(DialogInterface dialog) {
                     mLoadTimes = 0;
                     mLoading = null;
+                    if (mPresenter != null) mPresenter.onDialogDismiss();
                     updateLoadingDialog(null, null);
                 }
             });

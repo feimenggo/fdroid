@@ -10,11 +10,15 @@ import com.feimeng.fdroid.base.FDActivity;
 import com.feimeng.fdroid.base.FDApp;
 import com.feimeng.fdroid.base.FDDialog;
 import com.feimeng.fdroid.base.FDFragment;
+import com.feimeng.fdroid.mvp.model.api.FDApi;
 import com.feimeng.fdroid.mvp.model.api.WithoutNetworkException;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.NetworkUtil;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 import com.trello.rxlifecycle2.android.FragmentEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -25,6 +29,7 @@ import io.reactivex.ObservableOnSubscribe;
  * Created by feimeng on 2017/1/20.
  */
 public abstract class FDPresenter<V extends FDView> {
+    private List<String> mApiTags;
     protected V mView;// 视图
 
     /**
@@ -109,10 +114,14 @@ public abstract class FDPresenter<V extends FDView> {
     }
 
     public void showDialog(String message) {
-        showDialog(message, true);
+        showDialog(message, true, null);
     }
 
-    public void showDialog(String message, boolean cancelable) {
+    public void showDialogApiTag(String withApiTag) {
+        showDialog(null, true, withApiTag);
+    }
+
+    public void showDialog(String message, boolean cancelable, String withApiTag) {
         if (mView == null) return;
         if (mView instanceof FDActivity) {
             ((FDActivity) mView).showLoadingDialog(message, cancelable);
@@ -120,6 +129,12 @@ public abstract class FDPresenter<V extends FDView> {
             ((FDFragment) mView).showLoadingDialog(message, cancelable);
         } else if (mView instanceof FDDialog) {
             ((FDDialog) mView).showLoadingDialog(message, cancelable);
+        } else {
+            return;
+        }
+        if (withApiTag != null) {
+            if (mApiTags == null) mApiTags = new ArrayList<>();
+            mApiTags.add(withApiTag);
         }
     }
 
@@ -135,6 +150,14 @@ public abstract class FDPresenter<V extends FDView> {
         } else if (mView instanceof FDDialog) {
             ((FDDialog) mView).hideLoadingDialog();
         }
+    }
+
+    public void onDialogDismiss() {
+        if (mApiTags == null || mApiTags.isEmpty()) return;
+        for (String apiTag : mApiTags) {
+            FDApi.cancelApi(apiTag);
+        }
+        mApiTags.clear();
     }
 
     /**
