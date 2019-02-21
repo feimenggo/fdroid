@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -55,6 +56,7 @@ import static com.feimeng.fdroid.config.FDConfig.SHOW_HTTP_LOG;
  * Created by feimeng on 2017/1/20.
  */
 public class FDApi {
+    private static final Map<String, Disposable> mApiTags = new HashMap<>(); // 请求列表
     private List<HeaderParam> mHeaderParam; // 自定义请求头
     private Map<String, String> mMockData; // 模拟请求
     private ResponseCodeInterceptorListener mResponseCodeInterceptorListener;
@@ -353,11 +355,29 @@ public class FDApi {
         };
     }
 
+    /**
+     * 订阅请求
+     *
+     * @param fdApiFinish 响应结果
+     * @param <T>         响应数据
+     */
     public static <T> Observer<T> subscriber(final FDApiFinish<T> fdApiFinish) {
+        return subscriber(null, fdApiFinish);
+    }
+
+    /**
+     * 订阅请求
+     *
+     * @param apiTag      给本次请求添加标签，用于手动取消该请求
+     * @param fdApiFinish 响应结果
+     * @param <T>         响应数据
+     */
+    public static <T> Observer<T> subscriber(final String apiTag, final FDApiFinish<T> fdApiFinish) {
         return new Observer<T>() {
             @Override
-            public void onSubscribe(Disposable d) {
+            public void onSubscribe(Disposable disposable) {
                 if (SHOW_HTTP_LOG) L.d("请求开始 线程：" + Thread.currentThread().getName());
+                if (apiTag != null) requestApi(apiTag, disposable);
                 fdApiFinish.start();
             }
 
@@ -413,12 +433,14 @@ public class FDApi {
                         fdApiFinish.fail(e, error);
                     }
                 }
+                removeApi(apiTag);
                 fdApiFinish.stop();
             }
 
             @Override
             public void onComplete() {
                 if (SHOW_HTTP_LOG) L.d("请求结束 线程：" + Thread.currentThread().getName());
+                removeApi(apiTag);
                 fdApiFinish.stop();
             }
         };
@@ -438,5 +460,28 @@ public class FDApi {
         if (responseCodeInterceptor(response))
             throw new ApiException(ApiException.CODE_RESPONSE_INTERCEPTOR, "Response interceptor");
         throw new ApiException(response.getCode(), response.getInfo());
+    }
+
+    public static void requestApi(String apiTag, Disposable disposable) {
+        mApiTags.put(apiTag, disposable);
+    }
+
+    public static void cancelApi() {
+        if (mApiTags.isEmpty()) return;
+        Set<String> apis = mApiTags.keySet();
+        for (String api : apis) cancelApi(api);
+    }
+
+    public static void cancelApi(String apiTag) {
+        if (mApiTags.isEmpty()) return;
+        Disposable disposable = mApiTags.get(apiTag);
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+            removeApi(apiTag);
+        }
+    }
+
+    public static void removeApi(String apiTag) {
+        mApiTags.remove(apiTag);
     }
 }

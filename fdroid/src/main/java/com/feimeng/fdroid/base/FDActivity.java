@@ -107,6 +107,7 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
             updateLoadingDialog(mLoading, message);
         }
         mLoading.setCancelable(cancelable);
+        mLoading.setCanceledOnTouchOutside(cancelable);
         if (!mLoading.isShowing()) mLoading.show();
     }
 

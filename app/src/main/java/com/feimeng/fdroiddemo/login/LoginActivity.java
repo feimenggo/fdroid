@@ -1,11 +1,14 @@
 package com.feimeng.fdroiddemo.login;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.view.View;
 
 import com.feimeng.fdroid.base.FDActivity;
+import com.feimeng.fdroid.mvp.model.api.FDApi;
 import com.feimeng.fdroiddemo.R;
 
 public class LoginActivity extends FDActivity<LoginContract.View, LoginContract.Presenter> implements LoginContract.View, View.OnClickListener {
@@ -29,5 +32,10 @@ public class LoginActivity extends FDActivity<LoginContract.View, LoginContract.
     @Override
     public void onClick(View v) {
         mPresenter.login();
+    }
+
+    @Override
+    protected void updateLoadingDialog(@Nullable Dialog dialog, @Nullable String message) {
+        if (dialog == null) FDApi.cancelApi("login");
     }
 }
