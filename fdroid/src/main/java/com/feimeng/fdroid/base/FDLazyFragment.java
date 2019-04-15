@@ -28,8 +28,8 @@ import java.util.List;
 public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>> extends FDFragment<V, P> {
     protected WeakReference<View> mRootView;
     private boolean mIsFirstVisible = true;
-    private boolean isViewCreated = false;
-    private boolean currentVisibleState = false;
+    private boolean mIsViewCreated = false;
+    private boolean mCurrentVisibleState = false;
 
     public View getRootView() {
         return mRootView.get();
@@ -50,8 +50,8 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        if (!isViewCreated) {
-            isViewCreated = true;
+        if (!mIsViewCreated) {
+            mIsViewCreated = true;
             // 判断是否已经初始化
             if (view.getTag() == null) {
                 initView(view, savedInstanceState);
@@ -64,13 +64,13 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        // 对于默认 tab 和 间隔 checked tab 需要等到 isViewCreated = true 后才可以通过此通知用户可见
-        // 这种情况下第一次可见不是在这里通知 因为 isViewCreated = false 成立,等从别的界面回到这里后会使用 onFragmentResume 通知可见
+        // 对于默认 tab 和 间隔 checked tab 需要等到 mIsViewCreated = true 后才可以通过此通知用户可见
+        // 这种情况下第一次可见不是在这里通知 因为 mIsViewCreated = false 成立,等从别的界面回到这里后会使用 onFragmentResume 通知可见
         // 对于非默认 tab mIsFirstVisible = true 会一直保持到选择则这个 tab 的时候，因为在 onActivityCreated 会返回 false
-        if (isViewCreated) {
-            if (isVisibleToUser && !currentVisibleState) {
+        if (mIsViewCreated) {
+            if (isVisibleToUser && !mCurrentVisibleState) {
                 dispatchUserVisibleHint(true);
-            } else if (!isVisibleToUser && currentVisibleState) {
+            } else if (!isVisibleToUser && mCurrentVisibleState) {
                 dispatchUserVisibleHint(false);
             }
         }
@@ -101,7 +101,7 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
     public void onResume() {
         super.onResume();
         if (!mIsFirstVisible) {
-            if (!isHidden() && !currentVisibleState && getUserVisibleHint()) {
+            if (!isHidden() && !mCurrentVisibleState && getUserVisibleHint()) {
                 dispatchUserVisibleHint(true);
             }
         }
@@ -112,7 +112,7 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
         super.onPause();
         // 当前 Fragment 包含子 Fragment 的时候 dispatchUserVisibleHint 内部本身就会通知子 Fragment 不可见
         // 子 fragment 走到这里的时候自身又会调用一遍 ？
-        if (currentVisibleState && getUserVisibleHint()) {
+        if (mCurrentVisibleState && getUserVisibleHint()) {
             dispatchUserVisibleHint(false);
         }
     }
@@ -129,15 +129,15 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
      */
     private void dispatchUserVisibleHint(boolean visible) {
         //当前 Fragment 是 child 时候 作为缓存 Fragment 的子 fragment getUserVisibleHint = true
-        //但当父 fragment 不可见所以 currentVisibleState = false 直接 return 掉
+        //但当父 fragment 不可见所以 mCurrentVisibleState = false 直接 return 掉
 //        L.e(getClass().getSimpleName() + "  dispatchUserVisibleHint isParentInvisible() " + isParentInvisible());
         // 这里限制则可以限制多层嵌套的时候子 Fragment 的分发
         if (visible && isParentInvisible()) return;
-//        //此处是对子 Fragment 不可见的限制，因为 子 Fragment 先于父 Fragment回调本方法 currentVisibleState 置位 false
+//        //此处是对子 Fragment 不可见的限制，因为 子 Fragment 先于父 Fragment回调本方法 mCurrentVisibleState 置位 false
 //        // 当父 dispatchChildVisibleState 的时候第二次回调本方法 visible = false 所以此处 visible 将直接返回
-        if (!isViewCreated) return;
-        if (currentVisibleState == visible) return;
-        currentVisibleState = visible;
+        if (!mIsViewCreated) return;
+        if (mCurrentVisibleState == visible) return;
+        mCurrentVisibleState = visible;
         if (visible) {
             if (mIsFirstVisible) {
                 mIsFirstVisible = false;
@@ -163,7 +163,7 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
     }
 
     private boolean isSupportVisible() {
-        return currentVisibleState;
+        return mCurrentVisibleState;
     }
 
     /**
@@ -182,7 +182,7 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
     private void dispatchChildVisibleState(boolean visible) {
         FragmentManager childFragmentManager = getChildFragmentManager();
         List<Fragment> fragments = childFragmentManager.getFragments();
-        if (fragments != null && !fragments.isEmpty()) {
+        if (!fragments.isEmpty()) {
             for (Fragment child : fragments) {
                 if (child instanceof FDLazyFragment && !child.isHidden() && child.getUserVisibleHint()) {
                     ((FDLazyFragment) child).dispatchUserVisibleHint(visible);
@@ -200,7 +200,7 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
                 parent.removeView(getView());
             }
         }
-        isViewCreated = false;
+        mIsViewCreated = false;
     }
 
     /**

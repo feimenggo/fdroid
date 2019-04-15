@@ -36,7 +36,7 @@ public class Optional<M> {
     }
 
     public static Optional<Void> empty() {
-        if (NULL == null) NULL = new Optional<Void>(null);
+        if (NULL == null) NULL = new Optional<>(null);
         return NULL;
     }
 }

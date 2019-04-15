@@ -8,24 +8,26 @@ import android.content.pm.PackageManager;
  * Created by feimeng on 2016/6/22.
  */
 public class VersionUtils {
-    public static int getVerCode(Context context) {
-        int verCode = -1;
+    public static long getVerCode(Context context) {
+        long verCode;
         try {
             verCode = context.getPackageManager().getPackageInfo(
-                    context.getPackageName(), 0).versionCode;
+                    context.getPackageName(), 0).getLongVersionCode();
         } catch (PackageManager.NameNotFoundException e) {
             L.e(e.getMessage());
+            verCode = -1;
         }
         return verCode;
     }
 
     public static String getVerName(Context context) {
-        String verName = "";
+        String verName;
         try {
             verName = context.getPackageManager().getPackageInfo(
                     context.getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             L.e(e.getMessage());
+            verName = "";
         }
         return verName;
     }

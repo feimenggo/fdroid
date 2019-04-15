@@ -31,8 +31,9 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
         super.onCreate(savedInstanceState);
         // 绑定控制器
         mPresenter = initPresenter();
-        if (mPresenter != null && this instanceof FDView)
+        if (mPresenter != null && this instanceof FDView) {
             mPresenter.attach((V) this);
+        }
     }
 
     @Override

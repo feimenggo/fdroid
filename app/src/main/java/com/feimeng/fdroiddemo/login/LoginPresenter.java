@@ -15,7 +15,7 @@ public class LoginPresenter extends LoginContract.Presenter {
         })).subscribe(ApiWrapper.subscriber("login", new ApiFinish2<Integer>() {
             @Override
             public void start() {
-                showDialog("登录中...", true, "login");
+                showDialogApiTag("login");
             }
 
             @Override
