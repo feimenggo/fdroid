@@ -2,6 +2,7 @@ package com.feimeng.fdroid.utils;
 
 import com.feimeng.fdroid.base.FDActivity;
 import com.feimeng.fdroid.base.FDFragment;
+import com.feimeng.fdroid.exception.ApiException;
 import com.feimeng.fdroid.exception.Info;
 import com.feimeng.fdroid.mvp.base.FDView;
 import com.trello.rxlifecycle2.LifecycleTransformer;
@@ -152,7 +153,7 @@ public abstract class FastTask<T> {
     public abstract T task() throws Exception;
 
     public abstract static class Result<R> implements Observer<R> {
-        private static ResultFail sFail;
+        private static ResultFail sFail; // 全局异常监听
 
         public static void onFail(ResultFail fail) {
             sFail = fail;
@@ -212,8 +213,10 @@ public abstract class FastTask<T> {
         }
 
         private void onFail(Throwable throwable) {
-            if (throwable instanceof Info) {
+            if (throwable instanceof Info) { // 提示信息
                 info(throwable.getMessage());
+            } else if (throwable instanceof ApiException) { // API错误
+                fail(throwable);
             } else {
                 if (sFail != null && !sFail.onFail(throwable)) return;
                 fail(throwable);
@@ -252,6 +255,12 @@ public abstract class FastTask<T> {
     }
 
     public interface ResultFail {
+        /**
+         * 异常监听
+         *
+         * @param throwable 异常
+         * @return 是否继续调用Result.fail(Throwable throwable)方法
+         */
         boolean onFail(Throwable throwable);
     }
 }

@@ -11,6 +11,7 @@ public class ApiException extends Exception {
     public static final int CODE_CONTENT_NULL = 0;
     public static final int CODE_REQUEST_UNSUCCESSFUL = -1;
     public static final int CODE_RESPONSE_INTERCEPTOR = -2;
+    public static final int CODE_NETWORK_UNAVAILABLE = -3; // 网络不可用
     private int code;
     private String message;
 

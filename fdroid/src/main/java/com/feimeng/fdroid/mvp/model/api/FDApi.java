@@ -449,16 +449,17 @@ public class FDApi {
     @SuppressWarnings("unchecked")
     protected <T> T call(Call<? extends FDResponse<T>> call) throws Exception {
         retrofit2.Response<FDResponse<T>> callResponse = (Response<FDResponse<T>>) call.execute();
-        if (!callResponse.isSuccessful())
+        if (!callResponse.isSuccessful()) {
             throw new ApiException(ApiException.CODE_REQUEST_UNSUCCESSFUL, "Request unsuccessful");
-        FDResponse<T> response = callResponse.body();
-        if (response == null)
-            throw new ApiException(ApiException.CODE_CONTENT_NULL, "Content is null");
-        if (response.isSuccess()) {
-            return response.getData();
         }
-        if (responseCodeInterceptor(response))
+        FDResponse<T> response = callResponse.body();
+        if (response == null) {
+            throw new ApiException(ApiException.CODE_CONTENT_NULL, "Content is null");
+        }
+        if (response.isSuccess()) return response.getData();
+        if (responseCodeInterceptor(response)) {
             throw new ApiException(ApiException.CODE_RESPONSE_INTERCEPTOR, "Response interceptor");
+        }
         throw new ApiException(response.getCode(), response.getInfo());
     }
 

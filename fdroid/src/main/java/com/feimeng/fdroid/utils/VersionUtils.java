@@ -4,15 +4,19 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 
 /**
- * 版本 工具类
- * Created by feimeng on 2016/6/22.
+ * Author: Feimeng
+ * Time:   2016/6/22
+ * Description: 版本 工具类
  */
 public class VersionUtils {
-    public static long getVerCode(Context context) {
-        long verCode;
+    /**
+     * 获取应用VersionCode
+     */
+    public static int getVerCode(Context context) {
+        int verCode;
         try {
             verCode = context.getPackageManager().getPackageInfo(
-                    context.getPackageName(), 0).getLongVersionCode();
+                    context.getPackageName(), 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             L.e(e.getMessage());
             verCode = -1;
@@ -20,6 +24,9 @@ public class VersionUtils {
         return verCode;
     }
 
+    /**
+     * 获取应用VersionName
+     */
     public static String getVerName(Context context) {
         String verName;
         try {
