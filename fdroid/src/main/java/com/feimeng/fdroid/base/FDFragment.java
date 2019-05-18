@@ -16,7 +16,7 @@ import com.trello.rxlifecycle2.components.support.RxFragment;
  * Fragment基类
  * Created by feimeng on 2017/1/20.
  */
-public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> extends RxFragment {
+public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> extends RxFragment implements DialogInterface.OnDismissListener {
     protected P mPresenter;
 
     /**
@@ -76,15 +76,7 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
         mLoadTimes++;
         if (mLoading == null) {
             mLoading = createLoadingDialog(message);
-            mLoading.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    mLoadTimes = 0;
-                    mLoading = null;
-                    if (mPresenter != null) mPresenter.onDialogDismiss();
-                    updateLoadingDialog(null, null);
-                }
-            });
+            mLoading.setOnDismissListener(this);
         } else {
             updateLoadingDialog(mLoading, message);
         }
@@ -119,9 +111,19 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     }
 
     @Override
+    public void onDismiss(DialogInterface dialog) {
+        mLoadTimes = 0;
+        if (mPresenter != null) mPresenter.onDialogDismiss();
+        updateLoadingDialog(null, null);
+    }
+
+    @Override
     public void onDestroy() {
+        if (mLoading != null && mLoading.isShowing()) {
+            mLoading.dismiss();
+            mLoading = null;
+        }
         super.onDestroy();
-        hideLoadingDialog();
         // 解绑控制器
         if (mPresenter != null) {
             mPresenter.detach();

@@ -18,7 +18,7 @@ import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
  * Activity基类
  * Created by feimeng on 2017/1/20.
  */
-public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> extends RxAppCompatActivity {
+public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> extends RxAppCompatActivity implements DialogInterface.OnDismissListener {
     protected P mPresenter;
 
     /**
@@ -95,15 +95,7 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
         mLoadTimes++;
         if (mLoading == null) {
             mLoading = createLoadingDialog(message);
-            mLoading.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    mLoadTimes = 0;
-                    mLoading = null;
-                    if (mPresenter != null) mPresenter.onDialogDismiss();
-                    updateLoadingDialog(null, null);
-                }
-            });
+            mLoading.setOnDismissListener(this);
         } else {
             updateLoadingDialog(mLoading, message);
         }
@@ -171,14 +163,19 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
     }
 
     @Override
+    public void onDismiss(DialogInterface dialog) { // mLoading.setOnDismissListener(this)
+        mLoadTimes = 0;
+        if (mPresenter != null) mPresenter.onDialogDismiss();
+        updateLoadingDialog(null, null);
+    }
+
+    @Override
     protected void onDestroy() {
-        super.onDestroy();
-        // 移除Activity管理
-        ActivityPageManager.getInstance().removeActivity(this);
         if (mLoading != null && mLoading.isShowing()) {
             mLoading.dismiss();
             mLoading = null;
         }
+        super.onDestroy();
         // 解绑控制器
         if (mPresenter != null) {
             mPresenter.detach();
@@ -186,5 +183,7 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
         }
         // 内容布局置空
         mContentView = null;
+        // 移除Activity管理
+        ActivityPageManager.getInstance().removeActivity(this);
     }
 }

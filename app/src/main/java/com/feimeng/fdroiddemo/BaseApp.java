@@ -5,6 +5,7 @@ import android.content.Context;
 import com.feimeng.fdroid.base.FDApp;
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.utils.L;
+import com.squareup.leakcanary.LeakCanary;
 
 import io.reactivex.functions.Consumer;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -22,15 +23,9 @@ public class BaseApp extends FDApp {
     public void onCreate() {
         super.onCreate();
         L.d("Application启动" + Math.random());
-        // 在这里为应用设置异常处理，然后程序才能获取未处理的异常
-//        CrashHandler.getInstance().init();
-//        CrashHandler.getInstance().setCrashInterceptor(new CrashHandler.CrashInterceptor() {
-//            @Override
-//            public void uncaughtException(CrashHandler crashHandler, Context context, Thread thread, Throwable exception) {
-//                L.d("我不让你蹦！");
-//                crashHandler.restartActivity(new Intent(context, CrashActivity.class).putExtra("feimeng", "ok"));
-//            }
-//        });
+        if (!LeakCanary.isInAnalyzerProcess(this)) {
+            LeakCanary.install(this);
+        }
     }
 
     @Override

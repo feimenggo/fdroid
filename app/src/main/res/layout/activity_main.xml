@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.feimeng.fdroiddemo.MainActivity">
 
     <TextView
@@ -16,34 +17,35 @@
         android:id="@+id/login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/name"
         android:text="登录" />
 
     <Button
         android:id="@+id/register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/login"
         android:text="注册" />
 
     <Button
         android:id="@+id/getUserInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/login"
         android:text="同步获取用户信息" />
+
+    <Button
+        android:id="@+id/leak"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="模拟内存泄露" />
 
     <Button
         android:id="@+id/showLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/register"
         android:text="显示 加载中" />
 
     <Button
         android:id="@+id/hideLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/showLoading"
         android:text="隐藏 加载中" />
-</RelativeLayout>
+</LinearLayout>

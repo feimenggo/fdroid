@@ -4,6 +4,9 @@ import com.feimeng.fdroid.mvp.model.api.bean.ApiFinish2;
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroiddemo.api.ApiWrapper;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+
 public class LoginPresenter extends LoginContract.Presenter {
     @Override
     public void login() {
@@ -12,7 +15,12 @@ public class LoginPresenter extends LoginContract.Presenter {
             public void withoutNetwork(Object data) {
                 T.showS(getContext(), "无网络连接");
             }
-        })).subscribe(ApiWrapper.subscriber("login", new ApiFinish2<Integer>() {
+        })).doOnNext(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                Thread.sleep(10000);
+            }
+        }).observeOn(AndroidSchedulers.mainThread()).subscribe(ApiWrapper.subscriber("login", new ApiFinish2<Integer>() {
             @Override
             public void start() {
                 showDialogApiTag("login");

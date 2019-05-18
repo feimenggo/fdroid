@@ -31,6 +31,7 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
         findViewById(R.id.login).setOnClickListener(this);
         findViewById(R.id.register).setOnClickListener(this);
         findViewById(R.id.getUserInfo).setOnClickListener(this);
+        findViewById(R.id.leak).setOnClickListener(this);
         findViewById(R.id.showLoading).setOnClickListener(this);
         findViewById(R.id.hideLoading).setOnClickListener(this);
     }
@@ -62,6 +63,9 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
                 break;
             case R.id.getUserInfo:
                 getUserInfoSync();
+                break;
+            case R.id.leak:
+                MainLeakActivity.start(this);
                 break;
             case R.id.showLoading:
 //                new FastTask<Ignore>() {

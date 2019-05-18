@@ -76,15 +76,7 @@ public abstract class FDDialog<V extends FDView, P extends FDPresenter<V>> exten
         mLoadTimes++;
         if (mLoading == null) {
             mLoading = createLoadingDialog(message);
-            mLoading.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    mLoadTimes = 0;
-                    mLoading = null;
-                    if (mPresenter != null) mPresenter.onDialogDismiss();
-                    updateLoadingDialog(null, null);
-                }
-            });
+            mLoading.setOnDismissListener(this);
         } else {
             updateLoadingDialog(mLoading, message);
         }
@@ -107,6 +99,17 @@ public abstract class FDDialog<V extends FDView, P extends FDPresenter<V>> exten
     }
 
     @Override
+    public void onDismiss(DialogInterface dialog) {
+        if (dialog == mLoading) {
+            mLoadTimes = 0;
+            if (mPresenter != null) mPresenter.onDialogDismiss();
+            updateLoadingDialog(null, null);
+        } else {
+            super.onDismiss(dialog);
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("LoadTimes", mLoadTimes);
@@ -120,8 +123,11 @@ public abstract class FDDialog<V extends FDView, P extends FDPresenter<V>> exten
 
     @Override
     public void onDestroy() {
+        if (mLoading != null && mLoading.isShowing()) {
+            mLoading.dismiss();
+            mLoading = null;
+        }
         super.onDestroy();
-        hideLoadingDialog();
         // 解绑控制器
         if (mPresenter != null) {
             mPresenter.detach();
