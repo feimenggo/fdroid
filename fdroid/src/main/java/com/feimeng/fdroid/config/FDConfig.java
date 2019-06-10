@@ -7,7 +7,6 @@ package com.feimeng.fdroid.config;
 public class FDConfig {
     public static String SP_NAME = "fdroid";// SharedPreferences文件名
 
-    public static boolean SHOW_TOAST = true;
     public static boolean SHOW_LOG = false;
     public static boolean SHOW_HTTP_LOG = false;
 

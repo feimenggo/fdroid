@@ -7,7 +7,6 @@ import android.content.Context;
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.SP;
-import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroid.utils.UE;
 
 import java.util.List;
@@ -66,8 +65,6 @@ public abstract class FDApp extends Application {
     }
 
     private void initCore() {
-        // Toast
-        T.init(FDConfig.SHOW_TOAST);
         // Log
         L.init(FDConfig.SHOW_LOG, L.V);
         // 增强用户体验效果工具

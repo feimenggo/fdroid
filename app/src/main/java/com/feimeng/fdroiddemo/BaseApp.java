@@ -5,6 +5,7 @@ import android.content.Context;
 import com.feimeng.fdroid.base.FDApp;
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.utils.L;
+import com.feimeng.fdroid.utils.T;
 import com.squareup.leakcanary.LeakCanary;
 
 import io.reactivex.functions.Consumer;
@@ -42,6 +43,7 @@ public class BaseApp extends FDApp {
                 throwable.printStackTrace();
             }
         });
+        T.init(true);
     }
 
     @Override
