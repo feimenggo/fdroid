@@ -85,7 +85,7 @@ public class T {
         void showL(@NonNull Context context, @NonNull String message);
     }
 
-    public static class DefaultWrapper implements Wrapper {
+    static class DefaultWrapper implements Wrapper {
         private static Toast mToast;
 
         @Override

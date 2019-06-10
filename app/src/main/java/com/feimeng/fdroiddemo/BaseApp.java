@@ -2,6 +2,9 @@ package com.feimeng.fdroiddemo;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
+import com.dovar.dtoast.DToast;
 import com.feimeng.fdroid.base.FDApp;
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.utils.L;
@@ -39,7 +42,17 @@ public class BaseApp extends FDApp {
                 throwable.printStackTrace();
             }
         });
-        T.init(true);
+        T.init(true, new T.Wrapper() {
+            @Override
+            public void showS(@NonNull Context context, @NonNull String message) {
+                DToast.make(context).setText(R.id.toast, message).show();
+            }
+
+            @Override
+            public void showL(@NonNull Context context, @NonNull String message) {
+                DToast.make(context).setText(R.id.toast, message).showLong();
+            }
+        });
     }
 
     @Override
