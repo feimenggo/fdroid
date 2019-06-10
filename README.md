@@ -23,8 +23,10 @@ allprojects {
 #### Step 2.在项目app的build.gradle中添加依赖
 ```groovy
 dependencies {
-  //...
-  api 'com.github.feimenggo:fdroid:3.2.4'
+  // 基于AndroidX
+  api 'com.github.feimenggo:fdroid:4.0'
+  // 非AndroidX
+  api 'com.github.feimenggo:fdroid:3.2.5'
 }
 ```
 #### Step 3.自定义Application继承FDApp.java
@@ -32,7 +34,7 @@ dependencies {
 public class BaseApp extends FDApp {
     @Override
     protected void config() {
-	// 此处可以进行您项目其它库的初始化
+	    // 此处可以进行您项目其它库的初始化
     }
 }
 ```
@@ -103,7 +105,7 @@ public class TestActivity extends FDActivity<TestContract.View, TestContract.Pre
 ##### 接下来，你的任务有自定义FDApi编写网络请求、学习使用L/T/SP工具类、全局对话框的使用等等。教程正在制作。。。
 
 ## 一键生成MVP模板
-### FDActivity模板：位于download目录
+### FDActivity模板：[FDActivity.zip](https://github.com/feimenggo/fdroid/blob/2.x/download/FDActivity.zip)
 #### Android Studio Template的使用，请自行度娘哦。
 ## License
 
