@@ -2,9 +2,11 @@ package com.feimeng.fdroid.mvp.base;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresPermission;
-import android.support.v4.app.FragmentActivity;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresPermission;
+import androidx.fragment.app.FragmentActivity;
 
 import com.feimeng.fdroid.base.FDActivity;
 import com.feimeng.fdroid.base.FDApp;
@@ -14,8 +16,8 @@ import com.feimeng.fdroid.mvp.model.api.FDApi;
 import com.feimeng.fdroid.mvp.model.api.WithoutNetworkException;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.NetworkUtil;
-import com.trello.rxlifecycle2.android.ActivityEvent;
-import com.trello.rxlifecycle2.android.FragmentEvent;
+import com.trello.rxlifecycle3.android.ActivityEvent;
+import com.trello.rxlifecycle3.android.FragmentEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +46,7 @@ public abstract class FDPresenter<V extends FDView> {
     /**
      * 初始化，setContentView之前被调用
      */
-    protected void preInit() {
+    public void preInit() {
     }
 
     /**
@@ -62,7 +64,7 @@ public abstract class FDPresenter<V extends FDView> {
         mView = null;
     }
 
-    protected void onDestroy() {
+    public void onDestroy() {
     }
 
     /**
@@ -77,18 +79,18 @@ public abstract class FDPresenter<V extends FDView> {
      *
      * @return 当前Activity的Context
      */
+    @NonNull
     public Context getContext() {
-        if (mView == null) return null;
         if (mView instanceof FDFragment) {
             FragmentActivity activity = ((FDFragment) mView).getActivity();
-            if (activity == null) return FDApp.getInstance();
-            return activity.getApplicationContext();
+            if (activity != null) return activity;
         } else if (mView instanceof FDDialog) {
             FragmentActivity activity = ((FDDialog) mView).getActivity();
-            if (activity == null) return FDApp.getInstance();
-            return activity.getApplicationContext();
+            if (activity != null) return activity;
+        } else if (mView instanceof FDActivity) {
+            return (Context) mView;
         }
-        return ((Context) mView).getApplicationContext();
+        return FDApp.getInstance().getApplicationContext();
     }
 
     /**
@@ -96,14 +98,16 @@ public abstract class FDPresenter<V extends FDView> {
      *
      * @return 当前Activity的Context
      */
+    @Nullable
     public FDActivity getActivity() {
-        if (mView == null) return null;
         if (mView instanceof FDFragment) {
             return (FDActivity) ((FDFragment) mView).getActivity();
         } else if (mView instanceof FDDialog) {
             return (FDActivity) ((FDDialog) mView).getActivity();
+        } else if (mView instanceof FDActivity) {
+            return (FDActivity) mView;
         }
-        return (FDActivity) mView;
+        return null;
     }
 
     /**

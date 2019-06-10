@@ -1,8 +1,9 @@
 package com.feimeng.fdroiddemo.login;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.View;
+
+import androidx.annotation.Nullable;
 
 import com.feimeng.fdroid.base.FDLazyFragment;
 import com.feimeng.fdroid.mvp.base.FDPresenter;

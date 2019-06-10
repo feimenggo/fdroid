@@ -3,14 +3,15 @@ package com.feimeng.fdroid.base;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.feimeng.fdroid.mvp.base.FDPresenter;
 import com.feimeng.fdroid.mvp.base.FDView;
 import com.feimeng.fdroid.widget.LoadingDialog;
-import com.trello.rxlifecycle2.components.support.RxDialogFragment;
+import com.trello.rxlifecycle3.components.support.RxDialogFragment;
 
 /**
  * Author: Feimeng
@@ -32,8 +33,9 @@ public abstract class FDDialog<V extends FDView, P extends FDPresenter<V>> exten
         super.onCreate(savedInstanceState);
         // 绑定控制器
         mPresenter = initPresenter();
-        if (mPresenter != null && this instanceof FDView)
+        if (mPresenter != null && this instanceof FDView) {
             mPresenter.attach((V) this);
+        }
     }
 
     @Override

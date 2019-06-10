@@ -3,14 +3,15 @@ package com.feimeng.fdroid.base;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.feimeng.fdroid.mvp.base.FDPresenter;
 import com.feimeng.fdroid.mvp.base.FDView;
 import com.feimeng.fdroid.widget.LoadingDialog;
-import com.trello.rxlifecycle2.components.support.RxFragment;
+import com.trello.rxlifecycle3.components.support.RxFragment;
 
 /**
  * Fragment基类

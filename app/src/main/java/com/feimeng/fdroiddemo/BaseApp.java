@@ -5,7 +5,7 @@ import android.content.Context;
 import com.feimeng.fdroid.base.FDApp;
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.utils.L;
-import com.squareup.leakcanary.LeakCanary;
+import com.feimeng.fdroid.utils.T;
 
 import io.reactivex.functions.Consumer;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -23,9 +23,6 @@ public class BaseApp extends FDApp {
     public void onCreate() {
         super.onCreate();
         L.d("Application启动" + Math.random());
-        if (!LeakCanary.isInAnalyzerProcess(this)) {
-            LeakCanary.install(this);
-        }
     }
 
     @Override
@@ -42,6 +39,7 @@ public class BaseApp extends FDApp {
                 throwable.printStackTrace();
             }
         });
+        T.init(true);
     }
 
     @Override

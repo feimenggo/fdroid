@@ -3,7 +3,7 @@ package com.feimeng.fdroid.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.annotation.RequiresPermission;
+import androidx.annotation.RequiresPermission;
 
 /**
  * 网络连接 工具类

@@ -1,7 +1,7 @@
 package com.feimeng.fdroid.widget;
 
 import android.content.Context;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 
 /**
  * 默认的对话框

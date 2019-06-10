@@ -2,8 +2,9 @@ package com.feimeng.fdroiddemo;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.View;
+
+import androidx.annotation.Nullable;
 
 import com.feimeng.fdroid.base.FDActivity;
 import com.feimeng.fdroid.bean.Ignore;
@@ -23,6 +24,7 @@ import io.reactivex.functions.Function;
 
 public class MainActivity extends FDActivity<MainContract.View, MainContract.Presenter> implements MainContract.View, View.OnClickListener {
     public static final String TAG = MainActivity.class.getName();
+    private int mToast = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,7 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
         findViewById(R.id.leak).setOnClickListener(this);
         findViewById(R.id.showLoading).setOnClickListener(this);
         findViewById(R.id.hideLoading).setOnClickListener(this);
+        findViewById(R.id.toast).setOnClickListener(this);
     }
 
     @Override
@@ -85,6 +88,9 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
                 break;
             case R.id.hideLoading:
                 hideLoadingDialog();
+                break;
+            case R.id.toast:
+                T.showS(this, "Toast:" + (++mToast));
                 break;
         }
     }
