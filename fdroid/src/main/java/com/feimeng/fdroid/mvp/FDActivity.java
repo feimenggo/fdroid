@@ -1,4 +1,4 @@
-package com.feimeng.fdroid.base;
+package com.feimeng.fdroid.mvp;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -8,8 +8,6 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.feimeng.fdroid.mvp.base.FDPresenter;
-import com.feimeng.fdroid.mvp.base.FDView;
 import com.feimeng.fdroid.utils.ActivityPageManager;
 import com.feimeng.fdroid.widget.LoadingDialog;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
@@ -41,8 +39,9 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
         ActivityPageManager.getInstance().addActivity(this);
         // 绑定控制器
         mPresenter = initPresenter();
-        if (mPresenter != null && this instanceof FDView)
+        if (mPresenter != null && this instanceof FDView) {
             mPresenter.attach((V) this);
+        }
     }
 
     /**
@@ -54,7 +53,7 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
     public void setContentView(@LayoutRes int layoutResID) {
         View view = LayoutInflater.from(this).inflate(layoutResID, null);
         setContentView(view);
-        if (mPresenter != null && mPresenter.isActive()) mPresenter.init();
+        if (mPresenter != null && mPresenter.isActive()) mPresenter.initPresenter();
     }
 
     @Override

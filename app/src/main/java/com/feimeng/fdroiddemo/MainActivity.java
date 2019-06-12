@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import com.feimeng.fdroid.base.FDActivity;
+import com.feimeng.fdroid.mvp.FDActivity;
 import com.feimeng.fdroid.bean.Ignore;
 import com.feimeng.fdroid.exception.ApiException;
 import com.feimeng.fdroid.mvp.model.api.bean.ApiFinish2;
@@ -48,7 +48,7 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
 
     @Override
     protected MainContract.Presenter initPresenter() {
-        return new MainPresenter();
+        return new MainPresenter().asyncInit();
     }
 
     @Override
@@ -165,5 +165,10 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
 //                        L.d(TAG, info);
 //                    }
 //                }));
+    }
+
+    @Override
+    public void init(Object initData, Throwable e) {
+        T.showS(this, "初始化结束");
     }
 }

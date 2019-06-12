@@ -1,4 +1,4 @@
-package com.feimeng.fdroid.base;
+package com.feimeng.fdroid.mvp;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -10,9 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.feimeng.fdroid.mvp.base.FDPresenter;
-import com.feimeng.fdroid.mvp.base.FDView;
 
 import java.lang.ref.WeakReference;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.feimeng.fdroid.base;
+package com.feimeng.fdroid.mvp;
 
 import android.app.ActivityManager;
 import android.app.Application;

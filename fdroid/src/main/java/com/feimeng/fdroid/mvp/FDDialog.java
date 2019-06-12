@@ -1,4 +1,4 @@
-package com.feimeng.fdroid.base;
+package com.feimeng.fdroid.mvp;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -7,16 +7,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import com.feimeng.fdroid.mvp.base.FDPresenter;
-import com.feimeng.fdroid.mvp.base.FDView;
 import com.feimeng.fdroid.widget.LoadingDialog;
-import com.trello.rxlifecycle2.components.support.RxFragment;
+import com.trello.rxlifecycle2.components.support.RxDialogFragment;
 
 /**
- * Fragment基类
- * Created by feimeng on 2017/1/20.
+ * Author: Feimeng
+ * Time:   2018/11/3 10:43
+ * Description: DialogFragment基类
  */
-public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> extends RxFragment implements DialogInterface.OnDismissListener {
+public abstract class FDDialog<V extends FDView, P extends FDPresenter<V>> extends RxDialogFragment {
     protected P mPresenter;
 
     /**
@@ -39,7 +38,7 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (mPresenter != null && mPresenter.isActive()) mPresenter.init();
+        if (mPresenter != null && mPresenter.isActive()) mPresenter.initPresenter();
     }
 
     /**
@@ -99,6 +98,17 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     }
 
     @Override
+    public void onDismiss(DialogInterface dialog) {
+        if (dialog == mLoading) {
+            mLoadTimes = 0;
+            if (mPresenter != null) mPresenter.onDialogDismiss();
+            updateLoadingDialog(null, null);
+        } else {
+            super.onDismiss(dialog);
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("LoadTimes", mLoadTimes);
@@ -108,13 +118,6 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) mLoadTimes = savedInstanceState.getInt("LoadTimes");
-    }
-
-    @Override
-    public void onDismiss(DialogInterface dialog) {
-        mLoadTimes = 0;
-        if (mPresenter != null) mPresenter.onDialogDismiss();
-        updateLoadingDialog(null, null);
     }
 
     @Override

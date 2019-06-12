@@ -1,17 +1,15 @@
-package com.feimeng.fdroid.mvp.base;
+package com.feimeng.fdroid.mvp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.app.FragmentActivity;
 
-import com.feimeng.fdroid.base.FDActivity;
-import com.feimeng.fdroid.base.FDApp;
-import com.feimeng.fdroid.base.FDDialog;
-import com.feimeng.fdroid.base.FDFragment;
 import com.feimeng.fdroid.mvp.model.api.FDApi;
 import com.feimeng.fdroid.mvp.model.api.WithoutNetworkException;
+import com.feimeng.fdroid.utils.FastTask;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.NetworkUtil;
 import com.trello.rxlifecycle2.android.ActivityEvent;
@@ -30,36 +28,85 @@ import io.reactivex.ObservableOnSubscribe;
  */
 public abstract class FDPresenter<V extends FDView> {
     private List<String> mApiTags;
+    private boolean mInitAsync; // 异步初始化
     protected V mView;// 视图
+
+    /**
+     * 开启异步初始化
+     * 开启后，{@link #onInit(boolean)}将会在子线程回调，否则在UI线程回调。
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends FDPresenter> T asyncInit() {
+        mInitAsync = true;
+        return (T) this;
+    }
 
     /**
      * 绑定视图
      */
-    public void attach(V view) {
+    void attach(V view) {
         L.d("绑定视图->" + view);
         mView = view;
-        preInit();
+        onAttach();
     }
 
     /**
      * 初始化，setContentView之前被调用
      */
-    protected void preInit() {
+    protected void onAttach() {
     }
 
     /**
      * 初始化，setContentView之后被调用
      */
-    public void init() {
+    void initPresenter() {
+        if (mInitAsync) {
+            new FastTask<Object>() {
+
+                @Override
+                public Object task() throws Exception {
+                    return onInit(mInitAsync);
+                }
+            }.runIO(new FastTask.Result<Object>() {
+                @Override
+                public void success(Object initObject) {
+                    if (isActive()) mView.init(initObject, null);
+                }
+
+                @Override
+                public void fail(Throwable e) {
+                    if (isActive()) mView.init(null, e);
+                }
+            });
+        } else {
+            try {
+                mView.init(onInit(mInitAsync), null);
+            } catch (Throwable e) {
+                mView.init(null, e);
+            }
+        }
     }
+
+    /**
+     * 此方法在setContentView()之后回调
+     *
+     * @param initAsync 是否为异步回调，在初始化控制器时调用{{@link #asyncInit()}开启
+     * @return 结果传给{@link FDView#onInit(Object,Throwable)}的第一个参数
+     * @throws Exception 初始化执行时抛出的异常
+     */
+    @Nullable
+    protected Object onInit(boolean initAsync) throws Exception {
+        return null;
+    }
+
 
     /**
      * 解绑视图
      */
-    public void detach() {
+    void detach() {
         L.d("解绑视图->" + mView);
-        onDestroy();
         mView = null;
+        onDestroy();
     }
 
     protected void onDestroy() {
@@ -77,18 +124,18 @@ public abstract class FDPresenter<V extends FDView> {
      *
      * @return 当前Activity的Context
      */
+    @NonNull
     public Context getContext() {
-        if (mView == null) return null;
         if (mView instanceof FDFragment) {
             FragmentActivity activity = ((FDFragment) mView).getActivity();
-            if (activity == null) return FDApp.getInstance();
-            return activity.getApplicationContext();
+            if (activity != null) return activity;
         } else if (mView instanceof FDDialog) {
             FragmentActivity activity = ((FDDialog) mView).getActivity();
-            if (activity == null) return FDApp.getInstance();
-            return activity.getApplicationContext();
+            if (activity != null) return activity;
+        } else if (mView instanceof FDActivity) {
+            return (Context) mView;
         }
-        return ((Context) mView).getApplicationContext();
+        return FDApp.getInstance().getApplicationContext();
     }
 
     /**
@@ -96,14 +143,25 @@ public abstract class FDPresenter<V extends FDView> {
      *
      * @return 当前Activity的Context
      */
+    @Nullable
     public FDActivity getActivity() {
-        if (mView == null) return null;
         if (mView instanceof FDFragment) {
             return (FDActivity) ((FDFragment) mView).getActivity();
         } else if (mView instanceof FDDialog) {
             return (FDActivity) ((FDDialog) mView).getActivity();
+        } else if (mView instanceof FDActivity) {
+            return (FDActivity) mView;
         }
-        return (FDActivity) mView;
+        return null;
+    }
+
+    @NonNull
+    public FDActivity requireActivity() {
+        FDActivity activity = getActivity();
+        if (activity == null) {
+            throw new IllegalStateException("Presenter " + this + " not attached to an activity.");
+        }
+        return activity;
     }
 
     /**

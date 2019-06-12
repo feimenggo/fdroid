@@ -1,7 +1,15 @@
 package com.feimeng.fdroiddemo;
 
+import android.support.annotation.Nullable;
+
 public class MainPresenter extends MainContract.Presenter {
+    @Nullable
     @Override
+    protected Object onInit(boolean initAsync) throws Exception {
+        Thread.sleep(5000);
+        return super.onInit(initAsync);
+    }
+
     public void init() {
 //        new FastTask<Ignore>() {
 //            @Override
