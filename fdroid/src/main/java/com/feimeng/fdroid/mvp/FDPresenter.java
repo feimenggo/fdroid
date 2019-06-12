@@ -62,10 +62,9 @@ public abstract class FDPresenter<V extends FDView> {
     void initPresenter() {
         if (mInitAsync) {
             new FastTask<Object>() {
-
                 @Override
                 public Object task() throws Exception {
-                    return onInit(mInitAsync);
+                    return onInit(true);
                 }
             }.runIO(new FastTask.Result<Object>() {
                 @Override
@@ -77,10 +76,10 @@ public abstract class FDPresenter<V extends FDView> {
                 public void fail(Throwable e) {
                     if (isActive()) mView.init(null, e);
                 }
-            });
+            }, mView);
         } else {
             try {
-                mView.init(onInit(mInitAsync), null);
+                mView.init(onInit(false), null);
             } catch (Throwable e) {
                 mView.init(null, e);
             }

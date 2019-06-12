@@ -1,6 +1,7 @@
 package com.feimeng.fdroid.utils;
 
 import com.feimeng.fdroid.mvp.FDActivity;
+import com.feimeng.fdroid.mvp.FDDialog;
 import com.feimeng.fdroid.mvp.FDFragment;
 import com.feimeng.fdroid.exception.ApiException;
 import com.feimeng.fdroid.exception.Info;
@@ -135,6 +136,8 @@ public abstract class FastTask<T> {
                 observable = observable.compose(((FDActivity) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
             } else if (fdView instanceof FDFragment) {
                 observable = observable.compose(((FDFragment) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
+            } else if (fdView instanceof FDDialog) {
+                observable = observable.compose(((FDDialog) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
             }
         }
         observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
