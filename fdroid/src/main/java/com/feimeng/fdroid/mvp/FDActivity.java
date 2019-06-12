@@ -1,35 +1,43 @@
-package com.feimeng.fdroid.base;
+package com.feimeng.fdroid.mvp;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 
-import com.feimeng.fdroid.mvp.base.FDPresenter;
-import com.feimeng.fdroid.mvp.base.FDView;
+import com.feimeng.fdroid.utils.ActivityPageManager;
 import com.feimeng.fdroid.widget.LoadingDialog;
-import com.trello.rxlifecycle3.components.support.RxFragment;
+import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
 /**
- * Fragment基类
+ * Activity基类
  * Created by feimeng on 2017/1/20.
  */
-public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> extends RxFragment implements DialogInterface.OnDismissListener {
+public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> extends RxAppCompatActivity implements DialogInterface.OnDismissListener {
     protected P mPresenter;
+
+    /**
+     * 页面布局的 根view
+     */
+    protected View mContentView;
 
     /**
      * 对话框
      */
     private Dialog mLoading;
+    private boolean mStarted;
     private int mLoadTimes = 0; // 加载次数
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Activity管理
+        ActivityPageManager.getInstance().addActivity(this);
         // 绑定控制器
         mPresenter = initPresenter();
         if (mPresenter != null && this instanceof FDView) {
@@ -37,16 +45,23 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
         }
     }
 
+    /**
+     * 实例化控制器
+     */
+    protected abstract P initPresenter();
+
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        if (mPresenter != null && mPresenter.isActive()) mPresenter.init();
+    public void setContentView(@LayoutRes int layoutResID) {
+        View view = LayoutInflater.from(this).inflate(layoutResID, null);
+        setContentView(view);
+        if (mPresenter != null && mPresenter.isActive()) mPresenter.initPresenter();
     }
 
-    /**
-     * 实例化presenter
-     */
-    public abstract P initPresenter();
+    @Override
+    public void setContentView(View view) {
+        super.setContentView(view);
+        mContentView = view;
+    }
 
     /**
      * 绘制对话框
@@ -55,13 +70,16 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
      * @param message 提示的信息
      * @return Dialog 对话框
      */
-    protected Dialog createLoadingDialog(String message) {
-        return new LoadingDialog(getActivity(), message == null ? "" : message);
+    protected Dialog createLoadingDialog(@Nullable String message) {
+        return new LoadingDialog(this, message == null ? "" : message);
     }
 
     protected void updateLoadingDialog(@Nullable Dialog dialog, @Nullable String message) {
     }
 
+    /**
+     * 显示对话框
+     */
     public void showLoadingDialog() {
         showLoadingDialog(null);
     }
@@ -99,27 +117,60 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
         hideLoadingDialog();
     }
 
+
+    /**
+     * 拿到最新Activity
+     *
+     * @return BaseActivity
+     */
+    public static FDActivity getLatestActivity() {
+        return ActivityPageManager.getInstance().currentActivity();
+    }
+
+    /**
+     * 结束所有Activity
+     */
+    public static void finishAll() {
+        ActivityPageManager.getInstance().finishAllActivity();
+    }
+
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
+    protected void onStart() {
+        super.onStart();
+        mStarted = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mStarted = false;
+    }
+
+    public boolean isStarted() {
+        return mStarted;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("LoadTimes", mLoadTimes);
     }
 
     @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null) mLoadTimes = savedInstanceState.getInt("LoadTimes");
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mLoadTimes = savedInstanceState.getInt("LoadTimes");
     }
 
     @Override
-    public void onDismiss(DialogInterface dialog) {
+    public void onDismiss(DialogInterface dialog) { // mLoading.setOnDismissListener(this)
         mLoadTimes = 0;
         if (mPresenter != null) mPresenter.onDialogDismiss();
         updateLoadingDialog(null, null);
     }
 
     @Override
-    public void onDestroy() {
+    protected void onDestroy() {
         if (mLoading != null && mLoading.isShowing()) {
             mLoading.dismiss();
             mLoading = null;
@@ -130,5 +181,9 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
             mPresenter.detach();
             mPresenter = null;
         }
+        // 内容布局置空
+        mContentView = null;
+        // 移除Activity管理
+        ActivityPageManager.getInstance().removeActivity(this);
     }
 }

@@ -5,7 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.dovar.dtoast.DToast;
-import com.feimeng.fdroid.base.FDApp;
+import com.feimeng.fdroid.mvp.FDApp;
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.T;

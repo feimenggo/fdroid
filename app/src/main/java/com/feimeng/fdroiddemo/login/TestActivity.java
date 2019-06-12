@@ -3,7 +3,9 @@ package com.feimeng.fdroiddemo.login;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.feimeng.fdroid.base.FDActivity;
+import androidx.annotation.Nullable;
+
+import com.feimeng.fdroid.mvp.FDActivity;
 import com.feimeng.fdroiddemo.R;
 
 public class TestActivity extends FDActivity<TestContract.View, TestContract.Presenter> implements TestContract.View {
@@ -25,5 +27,10 @@ public class TestActivity extends FDActivity<TestContract.View, TestContract.Pre
     public void getUserName(String username) {
         // 步骤三
         Toast.makeText(this, "用户名是" + username, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void init(@Nullable Object initData, @Nullable Throwable e) {
+
     }
 }

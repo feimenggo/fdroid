@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
 
-import com.feimeng.fdroid.base.FDActivity;
-import com.feimeng.fdroid.mvp.base.FDPresenter;
+import com.feimeng.fdroid.mvp.FDActivity;
+import com.feimeng.fdroid.mvp.FDPresenter;
 
 public class MainLeakActivity extends FDActivity {
     public static final String TAG = MainLeakActivity.class.getName();

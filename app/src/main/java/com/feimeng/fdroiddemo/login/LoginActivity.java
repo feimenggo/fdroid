@@ -8,7 +8,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.feimeng.fdroid.base.FDActivity;
+import com.feimeng.fdroid.mvp.FDActivity;
 import com.feimeng.fdroid.widget.LoadingDialog;
 import com.feimeng.fdroiddemo.R;
 
@@ -42,5 +42,10 @@ public class LoginActivity extends FDActivity<LoginContract.View, LoginContract.
                 ((LoadingDialog) dialog).setMessage(message);
             }
         }
+    }
+
+    @Override
+    public void init(@Nullable Object initData, @Nullable Throwable e) {
+
     }
 }

@@ -1,10 +1,10 @@
 package com.feimeng.fdroid.utils;
 
-import com.feimeng.fdroid.base.FDActivity;
-import com.feimeng.fdroid.base.FDFragment;
+import com.feimeng.fdroid.mvp.FDActivity;
+import com.feimeng.fdroid.mvp.FDFragment;
 import com.feimeng.fdroid.exception.ApiException;
 import com.feimeng.fdroid.exception.Info;
-import com.feimeng.fdroid.mvp.base.FDView;
+import com.feimeng.fdroid.mvp.FDView;
 import com.trello.rxlifecycle3.LifecycleTransformer;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.android.FragmentEvent;

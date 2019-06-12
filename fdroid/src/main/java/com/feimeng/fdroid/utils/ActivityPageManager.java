@@ -9,7 +9,7 @@ import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.Nullable;
 
-import com.feimeng.fdroid.base.FDActivity;
+import com.feimeng.fdroid.mvp.FDActivity;
 
 import java.util.Iterator;
 import java.util.Stack;

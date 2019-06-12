@@ -5,8 +5,8 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.feimeng.fdroid.base.FDLazyFragment;
-import com.feimeng.fdroid.mvp.base.FDPresenter;
+import com.feimeng.fdroid.mvp.FDLazyFragment;
+import com.feimeng.fdroid.mvp.FDPresenter;
 
 /**
  * Author: Feimeng

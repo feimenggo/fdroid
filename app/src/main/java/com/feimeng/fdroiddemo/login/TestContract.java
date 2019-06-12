@@ -1,7 +1,7 @@
 package com.feimeng.fdroiddemo.login;
 
-import com.feimeng.fdroid.mvp.base.FDPresenter;
-import com.feimeng.fdroid.mvp.base.FDView;
+import com.feimeng.fdroid.mvp.FDPresenter;
+import com.feimeng.fdroid.mvp.FDView;
 
 public interface TestContract {
     interface View extends FDView {
