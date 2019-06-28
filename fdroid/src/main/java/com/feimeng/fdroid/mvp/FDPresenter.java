@@ -59,7 +59,7 @@ public abstract class FDPresenter<V extends FDView> {
     /**
      * 初始化，setContentView之后被调用
      */
-    void initPresenter() {
+    void afterContentView() {
         if (mInitAsync) {
             new FastTask<Object>() {
                 @Override
@@ -98,17 +98,16 @@ public abstract class FDPresenter<V extends FDView> {
         return null;
     }
 
-
     /**
      * 解绑视图
      */
     void detach() {
         L.d("解绑视图->" + mView);
         mView = null;
-        onDestroy();
+        onDetach();
     }
 
-    protected void onDestroy() {
+    protected void onDetach() {
     }
 
     /**

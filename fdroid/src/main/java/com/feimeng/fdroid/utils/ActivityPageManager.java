@@ -19,25 +19,20 @@ import java.util.Stack;
  * Created by feimeng on 2017/1/20.
  */
 public class ActivityPageManager {
-    private static ActivityPageManager instance;
-    private static Stack<FDActivity> activityStack = new Stack<>();
+    private static ActivityPageManager instance = new ActivityPageManager();
+    private static Stack<FDActivity> activities = new Stack<>();
 
-    /**
-     * constructor
-     */
     private ActivityPageManager() {
-
     }
 
     public Stack<FDActivity> all() {
-        return activityStack;
+        return activities;
     }
 
     /**
      * get the AppManager instance, the AppManager is singleton.
      */
     public static ActivityPageManager getInstance() {
-        if (instance == null) instance = new ActivityPageManager();
         return instance;
     }
 
@@ -45,7 +40,7 @@ public class ActivityPageManager {
      * add Activity to Stack
      */
     public void addActivity(FDActivity activity) {
-        activityStack.add(activity);
+        activities.add(activity);
     }
 
 
@@ -53,7 +48,7 @@ public class ActivityPageManager {
      * remove Activity from Stack
      */
     public void removeActivity(FDActivity activity) {
-        activityStack.remove(activity);
+        activities.remove(activity);
     }
 
     /**
@@ -61,7 +56,7 @@ public class ActivityPageManager {
      */
     @Nullable
     public FDActivity currentActivity() {
-        return activityStack.size() == 0 ? null : activityStack.lastElement();
+        return activities.size() == 0 ? null : activities.lastElement();
     }
 
     public void finishActivity() {
@@ -70,13 +65,13 @@ public class ActivityPageManager {
 
     public void finishActivity(Activity activity) {
         if (activity != null) {
-            activityStack.remove(activity);
+            activities.remove(activity);
             activity.finish();
         }
     }
 
     public void finishActivity(Class<?> cls) {
-        for (Activity activity : activityStack) {
+        for (Activity activity : activities) {
             if (activity.getClass().equals(cls)) {
                 finishActivity(activity);
             }
@@ -91,7 +86,7 @@ public class ActivityPageManager {
      * @param activity 保留的Activity
      */
     public void finishAllActivity(Activity activity) {
-        Iterator<FDActivity> iterator = activityStack.iterator();
+        Iterator<FDActivity> iterator = activities.iterator();
         while (iterator.hasNext()) {
             FDActivity fdActivity = iterator.next();
             if (activity != null && fdActivity == activity) continue;

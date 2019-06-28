@@ -13,7 +13,6 @@ import java.util.Map;
  * Description: 解决Activity使用Intent传递大数据的问题
  */
 public class DataHolder {
-    public static String string1, string2;
     private Map<String, WeakReference<Object>> mDataList = new HashMap<>();
 
     private static class Holder {
@@ -29,9 +28,10 @@ public class DataHolder {
     }
 
     @Nullable
-    public Object getData(@NonNull String key) {
+    @SuppressWarnings("unchecked")
+    public <T> T getData(@NonNull String key) {
         WeakReference<Object> reference = mDataList.get(key);
-        if (reference != null) return reference.get();
+        if (reference != null) return (T) reference.get();
         return null;
     }
 }

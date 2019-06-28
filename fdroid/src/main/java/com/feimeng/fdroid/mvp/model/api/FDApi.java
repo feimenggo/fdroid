@@ -404,7 +404,7 @@ public class FDApi {
                         if (fdApiFinish.apiFail((ApiException) e))
                             fdApiFinish.fail(e, e.getMessage());
                     } else if (e instanceof WithoutNetworkException) {
-                        // 直接结束 会回调FDPresenter.OnWithoutNetwork.withoutNetwork()方法
+                        // 可以结束请求，因为会回调FDPresenter.OnWithoutNetwork.withoutNetwork()方法
                     } else if (e instanceof Info) {
                         fdApiFinish.info(e.getMessage());
                     } else if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {

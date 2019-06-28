@@ -23,6 +23,11 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     private Dialog mLoading;
     private int mLoadTimes = 0; // 加载次数
 
+    /**
+     * 实例化presenter
+     */
+    public abstract P initPresenter();
+
     @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,13 +42,8 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (mPresenter != null && mPresenter.isActive()) mPresenter.initPresenter();
+        if (mPresenter != null && mPresenter.isActive()) mPresenter.afterContentView();
     }
-
-    /**
-     * 实例化presenter
-     */
-    public abstract P initPresenter();
 
     /**
      * 绘制对话框
