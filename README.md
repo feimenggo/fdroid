@@ -23,7 +23,7 @@ allprojects {
 #### Step 2.在项目app的build.gradle中添加依赖
 ```groovy
 dependencies {
-  api 'com.github.feimenggo:fdroid:3.2.5'
+  api 'com.github.feimenggo:fdroid:3.2.7'
 }
 ```
 #### Step 3.自定义Application继承FDApp.java

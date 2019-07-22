@@ -162,7 +162,7 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
         } else if (parentFragment != null) {
             return !parentFragment.getUserVisibleHint();
         }
-        return true;
+        return false;
     }
 
     private boolean isSupportVisible() {
