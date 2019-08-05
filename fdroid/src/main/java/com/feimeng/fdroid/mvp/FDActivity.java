@@ -3,10 +3,9 @@ package com.feimeng.fdroid.mvp;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
-import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 
 import com.feimeng.fdroid.utils.ActivityPageManager;
@@ -19,12 +18,6 @@ import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
  */
 public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> extends RxAppCompatActivity implements DialogInterface.OnDismissListener {
     protected P mPresenter;
-
-    /**
-     * 页面布局的 根view
-     */
-    protected View mContentView;
-
     /**
      * 对话框
      */
@@ -32,11 +25,15 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
     private boolean mStarted;
     private int mLoadTimes = 0; // 加载次数
 
+    /**
+     * 实例化控制器
+     */
+    protected abstract P initPresenter();
+
     @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Activity管理
         ActivityPageManager.getInstance().addActivity(this);
         // 绑定控制器
         mPresenter = initPresenter();
@@ -45,22 +42,22 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
         }
     }
 
-    /**
-     * 实例化控制器
-     */
-    protected abstract P initPresenter();
-
     @Override
-    public void setContentView(@LayoutRes int layoutResID) {
-        View view = LayoutInflater.from(this).inflate(layoutResID, null);
-        setContentView(view);
-        if (mPresenter != null && mPresenter.isActive()) mPresenter.initPresenter();
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        afterContentView();
     }
 
     @Override
     public void setContentView(View view) {
         super.setContentView(view);
-        mContentView = view;
+        afterContentView();
+    }
+
+    @Override
+    public void setContentView(View view, ViewGroup.LayoutParams params) {
+        super.setContentView(view, params);
+        afterContentView();
     }
 
     /**
@@ -176,14 +173,15 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
             mLoading = null;
         }
         super.onDestroy();
+        ActivityPageManager.getInstance().removeActivity(this);
         // 解绑控制器
         if (mPresenter != null) {
             mPresenter.detach();
             mPresenter = null;
         }
-        // 内容布局置空
-        mContentView = null;
-        // 移除Activity管理
-        ActivityPageManager.getInstance().removeActivity(this);
+    }
+
+    private void afterContentView() {
+        if (mPresenter != null && mPresenter.isActive()) mPresenter.afterContentView();
     }
 }

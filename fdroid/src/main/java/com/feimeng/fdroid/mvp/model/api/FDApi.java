@@ -361,7 +361,7 @@ public class FDApi {
      * @param fdApiFinish 响应结果
      * @param <T>         响应数据
      */
-    public static <T> Observer<T> subscriber(final FDApiFinish<T> fdApiFinish) {
+    public <T> Observer<T> subscriber(final FDApiFinish<T> fdApiFinish) {
         return subscriber(null, fdApiFinish);
     }
 
@@ -372,7 +372,7 @@ public class FDApi {
      * @param fdApiFinish 响应结果
      * @param <T>         响应数据
      */
-    public static <T> Observer<T> subscriber(final String apiTag, final FDApiFinish<T> fdApiFinish) {
+    public <T> Observer<T> subscriber(final String apiTag, final FDApiFinish<T> fdApiFinish) {
         return new Observer<T>() {
             @Override
             public void onSubscribe(Disposable disposable) {
@@ -417,6 +417,7 @@ public class FDApi {
                             error = FDConfig.INFO_CONNECT_EXCEPTION;
                         } else if (e instanceof HttpException) {
                             error = FDConfig.INFO_HTTP_EXCEPTION;
+                            onResponseFail(((HttpException) e).response());
                         } else if (e instanceof JsonSyntaxException) {
                             error = FDConfig.INFO_JSON_SYNTAX_EXCEPTION;
                         } else if (e instanceof MalformedJsonException) {
@@ -450,6 +451,7 @@ public class FDApi {
     protected <T> T call(Call<? extends FDResponse<T>> call) throws Exception {
         retrofit2.Response<FDResponse<T>> callResponse = (Response<FDResponse<T>>) call.execute();
         if (!callResponse.isSuccessful()) {
+            onResponseFail(callResponse);
             throw new ApiException(ApiException.CODE_REQUEST_UNSUCCESSFUL, "Request unsuccessful");
         }
         FDResponse<T> response = callResponse.body();
@@ -484,5 +486,14 @@ public class FDApi {
 
     public static void removeApi(String apiTag) {
         mApiTags.remove(apiTag);
+    }
+
+    /**
+     * 当请求返回，响应状态码为非[200-300)时回调
+     *
+     * @param response 响应数据
+     */
+    protected <T> void onResponseFail(Response<T> response) {
+
     }
 }

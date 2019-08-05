@@ -18,21 +18,11 @@ import io.reactivex.plugins.RxJavaPlugins;
  */
 public class BaseApp extends FDApp {
     @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        L.d("Application启动" + Math.random());
-    }
-
-    @Override
     protected void config() {
         FDConfig.SHOW_LOG = true;
         FDConfig.SHOW_HTTP_LOG = true;
         FDConfig.SHOW_HTTP_EXCEPTION_INFO = true;
+        // 处理RxJava取消订阅后抛出的异常
         RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {

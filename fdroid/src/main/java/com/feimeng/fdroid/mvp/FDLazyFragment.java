@@ -156,8 +156,14 @@ public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>>
      * @return true fragment 不可见， false 父 fragment 可见
      */
     private boolean isParentInvisible() {
-        FDLazyFragment fragment = (FDLazyFragment) getParentFragment();
-        return fragment != null && !fragment.isSupportVisible();
+        Fragment parentFragment = getParentFragment();
+        if (parentFragment instanceof FDLazyFragment) {
+            FDLazyFragment fragment = (FDLazyFragment) getParentFragment();
+            return !fragment.isSupportVisible();
+        } else if (parentFragment != null) {
+            return !parentFragment.getUserVisibleHint();
+        }
+        return false;
     }
 
     private boolean isSupportVisible() {

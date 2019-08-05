@@ -32,24 +32,6 @@
         android:text="同步获取用户信息" />
 
     <Button
-        android:id="@+id/leak"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="模拟内存泄露" />
-
-    <Button
-        android:id="@+id/showLoading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="显示 加载中" />
-
-    <Button
-        android:id="@+id/hideLoading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="隐藏 加载中" />
-
-    <Button
         android:id="@+id/toast"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

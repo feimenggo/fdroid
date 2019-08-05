@@ -19,8 +19,9 @@ public abstract class FDApp extends Application {
     private static FDApp sInstance;
     private FDCoreThread mCoreThread = new FDCoreThread();
 
-    public static FDApp getInstance() {
-        return sInstance;
+    @SuppressWarnings("unchecked")
+    public static <T extends FDApp> T getInstance() {
+        return (T) sInstance;
     }
 
     @Override

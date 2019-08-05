@@ -23,10 +23,10 @@ allprojects {
 #### Step 2.在项目app的build.gradle中添加依赖
 ```groovy
 dependencies {
-  // 基于AndroidX
+  // 基于AndroidX版本 二选一
   api 'com.github.feimenggo:fdroid:4.0'
-  // 非AndroidX
-  api 'com.github.feimenggo:fdroid:3.2.5'
+  // 非AndroidX版本
+  api 'com.github.feimenggo:fdroid:3.3.1'
 }
 ```
 #### Step 3.自定义Application继承FDApp.java

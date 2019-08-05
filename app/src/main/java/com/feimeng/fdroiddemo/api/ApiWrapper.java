@@ -15,7 +15,7 @@ public class ApiWrapper extends FDApi {
     private ApiWrapper() {
         addHttpMockData("user/login", "{\"code\":200,\"info\":\"成功\",\"data\":1}");
         addHttpMockData("user/register", "{\"code\":200,\"info\":\"成功\",\"data\":null}");
-        addHttpMockData("user/info", "{\"code\":210,\"info\":\"失败\",\"data\":null}");
+        addHttpMockData("user/info", "{\"code\":210,\"info\":\"模拟后端登录失败\",\"data\":null}");
         api = getRetrofit("http://www.baidu.com/").create(ApiService.class);
     }
 

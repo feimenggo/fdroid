@@ -33,9 +33,6 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
         findViewById(R.id.login).setOnClickListener(this);
         findViewById(R.id.register).setOnClickListener(this);
         findViewById(R.id.getUserInfo).setOnClickListener(this);
-        findViewById(R.id.leak).setOnClickListener(this);
-        findViewById(R.id.showLoading).setOnClickListener(this);
-        findViewById(R.id.hideLoading).setOnClickListener(this);
         findViewById(R.id.toast).setOnClickListener(this);
     }
 
@@ -61,33 +58,10 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
                 LoginActivity.start(this);
                 break;
             case R.id.register:
-                testChoose();
-//                register();
+                register();
                 break;
             case R.id.getUserInfo:
                 getUserInfoSync();
-                break;
-            case R.id.leak:
-                MainLeakActivity.start(this);
-                break;
-            case R.id.showLoading:
-//                new FastTask<Ignore>() {
-//                    @Override
-//                    public Ignore task() throws Exception {
-//                        Thread.sleep(2000);
-//                        return Ignore.instance;
-//                    }
-//                }.runIO(new FastTask.Result<Ignore>() {
-//                    @Override
-//                    public void success(Ignore ignore) {
-//                        L.d("nodawang", "hello");
-//                    }
-//                }, this);
-                showLoadingDialog("拼命加载中...", true);
-//                showLoadingDialog("拼命加载中2...");
-                break;
-            case R.id.hideLoading:
-                hideLoadingDialog();
                 break;
             case R.id.toast:
                 T.showS(this, "Toast:" + (++mToast));
@@ -103,7 +77,7 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
                     Integer aVoid = ApiWrapper.getInstance().getUserInfo("", "");
                     L.d("nodawang", aVoid);
                 } catch (ApiException e) {
-                    e.printStackTrace();
+                    L.d("nodawang", e.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -121,7 +95,7 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
                         return ApiWrapper.getInstance().login("10086", "123456");
                     }
                 })
-                .subscribe(ApiWrapper.subscriber(new ApiFinish2<Integer>() {
+                .subscribe(ApiWrapper.getInstance().subscriber(new ApiFinish2<Integer>() {
                     @Override
                     public void success(Integer data) {
                         T.showS(getApplicationContext(), "登录成功");
@@ -138,7 +112,7 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
 
     private void login() {
         ApiWrapper.getInstance().login("10086", "123456")
-                .subscribe(ApiWrapper.subscriber(new ApiFinish2<Integer>() {
+                .subscribe(ApiWrapper.getInstance().subscriber(new ApiFinish2<Integer>() {
                     @Override
                     public void success(Integer data) {
                         T.showS(getApplicationContext(), "登录成功");

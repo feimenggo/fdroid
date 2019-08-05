@@ -18,12 +18,12 @@ public class LoginPresenter extends LoginContract.Presenter {
         })).doOnNext(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
-                Thread.sleep(10000);
+                Thread.sleep(1000); // 等待1秒
             }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribe(ApiWrapper.subscriber("login", new ApiFinish2<Integer>() {
+        }).observeOn(AndroidSchedulers.mainThread()).subscribe(ApiWrapper.getInstance().subscriber("login", new ApiFinish2<Integer>() {
             @Override
             public void start() {
-                showDialogApiTag("login");
+                showDialog("正在登录", true, "login");
             }
 
             @Override
