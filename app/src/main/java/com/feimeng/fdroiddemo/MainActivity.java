@@ -115,7 +115,7 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
                         return ApiWrapper.getInstance().login("10086", "123456");
                     }
                 })
-                .subscribe(ApiWrapper.subscriber(new ApiFinish2<Integer>() {
+                .subscribe(ApiWrapper.getInstance().subscriber(new ApiFinish2<Integer>() {
                     @Override
                     public void success(Integer data) {
                         T.showS(getApplicationContext(), "登录成功");
@@ -132,7 +132,7 @@ public class MainActivity extends FDActivity<MainContract.View, MainContract.Pre
 
     private void login() {
         ApiWrapper.getInstance().login("10086", "123456")
-                .subscribe(ApiWrapper.subscriber(new ApiFinish2<Integer>() {
+                .subscribe(ApiWrapper.getInstance().subscriber(new ApiFinish2<Integer>() {
                     @Override
                     public void success(Integer data) {
                         T.showS(getApplicationContext(), "登录成功");

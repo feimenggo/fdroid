@@ -20,7 +20,7 @@ public class LoginPresenter extends LoginContract.Presenter {
             public void accept(Integer integer) throws Exception {
                 Thread.sleep(10000);
             }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribe(ApiWrapper.subscriber("login", new ApiFinish2<Integer>() {
+        }).observeOn(AndroidSchedulers.mainThread()).subscribe(ApiWrapper.getInstance().subscriber("login", new ApiFinish2<Integer>() {
             @Override
             public void start() {
                 showDialogApiTag("login");

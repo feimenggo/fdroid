@@ -1,5 +1,6 @@
 package com.feimeng.fdroid.mvp.model.api;
 
+
 import android.support.annotation.NonNull;
 
 import com.feimeng.fdroid.config.FDConfig;
@@ -488,6 +489,11 @@ public class FDApi {
         mApiTags.remove(apiTag);
     }
 
+    /**
+     * 当请求返回，响应状态码为非[200-300)时回调
+     *
+     * @param response 响应数据
+     */
     protected <T> void onResponseFail(Response<T> response) {
 
     }
