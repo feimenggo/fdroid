@@ -29,26 +29,19 @@ public abstract class FDApp extends Application {
         super.onCreate();
         if (getPackageName().equals(getProcessName(this, android.os.Process.myPid()))) {
             sInstance = this;
-            configBeforeCore();
-            mCoreThread.start();
             config();
+            mCoreThread.start();
         }
     }
 
     /**
-     * 配置 UI线程
+     * 配置 在UI线程调用
      */
     protected void config() {
     }
 
     /**
-     * 配置 在Core执行之前 UI线程
-     */
-    protected void configBeforeCore() {
-    }
-
-    /**
-     * 配置 子线程
+     * 配置 在子线程调用
      */
     protected abstract void configAsync();
 
@@ -63,6 +56,19 @@ public abstract class FDApp extends Application {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getProcessName(Context context, int pid) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (am == null) return null;
+        List<ActivityManager.RunningAppProcessInfo> runningApps = am.getRunningAppProcesses();
+        if (runningApps == null) return null;
+        for (ActivityManager.RunningAppProcessInfo processInfo : runningApps) {
+            if (processInfo.pid == pid) {
+                return processInfo.processName;
+            }
+        }
+        return null;
     }
 
     private void initCore() {
@@ -80,18 +86,5 @@ public abstract class FDApp extends Application {
             initCore();
             configAsync();
         }
-    }
-
-    public String getProcessName(Context cxt, int pid) {
-        ActivityManager am = (ActivityManager) cxt.getSystemService(Context.ACTIVITY_SERVICE);
-        if (am == null) return null;
-        List<ActivityManager.RunningAppProcessInfo> runningApps = am.getRunningAppProcesses();
-        if (runningApps == null) return null;
-        for (ActivityManager.RunningAppProcessInfo processInfo : runningApps) {
-            if (processInfo.pid == pid) {
-                return processInfo.processName;
-            }
-        }
-        return null;
     }
 }
