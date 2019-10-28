@@ -12,7 +12,6 @@ import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.interceptor.HeaderInterceptor;
 import com.feimeng.fdroid.utils.interceptor.MockInterceptor;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.MalformedJsonException;
 
@@ -52,11 +51,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static com.feimeng.fdroid.config.FDConfig.SHOW_HTTP_LOG;
 
 /**
- * API操作类
- * Created by feimeng on 2017/1/20.
+ * Author: Feimeng
+ * Time:   2017/1/20
+ * Description: API操作类
  */
 public class FDApi {
-    private static final Map<String, Disposable> mApiTags = new HashMap<>(); // 请求列表
+    private static final Map<String, Disposable> sApiTags = new HashMap<>(); // 请求列表
     private List<HeaderParam> mHeaderParam; // 自定义请求头
     private Map<String, String> mMockData; // 模拟请求
     private ResponseCodeInterceptorListener mResponseCodeInterceptorListener;
@@ -68,8 +68,17 @@ public class FDApi {
         this(new Gson());
     }
 
-    public FDApi(Gson gson) {
+    public FDApi(@NonNull Gson gson) {
         mGson = gson;
+    }
+
+    /**
+     * 获取构造时传入的Gson对象
+     *
+     * @return gson
+     */
+    public Gson getGson() {
+        return mGson;
     }
 
     protected Retrofit getRetrofit(String baseUrl) {
@@ -114,10 +123,23 @@ public class FDApi {
         return clientBuilder.build();
     }
 
+    /**
+     * 创建application/json数据体
+     *
+     * @param params 参数键值对 key1,value1,key2,value2...
+     * @return RequestBody
+     */
     public RequestBody json(Object... params) {
         return json(mGson, params);
     }
 
+    /**
+     * 创建application/json数据体
+     *
+     * @param gson   使用指定的Gson进行序列化
+     * @param params 参数键值对 key1,value1,key2,value2...
+     * @return RequestBody
+     */
     public RequestBody json(Gson gson, Object... params) {
         JsonRequestBody body = JsonRequestBody.getInstance();
         Map<String, Object> map = body.getMap();
@@ -133,10 +155,23 @@ public class FDApi {
         return body.build(gson);
     }
 
+    /**
+     * 创建application/json数据体
+     *
+     * @param requestObj 数据对象
+     * @return RequestBody
+     */
     public RequestBody json(Object requestObj) {
         return json(mGson, requestObj);
     }
 
+    /**
+     * 创建application/json数据体
+     *
+     * @param gson       使用指定的Gson进行序列化
+     * @param requestObj 数据对象
+     * @return RequestBody
+     */
     public RequestBody json(Gson gson, Object requestObj) {
         return RequestBody.create(JsonRequestBody.getInstance().getJsonType(), gson.toJson(requestObj));
     }
@@ -160,7 +195,7 @@ public class FDApi {
     }
 
     protected Converter.Factory getGsonConverterFactory() {
-        return GsonConverterFactory.create(new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create());
+        return GsonConverterFactory.create(mGson);
     }
 
     protected CallAdapter.Factory getRxJavaCallAdapterFactory() {
@@ -195,7 +230,7 @@ public class FDApi {
     }
 
     /**
-     * 对网络接口返回的Response进行分割操作
+     * 针对网络接口返回的Response，进行分割操作
      *
      * @param response 网络请求结果
      * @param <T>      实体数据
@@ -466,26 +501,35 @@ public class FDApi {
     }
 
     public static void requestApi(String apiTag, Disposable disposable) {
-        mApiTags.put(apiTag, disposable);
+        sApiTags.put(apiTag, disposable);
     }
 
+    /**
+     * 取消所有请求
+     */
     public static void cancelApi() {
-        if (mApiTags.isEmpty()) return;
-        Set<String> apis = mApiTags.keySet();
-        for (String api : apis) cancelApi(api);
+        if (sApiTags.isEmpty()) return;
+        Set<String> apis = sApiTags.keySet();
+        for (String apiTag : apis) cancelApi(apiTag);
     }
 
+    /**
+     * 取消指定tag的请求
+     */
     public static void cancelApi(String apiTag) {
-        if (mApiTags.isEmpty()) return;
-        Disposable disposable = mApiTags.get(apiTag);
+        if (sApiTags.isEmpty()) return;
+        Disposable disposable = sApiTags.get(apiTag);
         if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();
             removeApi(apiTag);
         }
     }
 
+    /**
+     * 移除指定tag的请求标识
+     */
     public static void removeApi(String apiTag) {
-        mApiTags.remove(apiTag);
+        sApiTags.remove(apiTag);
     }
 
     /**
@@ -494,6 +538,5 @@ public class FDApi {
      * @param response 响应数据
      */
     protected <T> void onResponseFail(Response<T> response) {
-
     }
 }
