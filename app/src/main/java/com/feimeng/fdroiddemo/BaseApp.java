@@ -19,7 +19,6 @@ import io.reactivex.plugins.RxJavaPlugins;
 public class BaseApp extends FDApp {
     @Override
     protected void config() {
-        FDConfig.SHOW_LOG = true;
         FDConfig.SHOW_HTTP_LOG = true;
         FDConfig.SHOW_HTTP_EXCEPTION_INFO = true;
         // 处理RxJava取消订阅后抛出的异常

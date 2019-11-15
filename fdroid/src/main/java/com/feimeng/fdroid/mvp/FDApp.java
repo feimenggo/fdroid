@@ -3,11 +3,13 @@ package com.feimeng.fdroid.mvp;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 
-import com.feimeng.fdroid.config.FDConfig;
+import androidx.annotation.NonNull;
+
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.SP;
-import com.feimeng.fdroid.utils.UE;
 
 import java.util.List;
 
@@ -17,8 +19,10 @@ import java.util.List;
  */
 public abstract class FDApp extends Application {
     private static FDApp sInstance;
-    private FDCoreThread mCoreThread = new FDCoreThread();
+    private Handler mHandler; // UI Handler
+    private FDCoreThread mCoreThread; // 用于初始化的子线程
 
+    @NonNull
     @SuppressWarnings("unchecked")
     public static <T extends FDApp> T getInstance() {
         return (T) sInstance;
@@ -29,8 +33,9 @@ public abstract class FDApp extends Application {
         super.onCreate();
         if (getPackageName().equals(getProcessName(this, android.os.Process.myPid()))) {
             sInstance = this;
+            mHandler = new Handler(Looper.getMainLooper());
             config();
-            mCoreThread.start();
+            (mCoreThread = new FDCoreThread()).start();
         }
     }
 
@@ -38,6 +43,10 @@ public abstract class FDApp extends Application {
      * 配置 在UI线程调用
      */
     protected void config() {
+        // 初始化 Log
+        L.init(true, L.V);
+        // 初始化 SharedPreferences
+        SP.init(this, "fdroid");
     }
 
     /**
@@ -71,19 +80,28 @@ public abstract class FDApp extends Application {
         return null;
     }
 
-    private void initCore() {
-        // Log
-        L.init(FDConfig.SHOW_LOG, L.V);
-        // 增强用户体验效果工具
-        UE.init(this);
-        // 共享参数 SharedPreferences
-        SP.init(this, FDConfig.SP_NAME);
+    /**
+     * 获取UI线程 Handler
+     *
+     * @return Handler
+     */
+    @NonNull
+    public Handler getHandler() {
+        return mHandler;
+    }
+
+    /**
+     * UI线程执行Runnable
+     *
+     * @param runnable Runnable
+     */
+    public void post(@NonNull Runnable runnable) {
+        mHandler.post(runnable);
     }
 
     private class FDCoreThread extends Thread {
         @Override
         public void run() {
-            initCore();
             configAsync();
         }
     }

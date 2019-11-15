@@ -5,9 +5,6 @@ package com.feimeng.fdroid.config;
  * Created by feimeng on 2017/2/27.
  */
 public class FDConfig {
-    public static String SP_NAME = "fdroid";// SharedPreferences文件名
-
-    public static boolean SHOW_LOG = false;
     public static boolean SHOW_HTTP_LOG = false;
 
     public static short CONNECT_TIMEOUT = 15;// 连接超时时间 单位：秒
