@@ -24,7 +24,7 @@ allprojects {
 ```groovy
 dependencies {
   // 基于AndroidX版本 二选一
-  api 'com.github.feimenggo:fdroid:4.0'
+  api 'com.github.feimenggo:fdroid:4.0.1'
   // 非AndroidX版本
   api 'com.github.feimenggo:fdroid:3.3.1'
 }
