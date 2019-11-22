@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="295dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_prompt"
+        android:orientation="vertical"
+        android:paddingBottom="30dp"
+        tools:ignore="UselessParent">
+
+        <ImageView
+            android:id="@id/close"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:scaleType="center"
+            android:src="@drawable/icon_close" />
+
+        <TextView
+            android:id="@id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="40dp"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            tools:text="提示" />
+
+        <TextView
+            android:id="@id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:layout_alignLeft="@id/title"
+            android:layout_alignRight="@id/title"
+            android:layout_marginTop="25dp"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.3"
+            android:textColor="@color/color929292"
+            android:textSize="14sp"
+            tools:text="今晚吃鸡" />
+
+        <TextView
+            android:id="@id/cancel"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/shape_oval_red_stroke"
+            android:gravity="center"
+            android:textColor="@drawable/shape_oval_red_stroke"
+            android:textSize="14sp"
+            tools:text="取消" />
+
+        <TextView
+            android:id="@id/ok"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="30dp"
+            android:background="@drawable/shape_oval_blue"
+            android:gravity="center"
+            android:textColor="@drawable/shape_oval_blue"
+            android:textSize="14sp"
+            tools:text="确定" />
+    </RelativeLayout>
+</FrameLayout>

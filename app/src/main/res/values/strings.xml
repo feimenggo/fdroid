@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">FDroid Demo</string>
+    <string name="token_invalid">身份认证失效</string>
+    <string name="network_unavailable">当前网络不可用，请检查网络设置。</string>
+    <string name="storage_unavailable">无读写权限，请赋予相关权限。</string>
 </resources>

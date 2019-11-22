@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="DialogTransparent" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="BaseDialog" parent="AlertDialog.AppCompat">
+        <!-- 这里设置背景为透明，为了隐藏边框，实现屏幕宽度铺满 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+
+    <style name="BaseDialog.Floating">
+        <!-- windowIsFloating属性设置为false, 默认将Window设置成全屏大小，设置为true，则window大小为wrap_content。-->
+        <item name="android:windowIsFloating">false</item>
+    </style>
+</resources>

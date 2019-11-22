@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="close" type="id" />
+    <item name="content" type="id" />
+    <item name="cancel" type="id" />
+    <item name="ok" type="id" />
+    <item name="progress" type="id" />
+</resources>
