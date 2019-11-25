@@ -1,65 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimary">#F65252</color>
     <color name="colorPrimaryDark">#F65252</color>
     <color name="colorAccent">#F65252</color>
-    <color name="statusBarColor">#FFFFFF</color>
-
-    <!--辅助色-->
-    <color name="success">#13CE66</color>
-    <color name="warning">#F7BA2A</color>
-    <color name="danger">#FF4949</color>
-    <color name="background">#F9F9F9</color>
-
-    <color name="black_2A">#2A2A2A</color>
-    <color name="black_22">#222222</color>
-    <color name="grey_98">#98A2AB</color>
-    <color name="grey_A6">#A6B4BF</color>
-    <color name="grey_B0">#B0BAC3</color>
-    <color name="grey_C0">#C0CBD4</color>
-    <color name="grey_DA">#DADADA</color>
-    <color name="grey_EB">#EBF3FB</color>
-    <color name="grey_EF">#EFF5FB</color>
-    <color name="grey_F9">#F9F9F9</color>
-
-    <color name="colorF4F4F4">#F4F4F4</color>
-    <color name="color060606">#060606</color>
-    <color name="colorCCCCCC">#CCCCCC</color>
-    <color name="colorFEEFEE">#FEEFEE</color>
-    <color name="colorF65252">#F65252</color>
-    <color name="colorF88586">#F88586</color>
-    <color name="color929292">#929292</color>
-    <color name="color979797">#979797</color>
-    <color name="colorF9F9F9">#F9F9F9</color>
-    <color name="color030303">#030303</color>
-    <color name="color333333">#333333</color>
-
-    <!--中性色-->
-    <color name="transparent">#00000000</color>
-    <color name="black">#000000</color>
-    <color name="lightBlack">#324057</color>
-    <color name="exLightBlack">#475669</color>
-    <color name="silver">#8492A6</color>
-    <color name="lightSilver">#99A9BF</color>
-    <color name="extraLightSilver">#C0CCDA</color>
-    <color name="gray">#D3DCE6</color>
-    <color name="lightGray">#E5E9F2</color>
-    <color name="exLightGray">#EFF2F7</color>
-    <color name="darkWhite">#F9FAFC</color>
     <color name="white">#FFFFFF</color>
-
-    <color name="blue">#20A0FF</color>
-    <color name="blue_AA">#AA2DBCFF</color>
-
-    <color name="black_1">#323232</color>
-    <color name="black_2">#4F4F4F</color>
-    <color name="black_3">#868686</color>
-    <color name="black_4">#BBBBBB</color>
-    <color name="black_5">#C5C5C5</color>
-
-    <color name="title">@color/black_2A</color>
-    <color name="subtitle">@color/black_22</color>
-    <color name="title2">#3E4D48</color>
-    <color name="subtitle2">#818C88</color>
-    <color name="desc">@color/grey_98</color>
 </resources>

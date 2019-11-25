@@ -7,7 +7,6 @@ import com.feimeng.fdroid.utils.SP;
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroiddemo.BuildConfig;
 import com.feimeng.fdroiddemo.data.Constants;
-import com.feimeng.fdroiddemo.mvp.model.file.FileManager;
 
 import io.reactivex.functions.Consumer;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -46,18 +45,11 @@ public class BaseApp extends FDApp implements Consumer<Throwable> {
     @Override
     protected void configAsync() {
         RxJavaPlugins.setErrorHandler(this); // 处理RxJava取消订阅后抛出的异常
-        FileManager.init(this); // 文件管理器
     }
 
     @Override
     public void accept(Throwable throwable) {
         // 处理RxJava取消订阅后抛出的异常
         throwable.printStackTrace();
-    }
-
-    /**
-     * APP销毁时调用
-     */
-    public void onAppDestroy() {
     }
 }

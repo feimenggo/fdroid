@@ -1,7 +1,8 @@
-package com.feimeng.fdroiddemo.api;
+package com.feimeng.fdroiddemo.mvp.model.api;
 
 
 import com.feimeng.fdroid.mvp.model.api.bean.Response;
+import com.feimeng.fdroiddemo.data.dto.LoginDto;
 
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
@@ -15,7 +16,10 @@ import retrofit2.http.POST;
  */
 public interface ApiService {
     @POST("user/login")
-    Observable<Response<Integer>> login(@Body RequestBody requestBody);
+    Observable<Response<LoginDto>> login(@Body RequestBody requestBody);
+
+    @POST("user/login")
+    Call<Response<LoginDto>> login_(@Body RequestBody requestBody);
 
     @POST("user/register")
     Observable<Response<Void>> register(@Body RequestBody requestBody);

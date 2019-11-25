@@ -43,11 +43,6 @@ public class SdcardManager {
     }
 
     @NonNull
-    public static File getBackupDir() {
-        return noMedia(makeDir(new File(getAppDir(), "备份")));
-    }
-
-    @NonNull
     public static File getSharedPictureDir() {
         return makeDir(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), APP));
     }

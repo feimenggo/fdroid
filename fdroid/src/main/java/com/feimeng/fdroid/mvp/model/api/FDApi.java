@@ -177,19 +177,18 @@ public class FDApi {
     }
 
     protected OkHttpClient getOkHttpClient() {
-        // Log拦截器  打印所有的Log
-        HttpLoggingInterceptor logInterceptor = null;
-        if (SHOW_HTTP_LOG) {
-            logInterceptor = new HttpLoggingInterceptor();
-            logInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        }
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .connectTimeout(FDConfig.CONNECT_TIMEOUT, TimeUnit.SECONDS) // 连接超时时间为15秒
                 .writeTimeout(FDConfig.WRITE_TIMEOUT, TimeUnit.SECONDS) // 写入超时时间
                 .readTimeout(FDConfig.READ_TIMEOUT, TimeUnit.SECONDS); // 读取超时时间
         if (mHeaderParam != null && !mHeaderParam.isEmpty())
             clientBuilder.addInterceptor(new HeaderInterceptor(mHeaderParam));
-        if (logInterceptor != null) clientBuilder.addInterceptor(logInterceptor);
+        // Log拦截器 打印所有的Log
+        if (SHOW_HTTP_LOG) {
+            HttpLoggingInterceptor logInterceptor = new HttpLoggingInterceptor();
+            logInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            clientBuilder.addInterceptor(logInterceptor);
+        }
         startMock(clientBuilder);
         return clientBuilder.build();
     }

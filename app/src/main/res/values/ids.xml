@@ -5,4 +5,11 @@
     <item name="cancel" type="id" />
     <item name="ok" type="id" />
     <item name="progress" type="id" />
+    <item name="loginAsync" type="id" />
+    <item name="loginSync" type="id" />
+    <item name="login" type="id" />
+    <item name="name" type="id" />
+    <item name="btn" type="id" />
+    <item name="test" type="id" />
+    <item name="info" type="id" />
 </resources>
