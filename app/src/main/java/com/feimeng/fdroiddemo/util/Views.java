@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 /**
@@ -21,11 +22,11 @@ import androidx.core.content.ContextCompat;
  */
 public class Views {
     public static boolean isVisible(View view) {
-        return view.getVisibility() == View.VISIBLE;
+        return view != null && view.getVisibility() == View.VISIBLE;
     }
 
     public static boolean isGone(View view) {
-        return view.getVisibility() == View.GONE;
+        return view != null && view.getVisibility() == View.GONE;
     }
 
     public static void visibility(View view, boolean visibility) {
@@ -85,33 +86,49 @@ public class Views {
     }
 
     public static void drawableLeft(Context context, TextView tv, @DrawableRes int resId) {
-        Drawable drawable = resId == 0 ? null : ContextCompat.getDrawable(context, resId);
-        tv.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        Drawable drawable = ContextCompat.getDrawable(context, resId);
+        if (drawable != null) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        }
     }
 
     public static void drawableLeft(TextView tv, @DrawableRes int resId) {
-        Drawable drawable = resId == 0 ? null : ContextCompat.getDrawable(tv.getContext(), resId);
-        tv.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        Drawable drawable = ContextCompat.getDrawable(tv.getContext(), resId);
+        if (drawable != null) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        }
     }
 
     public static void drawableRight(Context context, TextView tv, @DrawableRes int resId) {
-        Drawable drawable = resId == 0 ? null : ContextCompat.getDrawable(context, resId);
-        tv.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+        Drawable drawable = ContextCompat.getDrawable(context, resId);
+        if (drawable != null) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+        }
     }
 
     public static void drawableTop(TextView tv, @DrawableRes int resId) {
-        Drawable drawable = resId == 0 ? null : ContextCompat.getDrawable(tv.getContext(), resId);
-        tv.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null);
+        Drawable drawable = ContextCompat.getDrawable(tv.getContext(), resId);
+        if (drawable != null) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null);
+        }
     }
 
     public static void drawableTop(Context context, TextView tv, @DrawableRes int resId) {
-        Drawable drawable = resId == 0 ? null : ContextCompat.getDrawable(context, resId);
-        tv.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null);
+        Drawable drawable = ContextCompat.getDrawable(context, resId);
+        if (drawable != null) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null);
+        }
     }
 
     public static void clearFocus(View... views) {
         for (View view : views) {
             if (view != null) view.clearFocus();
+        }
+    }
+
+    public static void clickListener(@Nullable View.OnClickListener l, View... views) {
+        for (View view : views) {
+            if (view != null) view.setOnClickListener(l);
         }
     }
 
@@ -131,7 +148,7 @@ public class Views {
     private static int mLastClickViewId = -1;
 
     /**
-     * 是否是快速点击
+     * 是否是快速重复点击
      *
      * @param view 点击的控件
      * @return true:是，false:不是
@@ -141,7 +158,7 @@ public class Views {
     }
 
     /**
-     * 是否是快速点击
+     * 是否是快速重复点击
      *
      * @param view           点击的控件
      * @param intervalMillis 时间间隔（毫秒）
@@ -159,5 +176,10 @@ public class Views {
             mLastClickViewId = viewId;
             return false;
         }
+    }
+
+    public static void clearFast() {
+        mLastClickTime = 0;
+        mLastClickViewId = -1;
     }
 }

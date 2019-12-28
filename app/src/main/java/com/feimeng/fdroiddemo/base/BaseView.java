@@ -7,5 +7,5 @@ import com.feimeng.fdroid.mvp.FDView;
  * Time:   2018/6/11 13:40
  * Description: 视图基类
  */
-public interface BaseView extends FDView {
+public interface BaseView<D> extends FDView<D> {
 }

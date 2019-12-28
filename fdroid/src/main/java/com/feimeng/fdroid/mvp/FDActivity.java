@@ -15,8 +15,12 @@ import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 /**
  * Activity基类
  * Created by feimeng on 2017/1/20.
+ *
+ * @param <V> 视图
+ * @param <P> 控制器
+ * @param <D> 初始化结果
  */
-public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> extends RxAppCompatActivity implements DialogInterface.OnDismissListener {
+public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D>, D> extends RxAppCompatActivity implements FDView<D>, DialogInterface.OnDismissListener {
     protected P mPresenter;
     /**
      * 对话框
@@ -36,10 +40,7 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
         super.onCreate(savedInstanceState);
         ActivityPageManager.getInstance().addActivity(this);
         // 绑定控制器
-        mPresenter = initPresenter();
-        if (mPresenter != null && this instanceof FDView) {
-            mPresenter.attach((V) this);
-        }
+        if ((mPresenter = initPresenter()) != null) mPresenter.attach((V) this);
     }
 
     @Override
@@ -58,6 +59,10 @@ public abstract class FDActivity<V extends FDView, P extends FDPresenter<V>> ext
     public void setContentView(View view, ViewGroup.LayoutParams params) {
         super.setContentView(view, params);
         afterContentView();
+    }
+
+    @Override
+    public void init(D initData, Throwable e) {
     }
 
     /**

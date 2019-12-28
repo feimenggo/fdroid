@@ -25,7 +25,12 @@ public class TestPresenter extends TestContract.Presenter {
             @Override
             public void success(String username) {
                 // 回调结果给View层
-                if (isActive()) mView.getUserName(username);
+                if (isActive()) mView.getUserName(username, null);
+            }
+
+            @Override
+            public void fail(Throwable throwable) {
+                if (isActive()) mView.getUserName(null, throwable.getMessage());
             }
 
             @Override

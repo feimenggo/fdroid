@@ -32,7 +32,7 @@ import java.util.Objects;
  * Time:   2018/4/13 16:14
  * Description: 对话框封装类
  */
-public abstract class BaseDialog<V extends BaseView, P extends FDPresenter<V>> extends FDDialog<V, P> {
+public abstract class BaseDialog<V extends BaseView<D>, P extends FDPresenter<V, D>, D> extends FDDialog<V, P, D> {
     protected int mGravity;// 显示位置
     protected boolean mIsMatchWidth;// 是否宽度铺满
     protected boolean mCancelable;// 是否外部点击取消

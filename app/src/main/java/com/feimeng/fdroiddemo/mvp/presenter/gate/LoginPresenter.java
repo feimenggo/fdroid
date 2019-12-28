@@ -1,11 +1,19 @@
 package com.feimeng.fdroiddemo.mvp.presenter.gate;
 
+import androidx.annotation.Nullable;
+
 import com.feimeng.fdroid.mvp.model.api.bean.ApiFinish;
 import com.feimeng.fdroid.utils.FastTask;
 import com.feimeng.fdroiddemo.data.dto.LoginDto;
 import com.feimeng.fdroiddemo.mvp.model.api.ApiWrapper;
 
 public class LoginPresenter extends LoginContract.Presenter {
+    @Nullable
+    @Override
+    protected String onInit(boolean initAsync) throws Exception {
+        return "hello world";
+    }
+
     @Override
     public void loginBySync(String phone, String password) {
         new FastTask<String>() {

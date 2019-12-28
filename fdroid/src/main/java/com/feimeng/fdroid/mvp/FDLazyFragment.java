@@ -23,7 +23,7 @@ import java.util.List;
  * Fragment 第一次可见状态应该在哪里通知用户 在 onResume 以后？
  * https://blog.csdn.net/learningcoding/article/details/80044942
  */
-public abstract class FDLazyFragment<V extends FDView, P extends FDPresenter<V>> extends FDFragment<V, P> {
+public abstract class FDLazyFragment<V extends FDView<D>, P extends FDPresenter<V, D>, D> extends FDFragment<V, P, D> {
     protected WeakReference<View> mRootView;
     private boolean mIsFirstVisible = true;
     private boolean mIsViewCreated = false;

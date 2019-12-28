@@ -26,8 +26,11 @@ import io.reactivex.ObservableOnSubscribe;
 /**
  * 控制器基类
  * Created by feimeng on 2017/1/20.
+ *
+ * @param <V> 视图
+ * @param <D> 初始化结果
  */
-public abstract class FDPresenter<V extends FDView> {
+public abstract class FDPresenter<V extends FDView<D>, D> {
     private List<String> mApiTags;
     private boolean mInitAsync; // 异步初始化
     protected V mView;// 视图
@@ -37,9 +40,9 @@ public abstract class FDPresenter<V extends FDView> {
      * 开启后，{@link #onInit(boolean)}将会在子线程回调，否则在UI线程回调。
      */
     @SuppressWarnings("unchecked")
-    public <T extends FDPresenter> T asyncInit() {
+    public <P extends FDPresenter> P asyncInit() {
         mInitAsync = true;
-        return (T) this;
+        return (P) this;
     }
 
     /**
@@ -62,29 +65,44 @@ public abstract class FDPresenter<V extends FDView> {
      */
     void afterContentView() {
         if (mInitAsync) {
-            new FastTask<Object>() {
+            new FastTask<D>() {
                 @Override
-                public Object task() throws Exception {
+                public D task() throws Exception {
                     return onInit(true);
                 }
-            }.runIO(new FastTask.Result<Object>() {
+            }.runIO(new FastTask.Result<D>() {
                 @Override
-                public void success(Object initObject) {
-                    if (isActive()) mView.init(initObject, null);
+                public void success(D initData) {
+                    if (isActive()) postInitView(initData, null);
                 }
 
                 @Override
-                public void fail(Throwable e) {
-                    if (isActive()) mView.init(null, e);
+                public void fail(Throwable throwable) {
+                    if (isActive()) postInitView(null, throwable);
                 }
             }, mView);
         } else {
             try {
-                mView.init(onInit(false), null);
-            } catch (Throwable e) {
-                mView.init(null, e);
+                postInitView(onInit(false), null);
+            } catch (Throwable throwable) {
+                postInitView(null, throwable);
             }
         }
+    }
+
+    /**
+     * 执行视图初始化
+     *
+     * @param initData  初始化的结果
+     * @param throwable 初始化执行时抛出的异常
+     */
+    protected void postInitView(@Nullable final D initData, @Nullable final Throwable throwable) {
+        requireActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mView.init(initData, throwable);
+            }
+        });
     }
 
     /**
@@ -95,7 +113,7 @@ public abstract class FDPresenter<V extends FDView> {
      * @throws Exception 初始化执行时抛出的异常
      */
     @Nullable
-    protected Object onInit(boolean initAsync) throws Exception {
+    protected D onInit(boolean initAsync) throws Exception {
         return null;
     }
 

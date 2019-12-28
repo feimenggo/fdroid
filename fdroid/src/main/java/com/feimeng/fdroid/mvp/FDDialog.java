@@ -16,7 +16,7 @@ import com.trello.rxlifecycle3.components.support.RxDialogFragment;
  * Time:   2018/11/3 10:43
  * Description: DialogFragment基类
  */
-public abstract class FDDialog<V extends FDView, P extends FDPresenter<V>> extends RxDialogFragment {
+public abstract class FDDialog<V extends FDView<D>, P extends FDPresenter<V, D>, D> extends RxDialogFragment implements FDView<D> {
     protected P mPresenter;
 
     /**
@@ -35,16 +35,18 @@ public abstract class FDDialog<V extends FDView, P extends FDPresenter<V>> exten
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // 绑定控制器
-        mPresenter = initPresenter();
-        if (mPresenter != null && this instanceof FDView) {
-            mPresenter.attach((V) this);
-        }
+        if ((mPresenter = initPresenter()) != null) mPresenter.attach((V) this);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (mPresenter != null && mPresenter.isActive()) mPresenter.afterContentView();
+    }
+
+    @Override
+    public void init(D initData, Throwable e) {
+
     }
 
     /**

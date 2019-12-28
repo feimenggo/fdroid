@@ -25,6 +25,9 @@ import io.reactivex.schedulers.Schedulers;
  * Description: 方便的执行耗时任务，基于RxJava的封装
  */
 public abstract class FastTask<T> {
+    /**
+     * 快速创建Observable对象
+     */
     public Observable<T> fast() {
         return Observable.create(new ObservableOnSubscribe<T>() {
             @Override
@@ -35,44 +38,32 @@ public abstract class FastTask<T> {
         });
     }
 
+    /**
+     * 在计算线程执行
+     */
     public void runCalc() {
-        Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
-            }
-        }).subscribeOn(Schedulers.computation()).subscribe();
+        fast().subscribeOn(Schedulers.computation()).subscribe();
     }
 
+    /**
+     * 在计算线程执行
+     */
     public Disposable runCalc(Consumer<T> consumer) {
-        return Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(consumer);
+        return fast().subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(consumer);
     }
 
+    /**
+     * 在计算线程执行
+     */
     public void runCalc(Observer<T> observer) {
-        Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+        fast().subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
+    /**
+     * 在计算线程执行
+     */
     public void runCalc(Observer<T> observer, FDView fdView) {
-        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
-            }
-        });
+        Observable<T> observable = fast();
         if (fdView != null) {
             if (fdView instanceof FDActivity) {
                 observable = observable.compose(((FDActivity) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
@@ -83,54 +74,39 @@ public abstract class FastTask<T> {
         observable.subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
+    /**
+     * 在计算线程执行
+     */
     public void runCalc(Observer<T> observer, LifecycleTransformer<T> lifecycleTransformer) {
-        Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
-            }
-        }).compose(lifecycleTransformer).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+        fast().compose(lifecycleTransformer).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
+    /**
+     * 在IO线程执行
+     */
     public void runIO() {
-        Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
-            }
-        }).subscribeOn(Schedulers.io()).subscribe();
+        fast().subscribeOn(Schedulers.io()).subscribe();
     }
 
+    /**
+     * 在IO线程执行
+     */
     public Disposable runIO(Consumer<T> consumer) {
-        return Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(consumer);
+        return fast().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(consumer);
     }
 
+    /**
+     * 在IO线程执行
+     */
     public void runIO(Observer<T> observer) {
-        Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+        fast().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
+    /**
+     * 在IO线程执行
+     */
     public void runIO(Observer<T> observer, FDView fdView) {
-        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
-            }
-        });
+        Observable<T> observable = fast();
         if (fdView != null) {
             if (fdView instanceof FDActivity) {
                 observable = observable.compose(((FDActivity) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
@@ -143,14 +119,56 @@ public abstract class FastTask<T> {
         observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
+    /**
+     * 在IO线程执行
+     */
     public void runIO(Observer<T> observer, LifecycleTransformer<T> lifecycleTransformer) {
-        Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                emitter.onNext(task());
-                emitter.onComplete();
+        fast().compose(lifecycleTransformer).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+    }
+
+    /**
+     * 在新线程执行
+     */
+    public void runNew() {
+        fast().subscribeOn(Schedulers.newThread()).subscribe();
+    }
+
+    /**
+     * 在新线程执行
+     */
+    public Disposable runNew(Consumer<T> consumer) {
+        return fast().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(consumer);
+    }
+
+    /**
+     * 在新线程执行
+     */
+    public void runNew(Observer<T> observer) {
+        fast().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+    }
+
+    /**
+     * 在新线程执行
+     */
+    public void runNew(Observer<T> observer, FDView fdView) {
+        Observable<T> observable = fast();
+        if (fdView != null) {
+            if (fdView instanceof FDActivity) {
+                observable = observable.compose(((FDActivity) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
+            } else if (fdView instanceof FDFragment) {
+                observable = observable.compose(((FDFragment) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
+            } else if (fdView instanceof FDDialog) {
+                observable = observable.compose(((FDDialog) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
             }
-        }).compose(lifecycleTransformer).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+        }
+        observable.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+    }
+
+    /**
+     * 在新线程执行
+     */
+    public void runNew(Observer<T> observer, LifecycleTransformer<T> lifecycleTransformer) {
+        fast().compose(lifecycleTransformer).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
     }
 
     public abstract T task() throws Exception;

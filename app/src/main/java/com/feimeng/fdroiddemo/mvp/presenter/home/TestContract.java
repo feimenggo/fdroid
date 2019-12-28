@@ -4,11 +4,11 @@ import com.feimeng.fdroiddemo.base.BasePresenter;
 import com.feimeng.fdroiddemo.base.BaseView;
 
 public interface TestContract {
-    interface View extends BaseView {
-        void getUserName(String username);
+    interface View extends BaseView<Object> {
+        void getUserName(String username, String error);
     }
 
-    abstract class Presenter extends BasePresenter<View> {
+    abstract class Presenter extends BasePresenter<View, Object> {
         public abstract void getUserName();
     }
 }

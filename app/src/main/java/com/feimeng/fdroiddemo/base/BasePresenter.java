@@ -11,7 +11,7 @@ import com.feimeng.fdroiddemo.data.doo.NetworkError;
  * Time:   2018/6/11 13:40
  * Description: 控制器基类
  */
-public class BasePresenter<V extends BaseView> extends FDPresenter<V> implements FDPresenter.OnWithoutNetwork {
+public class BasePresenter<V extends BaseView<D>, D> extends FDPresenter<V, D> implements FDPresenter.OnWithoutNetwork {
     @Override
     public void withoutNetwork(Object o) {
         NetworkError.show(getActivity());
@@ -19,7 +19,7 @@ public class BasePresenter<V extends BaseView> extends FDPresenter<V> implements
 
     @Nullable
     @Override
-    protected Object onInit(boolean initAsync) throws Exception {
+    protected D onInit(boolean initAsync) throws Exception {
         init();
         return super.onInit(initAsync);
     }

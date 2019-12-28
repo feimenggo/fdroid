@@ -6,17 +6,23 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroiddemo.R;
 import com.feimeng.fdroiddemo.base.BaseActivity;
 import com.feimeng.fdroiddemo.mvp.presenter.gate.LoginContract;
 import com.feimeng.fdroiddemo.mvp.presenter.gate.LoginPresenter;
 import com.feimeng.fdroiddemo.util.Views;
 
-public class LoginActivity extends BaseActivity<LoginContract.View, LoginContract.Presenter> implements LoginContract.View, View.OnClickListener {
+public class LoginActivity extends BaseActivity<LoginContract.View, LoginContract.Presenter, String> implements LoginContract.View, View.OnClickListener {
     private TextView mInfo;
 
     public static void start(Context context) {
         context.startActivity(new Intent(context, LoginActivity.class));
+    }
+
+    @Override
+    protected LoginContract.Presenter initPresenter() {
+        return new LoginPresenter().asyncInit();
     }
 
     @Override
@@ -33,8 +39,8 @@ public class LoginActivity extends BaseActivity<LoginContract.View, LoginContrac
     }
 
     @Override
-    protected LoginContract.Presenter initPresenter() {
-        return new LoginPresenter();
+    public void init(String initData, Throwable e) {
+        T.showL(this, initData);
     }
 
     @Override

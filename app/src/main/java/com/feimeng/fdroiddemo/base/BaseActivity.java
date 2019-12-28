@@ -6,10 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
-import androidx.annotation.Nullable;
-
 import com.feimeng.fdroid.mvp.FDActivity;
-import com.feimeng.fdroid.mvp.FDView;
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroiddemo.R;
 
@@ -17,7 +14,7 @@ import com.feimeng.fdroiddemo.R;
  * Activity基类
  * Created by feimeng on 2016/3/18.
  */
-public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V>> extends FDActivity<V, P> implements FDView {
+public abstract class BaseActivity<V extends BaseView<D>, P extends BasePresenter<V, D>, D> extends FDActivity<V, P, D> {
     @Override
     protected Dialog createLoadingDialog(String message) {
         Dialog dialog = new Dialog(this, R.style.DialogTransparent);
@@ -67,10 +64,6 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
      * 2、initView()里使用的对象，需要保证在setContentView()调用前已经实例化;
      */
     protected abstract void initView();
-
-    @Override
-    public void init(@Nullable Object initData, @Nullable Throwable e) {
-    }
 
     /**
      * 显示错误提示

@@ -15,7 +15,7 @@ import com.trello.rxlifecycle3.components.support.RxFragment;
  * Fragment基类
  * Created by feimeng on 2017/1/20.
  */
-public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> extends RxFragment implements DialogInterface.OnDismissListener {
+public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D>, D> extends RxFragment implements FDView<D>, DialogInterface.OnDismissListener {
     protected P mPresenter;
 
     /**
@@ -34,16 +34,18 @@ public abstract class FDFragment<V extends FDView, P extends FDPresenter<V>> ext
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // 绑定控制器
-        mPresenter = initPresenter();
-        if (mPresenter != null && this instanceof FDView) {
-            mPresenter.attach((V) this);
-        }
+        if ((mPresenter = initPresenter()) != null) mPresenter.attach((V) this);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (mPresenter != null && mPresenter.isActive()) mPresenter.afterContentView();
+    }
+
+    @Override
+    public void init(D initData, Throwable e) {
+
     }
 
     /**

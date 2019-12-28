@@ -12,7 +12,7 @@ import com.feimeng.fdroiddemo.mvp.presenter.home.TestContract;
 import com.feimeng.fdroiddemo.mvp.presenter.home.TestPresenter;
 import com.feimeng.fdroiddemo.util.Views;
 
-public class TestActivity extends BaseActivity<TestContract.View, TestContract.Presenter> implements TestContract.View, View.OnClickListener {
+public class TestActivity extends BaseActivity<TestContract.View, TestContract.Presenter, Object> implements TestContract.View, View.OnClickListener {
 
     public static void start(Context context) {
         context.startActivity(new Intent(context, TestActivity.class));
@@ -35,7 +35,7 @@ public class TestActivity extends BaseActivity<TestContract.View, TestContract.P
     }
 
     @Override
-    public void getUserName(String username) {
+    public void getUserName(String username, String error) {
         // 步骤三
         T.showS(this, "用户名是" + username);
     }
