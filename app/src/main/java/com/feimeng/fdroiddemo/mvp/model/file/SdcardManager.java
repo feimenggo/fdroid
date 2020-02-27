@@ -7,7 +7,7 @@ import android.os.Environment;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
-import com.feimeng.fdroiddemo.base.BaseApp;
+import com.feimeng.fdroid.mvp.FDCore;
 
 import java.io.File;
 
@@ -29,7 +29,7 @@ public class SdcardManager {
         // 检测SdCard是否挂载
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) return false;
         // 检测是否有写的权限
-        int permission = ActivityCompat.checkSelfPermission(BaseApp.getInstance(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission = ActivityCompat.checkSelfPermission(FDCore.getApplication(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
         return permission == PackageManager.PERMISSION_GRANTED;
     }
 

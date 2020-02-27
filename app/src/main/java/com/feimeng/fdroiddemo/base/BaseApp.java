@@ -1,5 +1,7 @@
 package com.feimeng.fdroiddemo.base;
 
+import android.app.Application;
+
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.mvp.FDApp;
 import com.feimeng.fdroid.utils.L;
@@ -14,14 +16,14 @@ import io.reactivex.plugins.RxJavaPlugins;
 /**
  * Author: Feimeng
  * Time:   2016/3/18
- * Description: 全局Application
+ * Description: 通过继承FDApp的方式定义Application
  */
 public class BaseApp extends FDApp implements Consumer<Throwable> {
     /**
      * 配置 在UI线程调用
      */
     @Override
-    protected void config() {
+    protected void config(Application application) {
         // 初始化 Log
         L.init(BuildConfig.DEBUG, L.V);
         // 初始化 SharedPreferences
@@ -39,11 +41,8 @@ public class BaseApp extends FDApp implements Consumer<Throwable> {
         FDConfig.INFO_UNKNOWN_EXCEPTION = "抱歉！遇到错误了";
     }
 
-    /**
-     * 配置 在子线程调用
-     */
     @Override
-    protected void configAsync() {
+    protected void configAsync(Application application) {
         RxJavaPlugins.setErrorHandler(this); // 处理RxJava取消订阅后抛出的异常
     }
 

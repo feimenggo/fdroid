@@ -152,7 +152,7 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
         } else if (mView instanceof FDActivity) {
             return (Context) mView;
         }
-        return FDApp.getInstance().getApplicationContext();
+        return FDCore.getApplication().getApplicationContext();
     }
 
     /**

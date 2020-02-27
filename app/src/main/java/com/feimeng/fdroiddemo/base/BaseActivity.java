@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 
 import com.feimeng.fdroid.mvp.FDActivity;
+import com.feimeng.fdroid.mvp.FDCore;
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroiddemo.R;
 
@@ -28,8 +29,7 @@ public abstract class BaseActivity<V extends BaseView<D>, P extends BasePresente
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!(getClass().getName().contains("SplashActivity")))
-            BaseApp.getInstance().waitCoreThread();
+        if (!(getClass().getName().contains("SplashActivity"))) FDCore.waitConfigFinish();
     }
 
     @Override
