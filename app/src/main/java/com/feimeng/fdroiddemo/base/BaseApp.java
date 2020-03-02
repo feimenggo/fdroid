@@ -5,10 +5,8 @@ import android.app.Application;
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.mvp.FDApp;
 import com.feimeng.fdroid.utils.L;
-import com.feimeng.fdroid.utils.SP;
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroiddemo.BuildConfig;
-import com.feimeng.fdroiddemo.data.Constants;
 
 import io.reactivex.functions.Consumer;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -26,8 +24,6 @@ public class BaseApp extends FDApp implements Consumer<Throwable> {
     protected void config(Application application) {
         // 初始化 Log
         L.init(BuildConfig.DEBUG, L.V);
-        // 初始化 SharedPreferences
-        SP.init(this, Constants.SP_NAME);
         // 初始化Toast
         T.init(true);
         FDConfig.SHOW_HTTP_LOG = BuildConfig.DEBUG;

@@ -113,9 +113,7 @@ public final class L {
         } else {
             msg = obj.toString();
         }
-        if (msg != null) {
-            stringBuilder.append(msg);
-        }
+        stringBuilder.append(msg);
 
         String logStr = stringBuilder.append("\n").toString();
 

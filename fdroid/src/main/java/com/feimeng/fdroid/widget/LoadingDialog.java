@@ -13,10 +13,10 @@ public class LoadingDialog extends AlertDialog {
     public LoadingDialog(Context context, String message) {
         super(context);
         this.message = message;
-        init(context);
+        init();
     }
 
-    private void init(Context context) {
+    private void init() {
         setMessage(message);
         setCancelable(false);
         setCanceledOnTouchOutside(false);

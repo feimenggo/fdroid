@@ -7,7 +7,6 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 
 import com.feimeng.fdroid.utils.L;
-import com.feimeng.fdroid.utils.SP;
 
 /**
  * Author: Feimeng
@@ -48,8 +47,6 @@ public abstract class FDApp extends Application {
     protected void config(Application application) {
         // 初始化 Log
         L.init(true, L.V);
-        // 初始化 SharedPreferences
-        SP.init(application, "fdroid");
     }
 
     /**

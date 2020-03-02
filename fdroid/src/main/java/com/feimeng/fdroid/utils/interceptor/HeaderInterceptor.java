@@ -1,5 +1,7 @@
 package com.feimeng.fdroid.utils.interceptor;
 
+import androidx.annotation.NonNull;
+
 import com.feimeng.fdroid.mvp.model.api.HeaderParam;
 
 import java.io.IOException;
@@ -18,6 +20,7 @@ public class HeaderInterceptor implements Interceptor {
         mHeader = header;
     }
 
+    @NonNull
     @Override
     public okhttp3.Response intercept(Chain chain) throws IOException {
         Request request = chain.request();

@@ -5,10 +5,8 @@ import android.app.Application;
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.mvp.FDCore;
 import com.feimeng.fdroid.utils.L;
-import com.feimeng.fdroid.utils.SP;
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroiddemo.BuildConfig;
-import com.feimeng.fdroiddemo.data.Constants;
 
 /**
  * Author: Feimeng
@@ -24,8 +22,6 @@ public class BaseAppCustom extends Application {
             protected void config(Application application) { // 在UI线程调用
                 // 初始化 Log
                 L.init(BuildConfig.DEBUG, L.V);
-                // 初始化 SharedPreferences
-                SP.init(application, Constants.SP_NAME);
                 // 初始化Toast
                 T.init(true);
                 FDConfig.SHOW_HTTP_LOG = BuildConfig.DEBUG;

@@ -1,5 +1,7 @@
 package com.feimeng.fdroid.utils.interceptor;
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -20,6 +22,7 @@ public class MockInterceptor implements Interceptor {
         mMock = mock;
     }
 
+    @NonNull
     @Override
     public Response intercept(Chain chain) throws IOException {
         Response response;

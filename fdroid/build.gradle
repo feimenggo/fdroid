@@ -64,15 +64,14 @@ dependencies {
     api 'com.trello.rxlifecycle3:rxlifecycle-components:3.0.0'
     api 'com.trello.rxlifecycle3:rxlifecycle-android-lifecycle:3.0.0'
     // Retrofit
-    api 'com.squareup.retrofit2:retrofit:2.4.0'
-    api 'com.squareup.retrofit2:converter-gson:2.4.0'
-    api 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+    api 'com.squareup.retrofit2:retrofit:2.7.2'
+    api 'com.squareup.retrofit2:converter-gson:2.7.2'
+    api 'com.squareup.retrofit2:adapter-rxjava2:2.7.2'
     // OkHttp
-    api 'com.squareup.okhttp3:okhttp:3.10.0'
-    api 'com.squareup.okhttp3:logging-interceptor:3.10.0'
-    api 'com.squareup.okhttp3:okhttp-android-support:3.10.0'
+    api 'com.squareup.okhttp3:okhttp:3.14.7'
+    api 'com.squareup.okhttp3:logging-interceptor:3.14.7'
     // Gson
-    api 'com.google.code.gson:gson:2.8.5'
+    api 'com.google.code.gson:gson:2.8.6'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
