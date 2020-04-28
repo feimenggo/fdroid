@@ -15,14 +15,14 @@ import com.trello.rxlifecycle3.components.support.RxFragment;
  * Fragment基类
  * Created by feimeng on 2017/1/20.
  */
-public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D>, D> extends RxFragment implements FDView<D>, DialogInterface.OnDismissListener {
+public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D>, D> extends RxFragment implements FDView<D> {
     protected P mPresenter;
 
     /**
      * 对话框
      */
     private Dialog mLoading;
-    private int mLoadTimes = 0; // 加载次数
+    private int mLoadCount = 0; // 加载次数
 
     /**
      * 实例化presenter
@@ -74,10 +74,17 @@ public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D
      * 显示对话框 showLoadingDialog()和hideLoadingDialog()必须成对调用
      */
     public synchronized void showLoadingDialog(String message, boolean cancelable) {
-        mLoadTimes++;
+        mLoadCount++;
         if (mLoading == null) {
             mLoading = createLoadingDialog(message);
-            mLoading.setOnDismissListener(this);
+            mLoading.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    mLoadCount = 0;
+                    if (mPresenter != null) mPresenter.onDialogDismiss();
+                    updateLoadingDialog(null, null);
+                }
+            });
         } else {
             updateLoadingDialog(mLoading, message);
         }
@@ -89,39 +96,35 @@ public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D
      * 隐藏对话框
      */
     public synchronized void hideLoadingDialog() {
-        mLoadTimes = Math.max(0, mLoadTimes - 1);
-        if (mLoadTimes > 0) return;
-        if (mLoading != null && mLoading.isShowing()) mLoading.dismiss();
+        mLoadCount = Math.max(0, mLoadCount - 1);
+        if (mLoadCount > 0) return;
+        if (mLoading != null) {
+            if (mLoading.isShowing()) mLoading.dismiss();
+            mLoading = null;
+        }
     }
 
     public synchronized void cancelLoadingDialog() {
-        mLoadTimes = 1;
+        mLoadCount = 1;
         hideLoadingDialog();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("LoadTimes", mLoadTimes);
+        outState.putInt("LoadTimes", mLoadCount);
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null) mLoadTimes = savedInstanceState.getInt("LoadTimes");
-    }
-
-    @Override
-    public void onDismiss(DialogInterface dialog) {
-        mLoadTimes = 0;
-        if (mPresenter != null) mPresenter.onDialogDismiss();
-        updateLoadingDialog(null, null);
+        if (savedInstanceState != null) mLoadCount = savedInstanceState.getInt("LoadTimes");
     }
 
     @Override
     public void onDestroy() {
-        if (mLoading != null && mLoading.isShowing()) {
-            mLoading.dismiss();
+        if (mLoading != null) {
+            if (mLoading.isShowing()) mLoading.dismiss();
             mLoading = null;
         }
         super.onDestroy();

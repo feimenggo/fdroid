@@ -12,7 +12,7 @@ import java.util.List;
  * Description: FDroid核心类
  */
 public abstract class FDCore {
-    private static Application mApplication;
+    private static Application mApplication; // App上下文
     private static FDCoreThread mCoreThread; // 用于初始化的子线程
 
     public static void init(Application application, FDCore fdCore) {

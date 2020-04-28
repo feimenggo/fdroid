@@ -17,7 +17,7 @@ import static com.feimeng.fdroid.config.FDConfig.SHOW_HTTP_LOG;
  * Api类的包装
  */
 public class ApiWrapper extends FDApi {
-    private static final ApiWrapper instance = new ApiWrapper();// 单例模式
+    private static final ApiWrapper instance = new ApiWrapper(); // 单例模式
     private ApiService api;
 
     private ApiWrapper() {

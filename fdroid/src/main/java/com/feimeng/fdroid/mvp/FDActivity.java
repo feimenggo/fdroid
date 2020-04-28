@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.feimeng.fdroid.utils.ActivityPageManager;
@@ -20,19 +21,21 @@ import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
  * @param <P> 控制器
  * @param <D> 初始化结果
  */
-public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D>, D> extends RxAppCompatActivity implements FDView<D>, DialogInterface.OnDismissListener {
+public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D>, D> extends RxAppCompatActivity implements FDView<D> {
     protected P mPresenter;
+
     /**
      * 对话框
      */
-    private Dialog mLoading;
-    private boolean mStarted;
-    private int mLoadTimes = 0; // 加载次数
+    private Dialog mLoading; // 加载弹窗
+    private int mLoadCount; // 加载次数
 
     /**
      * 实例化控制器
      */
     protected abstract P initPresenter();
+
+    private boolean mStarted;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -94,10 +97,18 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
      * 显示对话框 showLoadingDialog()和hideLoadingDialog()必须成对调用
      */
     public synchronized void showLoadingDialog(String message, boolean cancelable) {
-        mLoadTimes++;
+        mLoadCount++;
         if (mLoading == null) {
             mLoading = createLoadingDialog(message);
-            mLoading.setOnDismissListener(this);
+            mLoading.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    mLoadCount = 0;
+                    if (mPresenter != null) mPresenter.onDialogDismiss();
+                    updateLoadingDialog(null, null);
+                    mLoading = null;
+                }
+            });
         } else {
             updateLoadingDialog(mLoading, message);
         }
@@ -109,13 +120,16 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
      * 隐藏对话框
      */
     public synchronized void hideLoadingDialog() {
-        mLoadTimes = Math.max(0, mLoadTimes - 1);
-        if (mLoadTimes > 0) return;
-        if (mLoading != null && mLoading.isShowing()) mLoading.dismiss();
+        mLoadCount = Math.max(0, mLoadCount - 1);
+        if (mLoadCount > 0) return;
+        if (mLoading != null) {
+            if (mLoading.isShowing()) mLoading.dismiss();
+            mLoading = null;
+        }
     }
 
     public synchronized void cancelLoadingDialog() {
-        mLoadTimes = 1;
+        mLoadCount = 1;
         hideLoadingDialog();
     }
 
@@ -153,28 +167,21 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("LoadTimes", mLoadTimes);
+        outState.putInt("LoadTimes", mLoadCount);
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        mLoadTimes = savedInstanceState.getInt("LoadTimes");
-    }
-
-    @Override
-    public void onDismiss(DialogInterface dialog) { // mLoading.setOnDismissListener(this)
-        mLoadTimes = 0;
-        if (mPresenter != null) mPresenter.onDialogDismiss();
-        updateLoadingDialog(null, null);
+        mLoadCount = savedInstanceState.getInt("LoadTimes");
     }
 
     @Override
     protected void onDestroy() {
-        if (mLoading != null && mLoading.isShowing()) {
-            mLoading.dismiss();
+        if (mLoading != null) {
+            if (mLoading.isShowing()) mLoading.dismiss();
             mLoading = null;
         }
         super.onDestroy();
