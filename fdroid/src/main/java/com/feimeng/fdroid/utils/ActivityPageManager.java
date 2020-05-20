@@ -6,28 +6,25 @@
 package com.feimeng.fdroid.utils;
 
 import android.app.Activity;
-import android.content.Context;
 
 import androidx.annotation.Nullable;
 
 import com.feimeng.fdroid.mvp.FDActivity;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
 
 /**
- * Activity页面管理器
- * Created by feimeng on 2017/1/20.
+ * Author: Feimeng
+ * Time:   2017/1/20
+ * Description: FDActivity页面管理器
  */
 public class ActivityPageManager {
-    private static ActivityPageManager instance = new ActivityPageManager();
     private static Stack<FDActivity> activities = new Stack<>();
+    private static ActivityPageManager instance = new ActivityPageManager();
 
     private ActivityPageManager() {
-    }
-
-    public Stack<FDActivity> all() {
-        return activities;
     }
 
     /**
@@ -35,6 +32,10 @@ public class ActivityPageManager {
      */
     public static ActivityPageManager getInstance() {
         return instance;
+    }
+
+    public List<FDActivity> all() {
+        return activities;
     }
 
     /**
@@ -53,37 +54,55 @@ public class ActivityPageManager {
     }
 
     /**
-     * get current activity from Stack
+     * 获取最新的Activity
      */
     @Nullable
     public FDActivity currentActivity() {
         return activities.size() == 0 ? null : activities.lastElement();
     }
 
+    /**
+     * 销毁最新的Activity
+     */
     public void finishActivity() {
         finishActivity(currentActivity());
     }
 
-    public void finishActivity(Activity activity) {
+    /**
+     * 销毁指定的Activity
+     *
+     * @param activity Activity类
+     */
+    public void finishActivity(FDActivity activity) {
         if (activity != null) {
-            activities.remove(activity);
             activity.finish();
+            activities.remove(activity);
         }
     }
 
+    /**
+     * 销毁指定的Activity
+     *
+     * @param cls Activity类
+     */
     public void finishActivity(Class<?> cls) {
-        for (Activity activity : activities) {
+        for (FDActivity activity : activities) {
             if (activity.getClass().equals(cls)) {
                 finishActivity(activity);
             }
         }
     }
 
+    /**
+     * 销毁所有的Activity
+     */
     public void finishAllActivity() {
         finishAllActivity(null);
     }
 
     /**
+     * 销毁所有的Activity
+     *
      * @param activity 保留的Activity
      */
     public void finishAllActivity(Activity activity) {
@@ -97,36 +116,10 @@ public class ActivityPageManager {
     }
 
     /**
-     * exit System
-     *
-     * @param context
+     * 退出应用
      */
-    public void exit(Context context) {
-        exit(context, true);
-    }
-
-    /**
-     * exit System
-     *
-     * @param context
-     * @param isClearCache
-     */
-    @SuppressWarnings("deprecation")
-    public void exit(Context context, boolean isClearCache) {
-        try {
-            finishAllActivity();
-            /*if(context != null){
-                ActivityManager activityMgr = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-				activityMgr.restartPackage(context.getPackageName());
-			}*/
-            /*if(isClearCache){
-                LruCacheManager.getInstance().evictAll();
-				CacheManager.clearAll();
-			}*/
-//			System.exit(0);
-//			android.os.Process.killProcess(android.os.Process.myPid());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void exit() {
+        finishAllActivity(); // 销毁所有的Activity
+        android.os.Process.killProcess(android.os.Process.myPid()); // 杀死该应用进程
     }
 }

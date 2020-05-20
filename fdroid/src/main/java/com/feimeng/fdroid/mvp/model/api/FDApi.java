@@ -284,7 +284,7 @@ public class FDApi {
     /**
      * 在子线程中执行，主线程中回调
      */
-    protected <T> ObservableTransformer<FDResponse<T>, T> applySchedulers() {
+    public  <T> ObservableTransformer<FDResponse<T>, T> applySchedulers() {
         return new ObservableTransformer<FDResponse<T>, T>() {
             @Override
             public ObservableSource<T> apply(Observable<FDResponse<T>> upstream) {
@@ -303,7 +303,7 @@ public class FDApi {
     /**
      * 在子线程中执行，主线程中回调 包装结果
      */
-    protected <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersOptional() {
+    public <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersOptional() {
         return new ObservableTransformer<FDResponse<T>, Optional<T>>() {
             @Override
             public ObservableSource<Optional<T>> apply(Observable<FDResponse<T>> upstream) {
@@ -322,7 +322,7 @@ public class FDApi {
     /**
      * 在子线程中执行并回调
      */
-    protected <T> ObservableTransformer<FDResponse<T>, T> applySchedulersNew() {
+    public <T> ObservableTransformer<FDResponse<T>, T> applySchedulersNew() {
         return new ObservableTransformer<FDResponse<T>, T>() {
             @Override
             public ObservableSource<T> apply(Observable<FDResponse<T>> upstream) {
@@ -340,7 +340,7 @@ public class FDApi {
     /**
      * 在子线程中执行并回调 包装结果
      */
-    protected <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersNewOptional() {
+    public <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersNewOptional() {
         return new ObservableTransformer<FDResponse<T>, Optional<T>>() {
             @Override
             public ObservableSource<Optional<T>> apply(Observable<FDResponse<T>> upstream) {
@@ -358,7 +358,7 @@ public class FDApi {
     /**
      * 在调用线程中执行并回调
      */
-    protected <T> ObservableTransformer<FDResponse<T>, T> applySchedulersFixed() {
+    public <T> ObservableTransformer<FDResponse<T>, T> applySchedulersFixed() {
         return new ObservableTransformer<FDResponse<T>, T>() {
             @Override
             public ObservableSource<T> apply(Observable<FDResponse<T>> upstream) {
@@ -375,7 +375,7 @@ public class FDApi {
     /**
      * 在调用线程中执行并回调 包装结果
      */
-    protected <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersFixedOptional() {
+    public <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersFixedOptional() {
         return new ObservableTransformer<FDResponse<T>, Optional<T>>() {
             @Override
             public ObservableSource<Optional<T>> apply(Observable<FDResponse<T>> upstream) {
