@@ -101,7 +101,7 @@ public abstract class FDDialog<V extends FDView<D>, P extends FDPresenter<V, D>,
     }
 
     @Override
-    public void onDismiss(DialogInterface dialog) {
+    public void onDismiss(@NonNull DialogInterface dialog) {
         if (dialog == mLoading) {
             mLoadTimes = 0;
             if (mPresenter != null) mPresenter.onDialogDismiss();

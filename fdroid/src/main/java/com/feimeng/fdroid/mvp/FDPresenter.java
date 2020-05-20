@@ -8,16 +8,12 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 import androidx.fragment.app.FragmentActivity;
 
-import com.feimeng.fdroid.mvp.model.api.FDApi;
 import com.feimeng.fdroid.mvp.model.api.WithoutNetworkException;
 import com.feimeng.fdroid.utils.FastTask;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.NetworkUtil;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.android.FragmentEvent;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -31,7 +27,6 @@ import io.reactivex.ObservableOnSubscribe;
  * @param <D> 初始化结果
  */
 public abstract class FDPresenter<V extends FDView<D>, D> {
-    private List<String> mApiTags;
     private boolean mInitAsync; // 异步初始化
     protected V mView;// 视图
 
@@ -189,14 +184,10 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
     }
 
     public void showDialog(String message) {
-        showDialog(message, true, null);
+        showDialog(message, true);
     }
 
-    public void showDialogApiTag(String withApiTag) {
-        showDialog(null, true, withApiTag);
-    }
-
-    public void showDialog(String message, boolean cancelable, String withApiTag) {
+    public void showDialog(String message, boolean cancelable) {
         if (mView == null) return;
         if (mView instanceof FDActivity) {
             ((FDActivity) mView).showLoadingDialog(message, cancelable);
@@ -206,10 +197,6 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
             ((FDDialog) mView).showLoadingDialog(message, cancelable);
         } else {
             return;
-        }
-        if (withApiTag != null) {
-            if (mApiTags == null) mApiTags = new ArrayList<>();
-            mApiTags.add(withApiTag);
         }
     }
 
@@ -227,12 +214,10 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
         }
     }
 
+    /**
+     * 当对话框消失的时候被回调
+     */
     public void onDialogDismiss() {
-        if (mApiTags == null || mApiTags.isEmpty()) return;
-        for (String apiTag : mApiTags) {
-            FDApi.cancelApi(apiTag);
-        }
-        mApiTags.clear();
     }
 
     /**

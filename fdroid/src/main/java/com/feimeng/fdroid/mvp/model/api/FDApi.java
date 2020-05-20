@@ -56,7 +56,7 @@ import static com.feimeng.fdroid.config.FDConfig.SHOW_HTTP_LOG;
  * Description: API操作类
  */
 public class FDApi {
-    private static final Map<String, Disposable> sApiTags = new HashMap<>(); // 请求列表
+    private final Map<String, Disposable> mApiTags = new HashMap<>(); // 请求列表
     private List<HeaderParam> mHeaderParam; // 自定义请求头
     private Map<String, String> mMockData; // 模拟请求
     private ResponseCodeInterceptorListener mResponseCodeInterceptorListener;
@@ -284,7 +284,7 @@ public class FDApi {
     /**
      * 在子线程中执行，主线程中回调
      */
-    public  <T> ObservableTransformer<FDResponse<T>, T> applySchedulers() {
+    public <T> ObservableTransformer<FDResponse<T>, T> applySchedulers() {
         return new ObservableTransformer<FDResponse<T>, T>() {
             @Override
             public ObservableSource<T> apply(Observable<FDResponse<T>> upstream) {
@@ -499,25 +499,25 @@ public class FDApi {
         throw new ApiException(response.getCode(), response.getInfo());
     }
 
-    public static void requestApi(String apiTag, Disposable disposable) {
-        sApiTags.put(apiTag, disposable);
+    private void requestApi(String apiTag, Disposable disposable) {
+        mApiTags.put(apiTag, disposable);
     }
 
     /**
      * 取消所有请求
      */
-    public static void cancelApi() {
-        if (sApiTags.isEmpty()) return;
-        Set<String> apis = sApiTags.keySet();
+    public void cancelApi() {
+        if (mApiTags.isEmpty()) return;
+        Set<String> apis = mApiTags.keySet();
         for (String apiTag : apis) cancelApi(apiTag);
     }
 
     /**
      * 取消指定tag的请求
      */
-    public static void cancelApi(String apiTag) {
-        if (sApiTags.isEmpty()) return;
-        Disposable disposable = sApiTags.get(apiTag);
+    public void cancelApi(String apiTag) {
+        if (mApiTags.isEmpty()) return;
+        Disposable disposable = mApiTags.get(apiTag);
         if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();
             removeApi(apiTag);
@@ -527,8 +527,8 @@ public class FDApi {
     /**
      * 移除指定tag的请求标识
      */
-    public static void removeApi(String apiTag) {
-        sApiTags.remove(apiTag);
+    public void removeApi(String apiTag) {
+        mApiTags.remove(apiTag);
     }
 
     /**

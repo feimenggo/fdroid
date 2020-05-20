@@ -172,7 +172,7 @@ public abstract class BaseDialog<V extends BaseView<D>, P extends FDPresenter<V,
     }
 
     @Override
-    public void onDismiss(DialogInterface dialog) {
+    public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
         if (mOnDismissListener != null) {
             mOnDismissListener.onDismiss(dialog);

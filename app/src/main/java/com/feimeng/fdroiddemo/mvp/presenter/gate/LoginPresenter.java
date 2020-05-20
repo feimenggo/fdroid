@@ -50,10 +50,11 @@ public class LoginPresenter extends LoginContract.Presenter {
 
     @Override
     public void loginByAsync(String phone, String password) {
+        String apiTag = "login";
         // 发起异步登录请求
         ApiWrapper.getInstance().login(phone, password)
                 .map(loginDto -> "欢迎您！" + loginDto.nickname)
-                .subscribe(ApiWrapper.getInstance().subscriber(new ApiFinish<String>() {
+                .subscribe(ApiWrapper.getInstance().subscriber(apiTag, new ApiFinish<String>() {
                     @Override
                     public void start() {
                         showDialog();
@@ -74,5 +75,7 @@ public class LoginPresenter extends LoginContract.Presenter {
                         hideDialog();
                     }
                 }));
+        // 可以通过这种方式取消相应标签的请求
+        // ApiWrapper.getInstance().cancelApi(apiTag);
     }
 }
