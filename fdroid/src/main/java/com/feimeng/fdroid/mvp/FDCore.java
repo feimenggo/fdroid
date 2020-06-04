@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 import java.util.List;
 
 /**
@@ -14,6 +16,7 @@ import java.util.List;
 public abstract class FDCore {
     private static Application mApplication; // App上下文
     private static FDCoreThread mCoreThread; // 用于初始化的子线程
+    private static Throwable mConfigThrowable; // 异步初始化出错
 
     public static void init(Application application, FDCore fdCore) {
         fdCore.onInit(application);
@@ -24,16 +27,23 @@ public abstract class FDCore {
     }
 
     /**
-     * 等待核心线程执行完毕
+     * 获取异步配置异常
+     *
+     * @return 异步配置抛出异常
      */
-    public static void waitConfigFinish() {
-        try {
-            if (mCoreThread.getState() != Thread.State.TERMINATED) {
-                mCoreThread.join();
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    @Nullable
+    public static Throwable getConfigThrowable() {
+        return mConfigThrowable;
+    }
+
+    /**
+     * 等待异步配置执行完毕
+     *
+     * @throws Throwable 异步配置抛出异常
+     */
+    public static void waitConfigFinish() throws Throwable {
+        if (mCoreThread.getState() != Thread.State.TERMINATED) mCoreThread.join();
+        if (mConfigThrowable != null) throw mConfigThrowable;
     }
 
     private void onInit(Application application) {
@@ -51,15 +61,19 @@ public abstract class FDCore {
     }
 
     /**
-     * 配置 在子线程调用
+     * 异步配置 在子线程调用
      */
-    protected void configAsync(Application application) {
+    protected void configAsync(Application application) throws Throwable {
     }
 
     private class FDCoreThread extends Thread {
         @Override
         public void run() {
-            configAsync(mApplication);
+            try {
+                configAsync(mApplication);
+            } catch (Throwable throwable) {
+                mConfigThrowable = throwable;
+            }
         }
     }
 

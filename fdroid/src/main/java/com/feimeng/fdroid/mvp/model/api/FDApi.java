@@ -482,7 +482,8 @@ public class FDApi {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T call(Call<? extends FDResponse<T>> call) throws Exception {
+    @NonNull
+    public  <T> T call(Call<? extends FDResponse<T>> call) throws Exception {
         retrofit2.Response<FDResponse<T>> callResponse = (Response<FDResponse<T>>) call.execute();
         if (!callResponse.isSuccessful()) {
             onResponseFail(callResponse);
