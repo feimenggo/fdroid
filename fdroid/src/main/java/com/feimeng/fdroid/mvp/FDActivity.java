@@ -9,8 +9,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.feimeng.fdroid.R;
 import com.feimeng.fdroid.utils.ActivityPageManager;
-import com.feimeng.fdroid.widget.LoadingDialog;
+import com.feimeng.fdroid.widget.FDLoadingDialog;
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
 /**
@@ -76,10 +77,11 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
      * @return Dialog 对话框
      */
     protected Dialog createLoadingDialog(@Nullable String message) {
-        return new LoadingDialog(this, message == null ? "" : message);
+        return new FDLoadingDialog(this, R.style.Theme_AppCompat_Dialog, message);
     }
 
     protected void updateLoadingDialog(@Nullable Dialog dialog, @Nullable String message) {
+        if (dialog != null) ((FDLoadingDialog) dialog).updateLoadingDialog(message);
     }
 
     /**
@@ -113,7 +115,7 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
             updateLoadingDialog(mLoading, message);
         }
         mLoading.setCancelable(cancelable);
-        if (!mLoading.isShowing()) mLoading.show();
+        mLoading.show();
     }
 
     /**
@@ -123,7 +125,7 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
         mLoadCount = Math.max(0, mLoadCount - 1);
         if (mLoadCount > 0) return;
         if (mLoading != null) {
-            if (mLoading.isShowing()) mLoading.dismiss();
+            mLoading.dismiss();
             mLoading = null;
         }
     }
@@ -169,19 +171,19 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("LoadTimes", mLoadCount);
+        outState.putInt("LoadCount", mLoadCount);
     }
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        mLoadCount = savedInstanceState.getInt("LoadTimes");
+        mLoadCount = savedInstanceState.getInt("LoadCount");
     }
 
     @Override
     protected void onDestroy() {
         if (mLoading != null) {
-            if (mLoading.isShowing()) mLoading.dismiss();
+            mLoading.dismiss();
             mLoading = null;
         }
         super.onDestroy();

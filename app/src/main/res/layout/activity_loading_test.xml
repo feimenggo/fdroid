@@ -8,12 +8,25 @@
     android:gravity="center_horizontal"
     android:orientation="vertical"
     android:paddingTop="50dp"
-    tools:context=".mvp.view.home.MvpSampleActivity">
+    tools:context=".mvp.view.home.LoadingTestActivity">
+
+    <TextView
+        android:id="@id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试Loading对话框，避免”闪烁“问题" />
 
     <Button
-        android:id="@id/btn"
+        android:id="@id/loading300"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="获取用户名" />
+        android:text="加载时间为300MS" />
+
+    <Button
+        android:id="@id/loading600"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="加载时间为600MS" />
 </LinearLayout>

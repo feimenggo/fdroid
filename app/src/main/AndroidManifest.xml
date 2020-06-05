@@ -23,7 +23,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".mvp.view.gate.LoginActivity" />
-        <activity android:name=".mvp.view.home.TestActivity" />
+        <activity android:name=".mvp.view.home.MvpSampleActivity" />
+        <activity android:name=".mvp.view.home.LoadingTestActivity" />
     </application>
 
 </manifest>

@@ -1,14 +1,11 @@
 package com.feimeng.fdroid.mvp;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
 
-import com.feimeng.fdroid.widget.LoadingDialog;
 import com.trello.rxlifecycle3.components.support.RxDialogFragment;
 
 /**
@@ -18,12 +15,6 @@ import com.trello.rxlifecycle3.components.support.RxDialogFragment;
  */
 public abstract class FDDialog<V extends FDView<D>, P extends FDPresenter<V, D>, D> extends RxDialogFragment implements FDView<D> {
     protected P mPresenter;
-
-    /**
-     * 对话框
-     */
-    private Dialog mLoading;
-    private int mLoadTimes = 0; // 加载次数
 
     /**
      * 实例化presenter
@@ -46,21 +37,6 @@ public abstract class FDDialog<V extends FDView<D>, P extends FDPresenter<V, D>,
 
     @Override
     public void init(D initData, Throwable e) {
-
-    }
-
-    /**
-     * 绘制对话框
-     * 一般用于网络访问时显示(子类可重写，使用自定义对话框)
-     *
-     * @param message 提示的信息
-     * @return Dialog 对话框
-     */
-    protected Dialog createLoadingDialog(String message) {
-        return new LoadingDialog(getActivity(), message == null ? "" : message);
-    }
-
-    protected void updateLoadingDialog(@Nullable Dialog dialog, @Nullable String message) {
     }
 
     public void showLoadingDialog() {
@@ -74,61 +50,38 @@ public abstract class FDDialog<V extends FDView<D>, P extends FDPresenter<V, D>,
     /**
      * 显示对话框 showLoadingDialog()和hideLoadingDialog()必须成对调用
      */
+    @SuppressWarnings("rawtypes")
     public synchronized void showLoadingDialog(String message, boolean cancelable) {
-        mLoadTimes++;
-        if (mLoading == null) {
-            mLoading = createLoadingDialog(message);
-            mLoading.setOnDismissListener(this);
-        } else {
-            updateLoadingDialog(mLoading, message);
+        FragmentActivity activity = getActivity();
+        if (activity instanceof FDActivity) {
+            ((FDActivity) activity).showLoadingDialog(message, cancelable);
         }
-        mLoading.setCancelable(cancelable);
-        if (!mLoading.isShowing()) mLoading.show();
     }
 
     /**
      * 隐藏对话框
      */
+    @SuppressWarnings("rawtypes")
     public synchronized void hideLoadingDialog() {
-        mLoadTimes = Math.max(0, mLoadTimes - 1);
-        if (mLoadTimes > 0) return;
-        if (mLoading != null && mLoading.isShowing()) mLoading.dismiss();
-    }
-
-    public synchronized void cancelLoadingDialog() {
-        mLoadTimes = 1;
-        hideLoadingDialog();
-    }
-
-    @Override
-    public void onDismiss(@NonNull DialogInterface dialog) {
-        if (dialog == mLoading) {
-            mLoadTimes = 0;
-            if (mPresenter != null) mPresenter.onDialogDismiss();
-            updateLoadingDialog(null, null);
-        } else {
-            super.onDismiss(dialog);
+        FragmentActivity activity = getActivity();
+        if (activity instanceof FDActivity) {
+            ((FDActivity) activity).hideLoadingDialog();
         }
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("LoadTimes", mLoadTimes);
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null) mLoadTimes = savedInstanceState.getInt("LoadTimes");
+    /**
+     * 取消对话框
+     */
+    @SuppressWarnings("rawtypes")
+    public synchronized void cancelLoadingDialog() {
+        FragmentActivity activity = getActivity();
+        if (activity instanceof FDActivity) {
+            ((FDActivity) activity).cancelLoadingDialog();
+        }
     }
 
     @Override
     public void onDestroy() {
-        if (mLoading != null && mLoading.isShowing()) {
-            mLoading.dismiss();
-            mLoading = null;
-        }
         super.onDestroy();
         // 解绑控制器
         if (mPresenter != null) {

@@ -12,10 +12,10 @@ import com.feimeng.fdroiddemo.mvp.presenter.home.TestContract;
 import com.feimeng.fdroiddemo.mvp.presenter.home.TestPresenter;
 import com.feimeng.fdroiddemo.util.Views;
 
-public class TestActivity extends BaseActivity<TestContract.View, TestContract.Presenter, Object> implements TestContract.View, View.OnClickListener {
+public class MvpSampleActivity extends BaseActivity<TestContract.View, TestContract.Presenter, Object> implements TestContract.View, View.OnClickListener {
 
     public static void start(Context context) {
-        context.startActivity(new Intent(context, TestActivity.class));
+        context.startActivity(new Intent(context, MvpSampleActivity.class));
     }
 
     @Override

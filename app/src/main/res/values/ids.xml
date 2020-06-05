@@ -12,4 +12,8 @@
     <item name="btn" type="id" />
     <item name="test" type="id" />
     <item name="info" type="id" />
+    <item name="loading300" type="id" />
+    <item name="loading600" type="id" />
+    <item name="loading" type="id" />
+    <item name="mvp" type="id" />
 </resources>

@@ -36,7 +36,6 @@ public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D
 
     @Override
     public void init(D initData, Throwable e) {
-
     }
 
     public void showLoadingDialog() {
@@ -50,6 +49,7 @@ public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D
     /**
      * 显示对话框 showLoadingDialog()和hideLoadingDialog()必须成对调用
      */
+    @SuppressWarnings("rawtypes")
     public synchronized void showLoadingDialog(String message, boolean cancelable) {
         FragmentActivity activity = getActivity();
         if (activity instanceof FDActivity) {
@@ -60,6 +60,7 @@ public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D
     /**
      * 隐藏对话框
      */
+    @SuppressWarnings("rawtypes")
     public synchronized void hideLoadingDialog() {
         FragmentActivity activity = getActivity();
         if (activity instanceof FDActivity) {
@@ -70,6 +71,7 @@ public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D
     /**
      * 取消对话框
      */
+    @SuppressWarnings("rawtypes")
     public synchronized void cancelLoadingDialog() {
         FragmentActivity activity = getActivity();
         if (activity instanceof FDActivity) {

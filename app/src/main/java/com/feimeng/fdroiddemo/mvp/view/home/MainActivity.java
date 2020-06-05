@@ -18,7 +18,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void initView() {
         findViewById(R.id.login).setOnClickListener(this);
-        findViewById(R.id.test).setOnClickListener(this);
+        findViewById(R.id.mvp).setOnClickListener(this);
+        findViewById(R.id.loading).setOnClickListener(this);
     }
 
     @Override
@@ -32,8 +33,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.login:
                 LoginActivity.start(this);
                 break;
-            case R.id.test:
-                TestActivity.start(this);
+            case R.id.mvp:
+                MvpSampleActivity.start(this);
+                break;
+            case R.id.loading:
+                LoadingTestActivity.start(this);
                 break;
         }
     }

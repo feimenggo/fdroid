@@ -4,11 +4,12 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
+
+import androidx.annotation.Nullable;
 
 import com.feimeng.fdroid.mvp.FDActivity;
-import com.feimeng.fdroid.mvp.FDCore;
 import com.feimeng.fdroid.utils.T;
+import com.feimeng.fdroid.widget.FDLoadingDialog;
 import com.feimeng.fdroiddemo.R;
 
 /**
@@ -17,19 +18,13 @@ import com.feimeng.fdroiddemo.R;
  */
 public abstract class BaseActivity<V extends BaseView<D>, P extends BasePresenter<V, D>, D> extends FDActivity<V, P, D> {
     @Override
-    protected Dialog createLoadingDialog(String message) {
-        Dialog dialog = new Dialog(this, R.style.DialogTransparent);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_loading);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(true);
-        return dialog;
+    protected Dialog createLoadingDialog(@Nullable String message) {
+        return new FDLoadingDialog(this, R.style.DialogTransparent, message);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!(getClass().getName().contains("SplashActivity"))) FDCore.waitConfigFinish();
     }
 
     @Override
