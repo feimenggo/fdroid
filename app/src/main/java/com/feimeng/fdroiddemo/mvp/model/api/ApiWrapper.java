@@ -35,7 +35,7 @@ public class ApiWrapper extends FDApi {
     }
 
     @Override
-    protected OkHttpClient getOkHttpClient() {
+    public OkHttpClient createOkHttpClient() {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .connectTimeout(FDConfig.CONNECT_TIMEOUT, TimeUnit.SECONDS) // 连接超时时间为15秒
                 .writeTimeout(FDConfig.WRITE_TIMEOUT, TimeUnit.SECONDS) // 写入超时时间

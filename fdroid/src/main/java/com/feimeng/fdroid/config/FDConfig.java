@@ -19,4 +19,5 @@ public class FDConfig {
     public static String INFO_JSON_SYNTAX_EXCEPTION = "Json语法错误"; // 提示信息 Json语法错误
     public static String INFO_MALFORMED_JSON_EXCEPTION = "Json结构错误"; // 提示信息 Json结构错误
     public static String INFO_EOF_EXCEPTION = "Json结束错误"; // 提示信息 Json非法结束
+    public static String INFO_UNKNOWN = "出错了"; // 提示信息 未知异常
 }

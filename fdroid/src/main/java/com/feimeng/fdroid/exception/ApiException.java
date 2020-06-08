@@ -1,5 +1,6 @@
 package com.feimeng.fdroid.exception;
 
+import com.feimeng.fdroid.mvp.model.api.ResponseCodeInterceptorListener;
 import com.feimeng.fdroid.mvp.model.api.bean.FDResponse;
 
 /**
@@ -8,10 +9,12 @@ import com.feimeng.fdroid.mvp.model.api.bean.FDResponse;
  * Description: 自定义异常，当接口返回的{@link FDResponse#isSuccess()}为false时，需要抛出此异常 eg：请求参数不全、用户令牌错误等
  */
 public class ApiException extends Exception {
-    public static final int CODE_CONTENT_NULL = 0;
+    public static final int CODE_RESPONSE_NULL = 0;
     public static final int CODE_REQUEST_UNSUCCESSFUL = -1;
+    /**
+     * 请求被{@link ResponseCodeInterceptorListener#onResponse(FDResponse)} 拦截
+     */
     public static final int CODE_RESPONSE_INTERCEPTOR = -2;
-    public static final int CODE_NETWORK_UNAVAILABLE = -3; // 网络不可用
     private int code;
     private String message;
 

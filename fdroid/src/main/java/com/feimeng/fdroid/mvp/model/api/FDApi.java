@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.exception.ApiException;
+import com.feimeng.fdroid.exception.ApiCallException;
 import com.feimeng.fdroid.exception.Info;
 import com.feimeng.fdroid.mvp.model.api.bean.FDApiFinish;
 import com.feimeng.fdroid.mvp.model.api.bean.FDResponse;
@@ -60,9 +61,8 @@ public class FDApi {
     private final Map<String, Disposable> mApiTags = new HashMap<>(); // 请求列表
     private List<HeaderParam> mHeaderParam; // 自定义请求头
     private Map<String, String> mMockData; // 模拟请求
-    private ResponseCodeInterceptorListener mResponseCodeInterceptorListener;
-    private int[] mResponseCodes = new int[]{};
-    private Retrofit retrofit;
+    private int[] mResponseCodes = new int[]{}; // 拦截API响应码
+    private ResponseCodeInterceptorListener mResponseCodeInterceptorListener; // 拦截API响应码 拦截器
     private Gson mGson;
 
     public FDApi() {
@@ -82,16 +82,13 @@ public class FDApi {
         return mGson;
     }
 
-    protected Retrofit getRetrofit(String baseUrl) {
-        if (retrofit == null) {
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(baseUrl)
-                    .client(getOkHttpClient())
-                    .addConverterFactory(getGsonConverterFactory())
-                    .addCallAdapterFactory(getRxJavaCallAdapterFactory())
-                    .build();
-        }
-        return retrofit;
+    public Retrofit getRetrofit(String baseUrl) {
+        return new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .client(createOkHttpClient())
+                .addConverterFactory(createConverterFactory())
+                .addCallAdapterFactory(createCallAdapterFactory())
+                .build();
     }
 
     /**
@@ -117,7 +114,7 @@ public class FDApi {
         mMockData.put("/" + api, data);
     }
 
-    protected OkHttpClient startMock(OkHttpClient.Builder clientBuilder) {
+    public OkHttpClient startMock(OkHttpClient.Builder clientBuilder) {
         if (mMockData != null && !mMockData.isEmpty()) {
             clientBuilder.addInterceptor(new MockInterceptor(mMockData));
         }
@@ -177,7 +174,7 @@ public class FDApi {
         return RequestBody.create(JsonRequestBody.getInstance().getJsonType(), gson.toJson(requestObj));
     }
 
-    protected OkHttpClient getOkHttpClient() {
+    public OkHttpClient createOkHttpClient() {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .connectTimeout(FDConfig.CONNECT_TIMEOUT, TimeUnit.SECONDS) // 连接超时时间为15秒
                 .writeTimeout(FDConfig.WRITE_TIMEOUT, TimeUnit.SECONDS) // 写入超时时间
@@ -194,11 +191,11 @@ public class FDApi {
         return clientBuilder.build();
     }
 
-    protected Converter.Factory getGsonConverterFactory() {
+    protected Converter.Factory createConverterFactory() {
         return GsonConverterFactory.create(mGson);
     }
 
-    protected CallAdapter.Factory getRxJavaCallAdapterFactory() {
+    protected CallAdapter.Factory createCallAdapterFactory() {
         return RxJava2CallAdapterFactory.create();
     }
 
@@ -217,7 +214,7 @@ public class FDApi {
      * 响应结果拦截器，根据响应码拦截
      *
      * @param response 响应结果
-     * @return true 拦截 false 不拦截，执行往后流程
+     * @return true 拦截 false 不拦截，执行后续流程
      */
     private boolean responseCodeInterceptor(FDResponse response) {
         if (mResponseCodeInterceptorListener == null || mResponseCodes.length == 0) return false;
@@ -452,14 +449,14 @@ public class FDApi {
                         fdApiFinish.fail(e, translateException(e));
                     }
                 }
-                removeApi(apiTag);
+                if (apiTag != null) removeApi(apiTag);
                 fdApiFinish.stop();
             }
 
             @Override
             public void onComplete() {
                 if (SHOW_HTTP_LOG) L.d("请求结束 线程：" + Thread.currentThread().getName());
-                removeApi(apiTag);
+                if (apiTag != null) removeApi(apiTag);
                 fdApiFinish.stop();
             }
         };
@@ -495,24 +492,37 @@ public class FDApi {
     @SuppressWarnings("unchecked")
     @NonNull
     public <T> T call(Call<? extends FDResponse<T>> call) throws Exception {
-        retrofit2.Response<FDResponse<T>> callResponse = (Response<FDResponse<T>>) call.execute();
-        if (!callResponse.isSuccessful()) {
-            onResponseFail(callResponse);
-            throw new ApiException(ApiException.CODE_REQUEST_UNSUCCESSFUL, "Request unsuccessful");
+        try {
+            retrofit2.Response<FDResponse<T>> callResponse = (Response<FDResponse<T>>) call.execute();
+            if (!callResponse.isSuccessful()) {
+                onResponseFail(callResponse);
+                throw new ApiException(ApiException.CODE_REQUEST_UNSUCCESSFUL, "Request unsuccessful");
+            }
+            FDResponse<T> response = callResponse.body();
+            if (response == null) {
+                throw new ApiException(ApiException.CODE_RESPONSE_NULL, "Response is null");
+            }
+            if (response.isSuccess()) return response.getData();
+            if (responseCodeInterceptor(response)) {
+                throw new ApiException(ApiException.CODE_RESPONSE_INTERCEPTOR, "Response intercepted");
+            }
+            throw new ApiException(response.getCode(), response.getInfo());
+        } catch (ApiException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new ApiCallException(translateException(e), e);
         }
-        FDResponse<T> response = callResponse.body();
-        if (response == null) {
-            throw new ApiException(ApiException.CODE_CONTENT_NULL, "Content is null");
-        }
-        if (response.isSuccess()) return response.getData();
-        if (responseCodeInterceptor(response)) {
-            throw new ApiException(ApiException.CODE_RESPONSE_INTERCEPTOR, "Response interceptor");
-        }
-        throw new ApiException(response.getCode(), response.getInfo());
     }
 
     private void requestApi(String apiTag, Disposable disposable) {
         mApiTags.put(apiTag, disposable);
+    }
+
+    /**
+     * 移除指定tag的请求标识
+     */
+    public void removeApi(String apiTag) {
+        mApiTags.remove(apiTag);
     }
 
     /**
@@ -534,13 +544,6 @@ public class FDApi {
             disposable.dispose();
             removeApi(apiTag);
         }
-    }
-
-    /**
-     * 移除指定tag的请求标识
-     */
-    public void removeApi(String apiTag) {
-        mApiTags.remove(apiTag);
     }
 
     /**

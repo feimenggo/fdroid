@@ -1,6 +1,8 @@
 package com.feimeng.fdroid.utils;
 
+import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.exception.ApiException;
+import com.feimeng.fdroid.exception.ApiCallException;
 import com.feimeng.fdroid.exception.Info;
 import com.feimeng.fdroid.mvp.FDActivity;
 import com.feimeng.fdroid.mvp.FDDialog;
@@ -193,7 +195,7 @@ public abstract class FastTask<T> {
         @Override
         public void onError(Throwable e) {
             if (e == null || e.getMessage() == null) {
-                onFail(new NullPointerException("哎呀！出错了。"));
+                onFail(new NullPointerException(FDConfig.INFO_UNKNOWN));
             } else if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
                 success(null);
             } else {
@@ -236,8 +238,13 @@ public abstract class FastTask<T> {
         private void onFail(Throwable throwable) {
             if (throwable instanceof Info) { // 提示信息
                 info(throwable.getMessage());
-            } else if (throwable instanceof ApiException) { // API错误
+            } else if (throwable instanceof ApiCallException) { // API调用异常
                 fail(throwable);
+            } else if (throwable instanceof ApiException) { // API响应异常
+                // 判断是否请求被{@link ResponseCodeInterceptorListener#onResponse(FDResponse)} 拦截
+                if (((ApiException) throwable).getCode() != ApiException.CODE_RESPONSE_INTERCEPTOR) {
+                    fail(throwable);
+                }
             } else {
                 if (sFail != null && !sFail.onFail(throwable)) return;
                 fail(throwable);
