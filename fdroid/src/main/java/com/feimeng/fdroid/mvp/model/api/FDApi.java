@@ -18,6 +18,7 @@ import com.google.gson.stream.MalformedJsonException;
 import java.io.EOFException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -434,9 +435,9 @@ public class FDApi {
                             }
                         }
                     }
-                    if (e instanceof ApiException) {
+                    if (e instanceof ApiException) { // 接口API异常
                         if (fdApiFinish.apiFail((ApiException) e))
-                            fdApiFinish.fail(e, e.getMessage());
+                            fdApiFinish.fail(e, translateException(e));
                     } else if (e instanceof WithoutNetworkException) {
                         // 直接结束 会回调FDPresenter.OnWithoutNetwork.withoutNetwork()方法
                     } else if (e instanceof Info) {
@@ -444,28 +445,11 @@ public class FDApi {
                     } else if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
                         fdApiFinish.success(null);
                     } else {
-                        String error;
-                        if (e instanceof SocketTimeoutException) {
-                            error = FDConfig.INFO_TIMEOUT_EXCEPTION;
-                        } else if (e instanceof ConnectException) {
-                            error = FDConfig.INFO_CONNECT_EXCEPTION;
-                        } else if (e instanceof HttpException) {
-                            error = FDConfig.INFO_HTTP_EXCEPTION;
+                        if (FDConfig.PRINT_HTTP_EXCEPTION) e.printStackTrace();
+                        if (e instanceof HttpException) {
                             onResponseFail(((HttpException) e).response());
-                        } else if (e instanceof JsonSyntaxException) {
-                            error = FDConfig.INFO_JSON_SYNTAX_EXCEPTION;
-                        } else if (e instanceof MalformedJsonException) {
-                            error = FDConfig.INFO_MALFORMED_JSON_EXCEPTION;
-                        } else if (e instanceof EOFException) {
-                            error = FDConfig.INFO_EOF_EXCEPTION;
-                        } else {
-                            error = FDConfig.INFO_UNKNOWN_EXCEPTION;
                         }
-                        if (FDConfig.SHOW_HTTP_EXCEPTION_INFO) {
-                            error += " " + e.getMessage();
-                            e.printStackTrace();
-                        }
-                        fdApiFinish.fail(e, error);
+                        fdApiFinish.fail(e, translateException(e));
                     }
                 }
                 removeApi(apiTag);
@@ -481,9 +465,36 @@ public class FDApi {
         };
     }
 
+    /**
+     * 翻译请求异常
+     *
+     * @param e 异常
+     * @return 翻译结果
+     */
+    @NonNull
+    public String translateException(Throwable e) {
+        if (e instanceof UnknownHostException) {
+            return FDConfig.INFO_UNKNOWN_HOST_EXCEPTION;
+        } else if (e instanceof SocketTimeoutException) {
+            return FDConfig.INFO_TIMEOUT_EXCEPTION;
+        } else if (e instanceof ConnectException) {
+            return FDConfig.INFO_CONNECT_EXCEPTION;
+        } else if (e instanceof HttpException) {
+            return FDConfig.INFO_HTTP_EXCEPTION;
+        } else if (e instanceof JsonSyntaxException) {
+            return FDConfig.INFO_JSON_SYNTAX_EXCEPTION;
+        } else if (e instanceof MalformedJsonException) {
+            return FDConfig.INFO_MALFORMED_JSON_EXCEPTION;
+        } else if (e instanceof EOFException) {
+            return FDConfig.INFO_EOF_EXCEPTION;
+        } else {
+            return e.getClass().getSimpleName();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @NonNull
-    public  <T> T call(Call<? extends FDResponse<T>> call) throws Exception {
+    public <T> T call(Call<? extends FDResponse<T>> call) throws Exception {
         retrofit2.Response<FDResponse<T>> callResponse = (Response<FDResponse<T>>) call.execute();
         if (!callResponse.isSuccessful()) {
             onResponseFail(callResponse);

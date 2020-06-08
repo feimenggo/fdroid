@@ -1,10 +1,13 @@
 package com.feimeng.fdroiddemo.mvp.model.api;
 
+import androidx.annotation.NonNull;
+
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.mvp.model.api.FDApi;
 import com.feimeng.fdroid.mvp.model.api.bean.Optional;
 import com.feimeng.fdroiddemo.data.dto.LoginDto;
 
+import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -53,6 +56,16 @@ public class ApiWrapper extends FDApi {
         });
         startMock(clientBuilder);
         return clientBuilder.build();
+    }
+
+    @NonNull
+    @Override
+    public String translateException(Throwable e) {
+        if (e instanceof UnknownHostException) {
+            return "网络异常，请重试";
+        } else {
+            return super.translateException(e);
+        }
     }
 
     /**

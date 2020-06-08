@@ -27,14 +27,13 @@ public class BaseApp extends FDApp implements Consumer<Throwable> {
         // 初始化Toast
         T.init(true);
         FDConfig.SHOW_HTTP_LOG = BuildConfig.DEBUG;
-        FDConfig.SHOW_HTTP_EXCEPTION_INFO = BuildConfig.DEBUG;
+        FDConfig.PRINT_HTTP_EXCEPTION = BuildConfig.DEBUG;
         FDConfig.READ_TIMEOUT = 120;
         FDConfig.WRITE_TIMEOUT = 120;
         FDConfig.CONNECT_TIMEOUT = 30;
         FDConfig.INFO_EOF_EXCEPTION = "数据格式异常";
         FDConfig.INFO_TIMEOUT_EXCEPTION = "请求超时";
         FDConfig.INFO_CONNECT_EXCEPTION = "无法连接服务器";
-        FDConfig.INFO_UNKNOWN_EXCEPTION = "抱歉！遇到错误了";
     }
 
     @Override
