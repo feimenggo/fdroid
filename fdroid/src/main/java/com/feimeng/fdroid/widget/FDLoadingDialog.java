@@ -41,19 +41,27 @@ public class FDLoadingDialog extends Dialog {
             mPostedShow = false;
             if (!mDismissed) {
                 mStartTime = System.currentTimeMillis();
-                FDLoadingDialog.super.show();
+                showInternal();
             }
         }
     };
+
+    private void showInternal() {
+        FDLoadingDialog.super.show();
+    }
 
     private final Runnable mDelayedHide = new Runnable() {
         @Override
         public void run() {
             mPostedHide = false;
             mStartTime = -1;
-            FDLoadingDialog.super.dismiss();
+            hideInternal();
         }
     };
+
+    private void hideInternal() {
+        FDLoadingDialog.super.dismiss();
+    }
 
     @Override
     public void show() {
@@ -112,7 +120,11 @@ public class FDLoadingDialog extends Dialog {
         mHandler.removeCallbacks(mDelayedHide);
         mPostedHide = false;
         if (!mPostedShow) {
-            mHandler.postDelayed(mDelayedShow, mShowDelay);
+            if (mShowDelay > 0) {
+                mHandler.postDelayed(mDelayedShow, mShowDelay);
+            } else {
+                showInternal();
+            }
             mPostedShow = true;
         }
     }
@@ -126,7 +138,11 @@ public class FDLoadingDialog extends Dialog {
             super.dismiss();
         } else {
             if (!mPostedHide) {
-                mHandler.postDelayed(mDelayedHide, mMinShowTime - diff);
+                if (mMinShowTime > 0) {
+                    mHandler.postDelayed(mDelayedHide, mMinShowTime - diff);
+                } else {
+                    hideInternal();
+                }
                 mPostedHide = true;
             }
         }
