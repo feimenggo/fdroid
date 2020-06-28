@@ -1,7 +1,6 @@
 package com.feimeng.fdroiddemo.mvp.model.api;
 
 
-import com.feimeng.fdroid.mvp.model.api.bean.Response;
 import com.feimeng.fdroiddemo.data.dto.LoginDto;
 
 import io.reactivex.Observable;

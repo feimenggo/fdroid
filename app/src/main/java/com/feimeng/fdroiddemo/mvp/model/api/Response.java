@@ -1,4 +1,6 @@
-package com.feimeng.fdroid.mvp.model.api.bean;
+package com.feimeng.fdroiddemo.mvp.model.api;
+
+import com.feimeng.fdroid.mvp.model.api.bean.FDResponse;
 
 /**
  * 请求结果

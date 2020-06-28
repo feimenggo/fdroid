@@ -3,6 +3,7 @@ package com.feimeng.fdroid.mvp.model.api;
 import androidx.annotation.NonNull;
 
 import com.feimeng.fdroid.config.FDConfig;
+import com.feimeng.fdroid.config.RxJavaConfig;
 import com.feimeng.fdroid.exception.ApiException;
 import com.feimeng.fdroid.exception.ApiCallException;
 import com.feimeng.fdroid.exception.Info;
@@ -238,7 +239,7 @@ public class FDApi {
             @Override
             public void subscribe(ObservableEmitter<T> emitter) throws Exception {
                 if (emitter.isDisposed()) return;
-                if (SHOW_HTTP_LOG) L.s(response);
+                if (SHOW_HTTP_LOG) L.v(response);
                 // 请求结果
                 if (response.isSuccess()) {
                     emitter.onNext(response.getData());
@@ -261,7 +262,7 @@ public class FDApi {
             @Override
             public void subscribe(ObservableEmitter<Optional<T>> emitter) throws Exception {
                 if (emitter.isDisposed()) return;
-                if (SHOW_HTTP_LOG) L.s(response);
+                if (SHOW_HTTP_LOG) L.v(response);
                 // 请求结果
                 if (response.isSuccess()) {
                     emitter.onNext(new Optional<>(response.getData()));
@@ -446,7 +447,9 @@ public class FDApi {
                         if (e instanceof HttpException) {
                             onResponseFail(((HttpException) e).response());
                         }
-                        fdApiFinish.fail(e, translateException(e));
+                        if (RxJavaConfig.interceptor == null || RxJavaConfig.interceptor.onError(e)) {
+                            fdApiFinish.fail(e, translateException(e));
+                        }
                     }
                 }
                 if (apiTag != null) removeApi(apiTag);

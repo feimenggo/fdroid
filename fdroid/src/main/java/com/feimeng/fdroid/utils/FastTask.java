@@ -1,13 +1,17 @@
 package com.feimeng.fdroid.utils;
 
+import com.feimeng.fdroid.bean.TaskProgress;
 import com.feimeng.fdroid.config.FDConfig;
-import com.feimeng.fdroid.exception.ApiException;
+import com.feimeng.fdroid.config.RxJavaConfig;
 import com.feimeng.fdroid.exception.ApiCallException;
+import com.feimeng.fdroid.exception.ApiException;
 import com.feimeng.fdroid.exception.Info;
 import com.feimeng.fdroid.mvp.FDActivity;
 import com.feimeng.fdroid.mvp.FDDialog;
 import com.feimeng.fdroid.mvp.FDFragment;
 import com.feimeng.fdroid.mvp.FDView;
+import com.feimeng.fdroid.mvp.model.api.FDApi;
+import com.feimeng.fdroid.mvp.model.api.bean.FDApiFinish;
 import com.trello.rxlifecycle3.LifecycleTransformer;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.android.FragmentEvent;
@@ -175,13 +179,11 @@ public abstract class FastTask<T> {
 
     public abstract T task() throws Exception;
 
-    public abstract static class Result<R> implements Observer<R> {
-        private static ResultFail sFail; // 全局异常监听
+    public static <R> Observer<R> resultApi(FDApi fdApi, FDApiFinish<R> apiFinish) {
+        return fdApi.subscriber(apiFinish);
+    }
 
-        public static void onFail(ResultFail fail) {
-            sFail = fail;
-        }
-
+    public static class Result<R> implements Observer<R>, TaskProgress<R> {
         @Override
         public void onSubscribe(Disposable d) {
             start();
@@ -195,13 +197,31 @@ public abstract class FastTask<T> {
         @Override
         public void onError(Throwable e) {
             if (e == null || e.getMessage() == null) {
-                onFail(new NullPointerException(FDConfig.INFO_UNKNOWN));
+                dealError(new NullPointerException(FDConfig.INFO_UNKNOWN));
             } else if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
                 success(null);
             } else {
-                onFail(e);
+                dealError(e);
             }
             stop();
+        }
+
+        private void dealError(Throwable throwable) {
+            if (throwable instanceof Info) { // 提示信息
+                info(throwable.getMessage());
+            } else if (throwable instanceof ApiCallException) { // API调用异常
+                fail(throwable, throwable.getMessage());
+            } else if (throwable instanceof ApiException) { // API响应异常
+                // 判断是否请求被{@link ResponseCodeInterceptorListener#onResponse(FDResponse)} 拦截
+                if (((ApiException) throwable).getCode() != ApiException.CODE_RESPONSE_INTERCEPTOR) {
+                    fail(throwable, throwable.getMessage());
+                }
+            } else {
+                if (RxJavaConfig.interceptor != null && !RxJavaConfig.interceptor.onError(throwable)) {
+                    return;
+                }
+                fail(throwable, throwable.getMessage());
+            }
         }
 
         @Override
@@ -209,46 +229,24 @@ public abstract class FastTask<T> {
             stop();
         }
 
-        /**
-         * 任务开始
-         */
+        @Override
         public void start() {
         }
 
-        /**
-         * 任务执行成功
-         */
-        public abstract void success(R truck);
-
-        /**
-         * 任务执行失败
-         */
-        public void fail(Throwable throwable) {
-        }
-
-        /**
-         * 任务结束
-         */
-        public void stop() {
-        }
-
+        @Override
         public void info(String message) {
         }
 
-        private void onFail(Throwable throwable) {
-            if (throwable instanceof Info) { // 提示信息
-                info(throwable.getMessage());
-            } else if (throwable instanceof ApiCallException) { // API调用异常
-                fail(throwable);
-            } else if (throwable instanceof ApiException) { // API响应异常
-                // 判断是否请求被{@link ResponseCodeInterceptorListener#onResponse(FDResponse)} 拦截
-                if (((ApiException) throwable).getCode() != ApiException.CODE_RESPONSE_INTERCEPTOR) {
-                    fail(throwable);
-                }
-            } else {
-                if (sFail != null && !sFail.onFail(throwable)) return;
-                fail(throwable);
-            }
+        @Override
+        public void success(R data) {
+        }
+
+        @Override
+        public void fail(Throwable error, String info) {
+        }
+
+        @Override
+        public void stop() {
         }
     }
 
@@ -280,15 +278,5 @@ public abstract class FastTask<T> {
 
     public static Info info(String info) throws Info {
         throw new Info(info);
-    }
-
-    public interface ResultFail {
-        /**
-         * 异常监听
-         *
-         * @param throwable 异常
-         * @return 是否继续调用Result.fail(Throwable throwable)方法
-         */
-        boolean onFail(Throwable throwable);
     }
 }

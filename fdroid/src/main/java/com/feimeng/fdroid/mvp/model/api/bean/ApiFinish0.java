@@ -7,6 +7,5 @@ package com.feimeng.fdroid.mvp.model.api.bean;
 public abstract class ApiFinish0<T> extends ApiFinish2<T> {
     @Override
     public void success(T data) {
-
     }
 }

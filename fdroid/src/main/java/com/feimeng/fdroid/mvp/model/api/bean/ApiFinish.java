@@ -8,7 +8,7 @@ import com.feimeng.fdroid.exception.ApiException;
  */
 public abstract class ApiFinish<T> implements FDApiFinish<T> {
     public boolean apiFail(ApiException exception) {
-        // 返回true，将会调用 fail(ApiError error, String info);
+        // 返回true，将会调用 fail(Throwable error, String info);
         return true;
     }
 

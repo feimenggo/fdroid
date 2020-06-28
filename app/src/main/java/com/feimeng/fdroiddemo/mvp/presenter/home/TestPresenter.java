@@ -29,8 +29,8 @@ public class TestPresenter extends TestContract.Presenter {
             }
 
             @Override
-            public void fail(Throwable throwable) {
-                if (isActive()) mView.getUserName(null, throwable.getMessage());
+            public void fail(Throwable error, String info) {
+                if (isActive()) mView.getUserName(null, info);
             }
 
             @Override

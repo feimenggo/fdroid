@@ -15,7 +15,7 @@ public interface FDResponse<T> {
     /**
      * 返回结果码
      *
-     * @return 小于10000的数字，例如：200；203；
+     * @return 例如：200；203；
      */
     int getCode();
 

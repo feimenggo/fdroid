@@ -72,8 +72,8 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
                 }
 
                 @Override
-                public void fail(Throwable throwable) {
-                    if (isActive()) postInitView(null, throwable);
+                public void fail(Throwable error, String info) {
+                    if (isActive()) postInitView(null, error);
                 }
             }, mView);
         } else {
@@ -180,11 +180,15 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
      * 显示对话框
      */
     public void showDialog() {
-        showDialog(null);
+        showDialog(null, true);
     }
 
     public void showDialog(String message) {
         showDialog(message, true);
+    }
+
+    public void showDialog(boolean cancelable) {
+        showDialog(null, cancelable);
     }
 
     public void showDialog(String message, boolean cancelable) {
@@ -195,8 +199,6 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
             ((FDFragment) mView).showLoadingDialog(message, cancelable);
         } else if (mView instanceof FDDialog) {
             ((FDDialog) mView).showLoadingDialog(message, cancelable);
-        } else {
-            return;
         }
     }
 
