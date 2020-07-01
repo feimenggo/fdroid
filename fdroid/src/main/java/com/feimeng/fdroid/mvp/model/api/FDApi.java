@@ -409,7 +409,7 @@ public class FDApi {
         return new Observer<T>() {
             @Override
             public void onSubscribe(Disposable disposable) {
-                if (SHOW_HTTP_LOG) L.d("请求开始 线程：" + Thread.currentThread().getName());
+                if (SHOW_HTTP_LOG) L.v("请求开始 线程：" + Thread.currentThread().getName());
                 if (apiTag != null) requestApi(apiTag, disposable);
                 fdApiFinish.start();
             }
@@ -458,7 +458,7 @@ public class FDApi {
 
             @Override
             public void onComplete() {
-                if (SHOW_HTTP_LOG) L.d("请求结束 线程：" + Thread.currentThread().getName());
+                if (SHOW_HTTP_LOG) L.v("请求结束 线程：" + Thread.currentThread().getName());
                 if (apiTag != null) removeApi(apiTag);
                 fdApiFinish.stop();
             }

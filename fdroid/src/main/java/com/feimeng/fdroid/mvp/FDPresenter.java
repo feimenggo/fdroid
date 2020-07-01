@@ -26,6 +26,7 @@ import io.reactivex.ObservableOnSubscribe;
  * @param <V> 视图
  * @param <D> 初始化结果
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class FDPresenter<V extends FDView<D>, D> {
     private boolean mInitAsync; // 异步初始化
     protected V mView;// 视图
@@ -34,7 +35,6 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
      * 开启异步初始化
      * 开启后，{@link #onInit(boolean)}将会在子线程回调，否则在UI线程回调。
      */
-    @SuppressWarnings("unchecked")
     public <P extends FDPresenter> P asyncInit() {
         mInitAsync = true;
         return (P) this;
@@ -44,7 +44,7 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
      * 绑定视图
      */
     void attach(V view) {
-        L.d("绑定视图->" + view);
+        L.v("绑定视图->" + view);
         mView = view;
         onAttach();
     }
@@ -116,7 +116,7 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
      * 解绑视图
      */
     void detach() {
-        L.d("解绑视图->" + mView);
+        L.v("解绑视图->" + mView);
         mView = null;
         onDetach();
     }

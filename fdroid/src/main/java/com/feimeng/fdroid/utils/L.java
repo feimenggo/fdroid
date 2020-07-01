@@ -119,31 +119,32 @@ public final class L {
         }
         sb.append(msg);
         String logStr = sb.append("\n").toString();
-        // 调用日志监听器的打印
-        if (printLog(tagStr, logStr)) {
+        // 打印日志
+        printLog(type, tagStr, logStr);
+    }
+
+    private static void printLog(int type, String tag, String info) {
+        if (monitor != null) {
+            monitor.onPrintLog(type, tag, info);
+        } else {
             switch (type) {
                 case V:
-                    Log.v(tagStr, logStr);
+                    Log.v(tag, info);
                     break;
                 case D:
-                    Log.d(tagStr, logStr);
+                    Log.d(tag, info);
                     break;
                 case I:
-                    Log.i(tagStr, logStr);
+                    Log.i(tag, info);
                     break;
                 case W:
-                    Log.w(tagStr, logStr);
+                    Log.w(tag, info);
                     break;
                 case E:
-                    Log.e(tagStr, logStr);
+                    Log.e(tag, info);
                     break;
             }
         }
-    }
-
-    private static boolean printLog(String tag, String info) {
-        if (monitor == null) return true;
-        return monitor.onPrintLog(tag, info);
     }
 
     /**
@@ -153,10 +154,10 @@ public final class L {
         /**
          * 打印日志
          *
+         * @param type 类型
          * @param tag  标签
          * @param info 信息
-         * @return 是否继续调用android.util.Log进行打印日志
          */
-        boolean onPrintLog(String tag, String info);
+        void onPrintLog(int type, String tag, String info);
     }
 }
