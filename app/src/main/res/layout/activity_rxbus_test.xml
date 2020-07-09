@@ -8,39 +8,25 @@
     android:gravity="center_horizontal"
     android:orientation="vertical"
     android:paddingTop="50dp"
-    tools:context=".mvp.view.home.MainActivity">
+    tools:context=".mvp.view.home.RxBusTestActivity">
 
     <TextView
         android:id="@id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="FDroid MVP Framework" />
+        android:text="测试RxBus" />
 
     <Button
-        android:id="@id/login"
+        android:id="@id/bind"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="网络请求例子" />
+        android:text="订阅事件" />
 
     <Button
-        android:id="@id/mvp"
+        android:id="@id/post"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="MVP示例" />
-
-    <Button
-        android:id="@id/loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="测试Loading对话框" />
-
-    <Button
-        android:id="@id/rxBus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="测试rxBus" />
+        android:text="发送事件" />
 </LinearLayout>

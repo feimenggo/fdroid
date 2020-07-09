@@ -32,7 +32,7 @@ public final class L {
      * @param level     显示等级
      */
     public static void init(boolean isShowLog, int level) {
-        setLevel(isShowLog ? NOTHING : level);
+        setLevel(isShowLog ? level : NOTHING);
     }
 
     /**

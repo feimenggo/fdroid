@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import com.feimeng.fdroid.R;
 import com.feimeng.fdroid.utils.ActivityPageManager;
 import com.feimeng.fdroid.widget.FDLoadingDialog;
+import com.trello.rxlifecycle3.LifecycleTransformer;
+import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
 /**
@@ -67,6 +69,13 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
 
     @Override
     public void init(D initData, Throwable e) {
+    }
+
+    /**
+     * 获取关联的RxLifecycle
+     */
+    public <T> LifecycleTransformer<T> getLifecycle(@NonNull ActivityEvent event) {
+        return bindUntilEvent(event);
     }
 
     /**

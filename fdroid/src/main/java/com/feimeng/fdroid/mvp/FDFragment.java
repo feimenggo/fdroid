@@ -3,9 +3,12 @@ package com.feimeng.fdroid.mvp;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
+import com.trello.rxlifecycle3.LifecycleTransformer;
+import com.trello.rxlifecycle3.android.FragmentEvent;
 import com.trello.rxlifecycle3.components.support.RxFragment;
 
 /**
@@ -36,6 +39,13 @@ public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D
 
     @Override
     public void init(D initData, Throwable e) {
+    }
+
+    /**
+     * 获取关联的RxLifecycle
+     */
+    public <T> LifecycleTransformer<T> getLifecycle(@NonNull FragmentEvent event) {
+        return bindUntilEvent(event);
     }
 
     public void showLoadingDialog() {

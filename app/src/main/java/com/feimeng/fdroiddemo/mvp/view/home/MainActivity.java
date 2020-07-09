@@ -3,12 +3,18 @@ package com.feimeng.fdroiddemo.mvp.view.home;
 import android.os.Bundle;
 import android.view.View;
 
-import com.feimeng.fdroid.mvp.FDPresenter;
 import com.feimeng.fdroiddemo.R;
 import com.feimeng.fdroiddemo.base.BaseActivity;
+import com.feimeng.fdroiddemo.base.BasePresenter;
+import com.feimeng.fdroiddemo.base.BaseView;
 import com.feimeng.fdroiddemo.mvp.view.gate.LoginActivity;
 
-public class MainActivity extends BaseActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity<BaseView<Object>, BasePresenter<BaseView<Object>, Object>, Object> implements View.OnClickListener {
+    @Override
+    protected BasePresenter<BaseView<Object>, Object> initPresenter() {
+        return new BasePresenter<>();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,11 +26,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.login).setOnClickListener(this);
         findViewById(R.id.mvp).setOnClickListener(this);
         findViewById(R.id.loading).setOnClickListener(this);
-    }
-
-    @Override
-    protected FDPresenter initPresenter() {
-        return null;
+        findViewById(R.id.rxBus).setOnClickListener(this);
     }
 
     @Override
@@ -38,6 +40,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.loading:
                 LoadingTestActivity.start(this);
+                break;
+            case R.id.rxBus:
+                RxBusTestActivity.start(this);
                 break;
         }
     }

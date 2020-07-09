@@ -12,6 +12,7 @@ import com.feimeng.fdroid.mvp.model.api.WithoutNetworkException;
 import com.feimeng.fdroid.utils.FastTask;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.NetworkUtil;
+import com.trello.rxlifecycle3.LifecycleTransformer;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
@@ -255,6 +256,28 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
             return observable.compose(((FDDialog) mView).<T>bindUntilEvent(event));
         }
         return observable;
+    }
+
+    /**
+     * 获取关联Activity的RxLifecycle
+     */
+    public <T> LifecycleTransformer<T> getLifecycle(@NonNull ActivityEvent event) {
+        if (mView instanceof FDActivity) {
+            return ((FDActivity) mView).getLifecycle(event);
+        }
+        return null;
+    }
+
+    /**
+     * 获取关联Fragment的RxLifecycle
+     */
+    public <T> LifecycleTransformer<T> getLifecycle(@NonNull FragmentEvent event) {
+        if (mView instanceof FDFragment) {
+            return ((FDFragment) mView).getLifecycle(event);
+        } else if (mView instanceof FDDialog) {
+            return ((FDDialog) mView).getLifecycle(event);
+        }
+        return null;
     }
 
     public interface OnWithoutNetwork {

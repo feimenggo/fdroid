@@ -16,4 +16,7 @@
     <item name="loading600" type="id" />
     <item name="loading" type="id" />
     <item name="mvp" type="id" />
+    <item name="bind" type="id" />
+    <item name="post" type="id" />
+    <item name="rxBus" type="id" />
 </resources>

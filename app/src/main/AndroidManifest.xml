@@ -25,6 +25,7 @@
         <activity android:name=".mvp.view.gate.LoginActivity" />
         <activity android:name=".mvp.view.home.MvpSampleActivity" />
         <activity android:name=".mvp.view.home.LoadingTestActivity" />
+        <activity android:name=".mvp.view.home.RxBusTestActivity" />
     </application>
 
 </manifest>
