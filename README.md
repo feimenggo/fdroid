@@ -4,11 +4,11 @@
 ## 特性
 - [x] `网络请求`：基于RxJava+Retrofit+Gson+FDroid的封装，支持对网络请求结果的统一处理、请求结果回调到UI线程、自动判断网络连接状态、自动管理生命周期、模拟后台返回数据、自定义请求头、请求响应日志打印、每个阶段都可扩展等。
 - [x] `MVP模式`：利用泛型深度解耦，为项目省掉一半代码；您不需要知道MVP实现细节，轻松使用MVP进行项目开发；
-- [x] `模板开发`：无需编写MVP的各层代码，利用Android Studio Template一键生成具有View+Contract+Presenter的Activity。模板下载：FDActivity
+- [x] `模板开发`：无需编写MVP的各层代码，利用Android Studio Template一键生成具有View+Contract+Presenter的Activity。模板下载：[FDActivity.zip](https://github.com/feimenggo/fdroid/blob/2.x/download/FDActivity.zip)
 - [x] `强大的控制层`：进行网络请求时，显隐等待对话框；使用FastTask类轻松进行耗时操作，自动回调到UI线程；
 - [x] `有用的FDFragment`：支持缓存rootView，防止重复加载布局；拥有是否对用户可见的操作；
 - [x] `L/T/SP类`：对Log、Toast和SharedP进行的有趣封装；Log支持显示打印的位置；全局管理log和Toast的显隐；
-- [x] `丰富的工具包`：RxBus、SyncFun等。
+- [x] `丰富的工具`：RxBus、FastTask、SyncFun、AsyncLayoutInflaterPlus、FDLoadingDialog等。
 
 ## 使用步骤
 #### Step 1.在项目根build.gradle中添加maven仓库
@@ -24,7 +24,7 @@ allprojects {
 ```groovy
 dependencies {
   // 基于AndroidX版本
-  api 'com.github.feimenggo:fdroid:4.0.3'
+  api 'com.github.feimenggo:fdroid:4.0.4'
   // 非AndroidX版本(不再维护)
   api 'com.github.feimenggo:fdroid:3.3.1'
 }
