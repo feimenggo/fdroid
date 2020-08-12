@@ -12,7 +12,6 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.util.Pools;
@@ -27,34 +26,64 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 实现异步加载布局的功能
- * 1. 引入线程池，减少单线程等待
- * 2. 手动设置setFactory2
+ * 1.引入线程池，减少单线程等待
+ * 2.手动设置setFactory2
  */
-public class AsyncLayoutInflaterPlus {
+public class AsyncLayoutInflaterPlus implements Handler.Callback {
     private static final String TAG = "AsyncLayoutInflaterPlus";
     private Pools.SynchronizedPool<InflateRequest> mRequestPool = new Pools.SynchronizedPool<>(10);
 
-    private LayoutInflater mInflater;
     private Handler mHandler;
     private Dispather mDispatcher;
+    private LayoutInflater mInflater;
 
     public AsyncLayoutInflaterPlus(@NonNull Context context) {
-        mInflater = getLayoutInflater(context);
-        Handler.Callback mHandlerCallback = new Handler.Callback() {
-            @Override
-            public boolean handleMessage(@NonNull Message msg) {
-                InflateRequest request = (InflateRequest) msg.obj;
-                if (request.view == null) {
-                    request.view = mInflater.inflate(request.resId, request.parent, false);
-                }
-                if (request.attachToRoot) request.parent.addView(request.view);
-                request.callback.onInflateFinished(request.view, request.resId, request.parent);
-                AsyncLayoutInflaterPlus.this.releaseRequest(request);
-                return true;
-            }
-        };
-        mHandler = new Handler(mHandlerCallback);
+        mHandler = new Handler(this);
         mDispatcher = new Dispather();
+        mInflater = getLayoutInflater(context);
+    }
+
+    @UiThread
+    public void inflate(@LayoutRes int resId, @NonNull ViewGroup parent, @NonNull OnInflateFinishedListener callback) {
+        inflate(resId, parent, false, callback);
+    }
+
+    @UiThread
+    public void inflate(@LayoutRes int resId, @NonNull ViewGroup parent, boolean attachToRoot, @NonNull OnInflateFinishedListener callback) {
+        inflate(resId, parent, attachToRoot, true, callback);
+    }
+
+    @UiThread
+    public void inflate(@LayoutRes int resId, @NonNull ViewGroup parent, boolean attachToRoot, boolean async, @NonNull OnInflateFinishedListener callback) {
+        if (async) {
+            InflateRequest request = obtainRequest();
+            request.inflater = this;
+            request.resId = resId;
+            request.parent = parent;
+            request.attachToRoot = attachToRoot;
+            request.callback = callback;
+            mDispatcher.enqueue(request);
+        } else {
+            View view = mInflater.inflate(resId, parent, false);
+            if (attachToRoot) parent.addView(view);
+            callback.onInflateFinished(view, resId, parent);
+        }
+    }
+
+    @Override
+    public boolean handleMessage(@NonNull Message msg) {
+        InflateRequest request = (InflateRequest) msg.obj;
+        if (request.view == null) {
+            request.view = mInflater.inflate(request.resId, request.parent, false);
+        }
+        if (request.attachToRoot) request.parent.addView(request.view);
+        request.callback.onInflateFinished(request.view, request.resId, request.parent);
+        releaseRequest(request);
+        return true;
+    }
+
+    public interface OnInflateFinishedListener {
+        void onInflateFinished(@NonNull View view, @LayoutRes int resId, @NonNull ViewGroup parent);
     }
 
     private LayoutInflater getLayoutInflater(Context context) {
@@ -63,34 +92,6 @@ public class AsyncLayoutInflaterPlus {
         } else {
             return new BasicInflater(context);
         }
-    }
-
-    @UiThread
-    public void inflate(@LayoutRes int resId, @Nullable ViewGroup parent, @NonNull OnInflateFinishedListener callback) {
-        inflate(resId, parent, false, callback);
-    }
-
-    @UiThread
-    public void inflate(@LayoutRes int resId, @Nullable ViewGroup parent, boolean attachToRoot, @NonNull OnInflateFinishedListener callback) {
-        InflateRequest request = obtainRequest();
-        request.inflater = this;
-        request.resId = resId;
-        request.parent = parent;
-        request.attachToRoot = attachToRoot;
-        request.callback = callback;
-        mDispatcher.enqueue(request);
-    }
-
-    public static ViewGroup createPlaceHolder(@NonNull Context context, @NonNull ViewGroup.LayoutParams params, Integer minHeight, Integer backgroundColor) {
-        FrameLayout parent = new FrameLayout(context);
-        parent.setLayoutParams(params);
-        if (minHeight != null) parent.setMinimumHeight(minHeight);
-        if (backgroundColor != null) parent.setBackgroundColor(backgroundColor);
-        return parent;
-    }
-
-    public interface OnInflateFinishedListener {
-        void onInflateFinished(@NonNull View view, @LayoutRes int resId, @NonNull ViewGroup parent);
     }
 
     private static class InflateRequest {
@@ -103,13 +104,13 @@ public class AsyncLayoutInflaterPlus {
     }
 
     private static class Dispather {
-        //获得当前CPU的核心数
+        // 获得当前CPU的核心数
         private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-        //设置线程池的核心线程数2-4之间,但是取决于CPU核数
+        // 设置线程池的核心线程数2-4之间,但是取决于CPU核数
         private static final int CORE_POOL_SIZE = Math.max(2, Math.min(CPU_COUNT - 1, 4));
-        //设置线程池的最大线程数为 CPU核数 * 2 + 1
+        // 设置线程池的最大线程数为 CPU核数 * 2 + 1
         private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;
-        //设置线程池空闲线程存活时间30s
+        // 设置线程池空闲线程存活时间30s
         private static final int KEEP_ALIVE_SECONDS = 30;
 
         private static final ThreadFactory sThreadFactory = new ThreadFactory() {
@@ -120,7 +121,7 @@ public class AsyncLayoutInflaterPlus {
             }
         };
 
-        //LinkedBlockingQueue 默认构造器，队列容量是Integer.MAX_VALUE
+        // LinkedBlockingQueue 默认构造器，队列容量是Integer.MAX_VALUE
         private static final BlockingQueue<Runnable> sPoolWorkQueue = new LinkedBlockingQueue<>();
 
         /**
@@ -176,7 +177,6 @@ public class AsyncLayoutInflaterPlus {
         }
     }
 
-
     private static class InflateRunnable implements Runnable {
         private InflateRequest request;
         private boolean isRunning;
@@ -216,6 +216,14 @@ public class AsyncLayoutInflaterPlus {
         obj.resId = 0;
         obj.view = null;
         mRequestPool.release(obj);
+    }
+
+    public static ViewGroup createPlaceHolder(@NonNull Context context, @NonNull ViewGroup.LayoutParams params, Integer minHeight, Integer backgroundColor) {
+        FrameLayout parent = new FrameLayout(context);
+        parent.setLayoutParams(params);
+        if (minHeight != null) parent.setMinimumHeight(minHeight);
+        if (backgroundColor != null) parent.setBackgroundColor(backgroundColor);
+        return parent;
     }
 }
 
