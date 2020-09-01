@@ -2,6 +2,7 @@ package com.feimeng.fdroid.utils;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -31,40 +32,35 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class AsyncLayoutInflaterPlus implements Handler.Callback {
     private static final String TAG = "AsyncLayoutInflaterPlus";
+
+    private Dispather mDispatcher = new Dispather();
+    private Handler mHandler = new Handler(Looper.getMainLooper(), this);
     private Pools.SynchronizedPool<InflateRequest> mRequestPool = new Pools.SynchronizedPool<>(10);
 
-    private Handler mHandler;
-    private Dispather mDispatcher;
-    private LayoutInflater mInflater;
-
-    public AsyncLayoutInflaterPlus(@NonNull Context context) {
-        mHandler = new Handler(this);
-        mDispatcher = new Dispather();
-        mInflater = getLayoutInflater(context);
+    @UiThread
+    public void inflate(Context context, @LayoutRes int resId, @NonNull ViewGroup parent, @NonNull OnInflateFinishedListener callback) {
+        inflate(context, resId, parent, false, callback);
     }
 
     @UiThread
-    public void inflate(@LayoutRes int resId, @NonNull ViewGroup parent, @NonNull OnInflateFinishedListener callback) {
-        inflate(resId, parent, false, callback);
+    public void inflate(Context context, @LayoutRes int resId, @NonNull ViewGroup parent, boolean attachToRoot, @NonNull OnInflateFinishedListener callback) {
+        inflate(context, resId, parent, attachToRoot, true, callback);
     }
 
     @UiThread
-    public void inflate(@LayoutRes int resId, @NonNull ViewGroup parent, boolean attachToRoot, @NonNull OnInflateFinishedListener callback) {
-        inflate(resId, parent, attachToRoot, true, callback);
-    }
-
-    @UiThread
-    public void inflate(@LayoutRes int resId, @NonNull ViewGroup parent, boolean attachToRoot, boolean async, @NonNull OnInflateFinishedListener callback) {
+    public void inflate(Context context, @LayoutRes int resId, @NonNull ViewGroup parent, boolean attachToRoot, boolean async, @NonNull OnInflateFinishedListener callback) {
+        LayoutInflater inflater = getLayoutInflater(context);
         if (async) {
             InflateRequest request = obtainRequest();
-            request.inflater = this;
+            request.holder = this;
+            request.inflater = inflater;
             request.resId = resId;
             request.parent = parent;
             request.attachToRoot = attachToRoot;
             request.callback = callback;
             mDispatcher.enqueue(request);
         } else {
-            View view = mInflater.inflate(resId, parent, false);
+            View view = inflater.inflate(resId, parent, false);
             if (attachToRoot) parent.addView(view);
             callback.onInflateFinished(view, resId, parent);
         }
@@ -74,7 +70,7 @@ public class AsyncLayoutInflaterPlus implements Handler.Callback {
     public boolean handleMessage(@NonNull Message msg) {
         InflateRequest request = (InflateRequest) msg.obj;
         if (request.view == null) {
-            request.view = mInflater.inflate(request.resId, request.parent, false);
+            request.view = request.inflater.inflate(request.resId, request.parent, false);
         }
         if (request.attachToRoot) request.parent.addView(request.view);
         request.callback.onInflateFinished(request.view, request.resId, request.parent);
@@ -95,7 +91,8 @@ public class AsyncLayoutInflaterPlus implements Handler.Callback {
     }
 
     private static class InflateRequest {
-        AsyncLayoutInflaterPlus inflater;
+        AsyncLayoutInflaterPlus holder;
+        LayoutInflater inflater;
         ViewGroup parent;
         boolean attachToRoot;
         int resId;
@@ -189,12 +186,12 @@ public class AsyncLayoutInflaterPlus implements Handler.Callback {
         public void run() {
             isRunning = true;
             try {
-                request.view = request.inflater.mInflater.inflate(request.resId, request.parent, false);
+                request.view = request.inflater.inflate(request.resId, request.parent, false);
             } catch (RuntimeException ex) {
                 // Probably a Looper failure, retry on the UI thread
                 Log.w(TAG, "Failed to inflate resource in the background! Retrying on the UI thread", ex);
             }
-            Message.obtain(request.inflater.mHandler, 0, request).sendToTarget();
+            Message.obtain(request.holder.mHandler, 0, request).sendToTarget();
         }
 
         public boolean isRunning() {
@@ -209,12 +206,13 @@ public class AsyncLayoutInflaterPlus implements Handler.Callback {
     }
 
     private void releaseRequest(InflateRequest obj) {
-        obj.callback = null;
+        obj.holder = null;
         obj.inflater = null;
         obj.parent = null;
         obj.attachToRoot = false;
         obj.resId = 0;
         obj.view = null;
+        obj.callback = null;
         mRequestPool.release(obj);
     }
 
