@@ -2,7 +2,6 @@ package com.feimeng.fdroid.utils;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -34,7 +33,7 @@ public class AsyncLayoutInflaterPlus implements Handler.Callback {
     private static final String TAG = "AsyncLayoutInflaterPlus";
 
     private Dispather mDispatcher = new Dispather();
-    private Handler mHandler = new Handler(Looper.getMainLooper(), this);
+    private Handler mHandler = new Handler(this);
     private Pools.SynchronizedPool<InflateRequest> mRequestPool = new Pools.SynchronizedPool<>(10);
 
     @UiThread
