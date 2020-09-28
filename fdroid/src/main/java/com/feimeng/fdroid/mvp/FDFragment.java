@@ -34,7 +34,16 @@ public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (mPresenter != null && mPresenter.isActive()) mPresenter.afterContentView();
+        if (mPresenter != null) {
+            if (mPresenter.isActive()) mPresenter.afterContentView();
+        } else {
+            view.post(new Runnable() {
+                @Override
+                public void run() {
+                    init(null, null);
+                }
+            });
+        }
     }
 
     @Override
@@ -91,11 +100,11 @@ public abstract class FDFragment<V extends FDView<D>, P extends FDPresenter<V, D
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         // 解绑控制器
         if (mPresenter != null) {
             mPresenter.detach();
             mPresenter = null;
         }
+        super.onDestroy();
     }
 }

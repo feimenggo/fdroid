@@ -196,16 +196,25 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
             mLoading.dismiss();
             mLoading = null;
         }
-        super.onDestroy();
-        ActivityPageManager.getInstance().removeActivity(this);
         // 解绑控制器
         if (mPresenter != null) {
             mPresenter.detach();
             mPresenter = null;
         }
+        ActivityPageManager.getInstance().removeActivity(this);
+        super.onDestroy();
     }
 
     private void afterContentView() {
-        if (mPresenter != null && mPresenter.isActive()) mPresenter.afterContentView();
+        if (mPresenter != null) {
+            if (mPresenter.isActive()) mPresenter.afterContentView();
+        } else {
+            getWindow().getDecorView().post(new Runnable() {
+                @Override
+                public void run() {
+                    init(null, null);
+                }
+            });
+        }
     }
 }
