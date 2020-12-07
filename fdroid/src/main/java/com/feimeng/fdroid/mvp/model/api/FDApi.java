@@ -251,7 +251,7 @@ public class FDApi {
                         emitter.onComplete();
                         return;
                     }
-                    emitter.onError(new ApiException(response.getCode(), response.getInfo()));
+                    emitter.onError(new ApiException(response.getCode(), response.getInfo(), response));
                 }
             }
         });
