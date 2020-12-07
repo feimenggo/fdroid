@@ -1,5 +1,7 @@
 package com.feimeng.fdroid.exception;
 
+import androidx.annotation.Nullable;
+
 import com.feimeng.fdroid.mvp.model.api.ResponseCodeInterceptorListener;
 import com.feimeng.fdroid.mvp.model.api.bean.FDResponse;
 
@@ -15,12 +17,20 @@ public class ApiException extends Exception {
      * 请求被{@link ResponseCodeInterceptorListener#onResponse(FDResponse)} 拦截
      */
     public static final int CODE_RESPONSE_INTERCEPTOR = -2;
-    private int code;
-    private String message;
+    private final int code; // 状态码
+    private final String message; // 提示信息
+    private final FDResponse<?> response; // 响应体
 
     public ApiException(int code, String message) {
         this.code = code;
         this.message = message;
+        this.response = null;
+    }
+
+    public ApiException(int code, String message, FDResponse<?> response) {
+        this.code = code;
+        this.message = message;
+        this.response = response;
     }
 
     public int getCode() {
@@ -30,5 +40,10 @@ public class ApiException extends Exception {
     @Override
     public String getMessage() {
         return message;
+    }
+
+    @Nullable
+    public FDResponse<?> getResponse() {
+        return response;
     }
 }

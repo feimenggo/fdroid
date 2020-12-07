@@ -93,7 +93,7 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
      * @param throwable 初始化执行时抛出的异常
      */
     protected void postInitView(@Nullable final D initData, @Nullable final Throwable throwable) {
-        requireActivity().runOnUiThread(new Runnable() {
+        requireActivity().getWindow().getDecorView().post(new Runnable() {
             @Override
             public void run() {
                 mView.init(initData, throwable);

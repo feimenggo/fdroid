@@ -217,7 +217,7 @@ public class FDApi {
      * @param response 响应结果
      * @return true 拦截 false 不拦截，执行后续流程
      */
-    private boolean responseCodeInterceptor(FDResponse response) {
+    private boolean responseCodeInterceptor(FDResponse<?> response) {
         if (mResponseCodeInterceptorListener == null || mResponseCodes.length == 0) return false;
         for (int responseCode : mResponseCodes) {
             if (responseCode == response.getCode()) {
@@ -237,7 +237,7 @@ public class FDApi {
     private <T> Observable<T> flatResponse(final FDResponse<T> response) {
         return Observable.create(new ObservableOnSubscribe<T>() {
             @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+            public void subscribe(@NonNull ObservableEmitter<T> emitter) {
                 if (emitter.isDisposed()) return;
                 if (SHOW_HTTP_LOG) L.v(response);
                 // 请求结果
@@ -260,7 +260,7 @@ public class FDApi {
     private <T> Observable<Optional<T>> flatResponseOptional(final FDResponse<T> response) {
         return Observable.create(new ObservableOnSubscribe<Optional<T>>() {
             @Override
-            public void subscribe(ObservableEmitter<Optional<T>> emitter) throws Exception {
+            public void subscribe(@NonNull ObservableEmitter<Optional<T>> emitter) {
                 if (emitter.isDisposed()) return;
                 if (SHOW_HTTP_LOG) L.v(response);
                 // 请求结果
@@ -274,7 +274,7 @@ public class FDApi {
                         emitter.onComplete();
                         return;
                     }
-                    emitter.onError(new ApiException(response.getCode(), response.getInfo()));
+                    emitter.onError(new ApiException(response.getCode(), response.getInfo(), response));
                 }
             }
         });
@@ -285,13 +285,14 @@ public class FDApi {
      */
     public <T> ObservableTransformer<FDResponse<T>, T> applySchedulers() {
         return new ObservableTransformer<FDResponse<T>, T>() {
+            @NonNull
             @Override
-            public ObservableSource<T> apply(Observable<FDResponse<T>> upstream) {
+            public ObservableSource<T> apply(@NonNull Observable<FDResponse<T>> upstream) {
                 return upstream.subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .flatMap(new Function<FDResponse<T>, ObservableSource<T>>() {
                             @Override
-                            public ObservableSource<T> apply(FDResponse<T> tResponse) throws Exception {
+                            public ObservableSource<T> apply(@NonNull FDResponse<T> tResponse) {
                                 return flatResponse(tResponse);
                             }
                         });
@@ -304,13 +305,14 @@ public class FDApi {
      */
     public <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersOptional() {
         return new ObservableTransformer<FDResponse<T>, Optional<T>>() {
+            @NonNull
             @Override
-            public ObservableSource<Optional<T>> apply(Observable<FDResponse<T>> upstream) {
+            public ObservableSource<Optional<T>> apply(@NonNull Observable<FDResponse<T>> upstream) {
                 return upstream.subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .flatMap(new Function<FDResponse<T>, ObservableSource<Optional<T>>>() {
                             @Override
-                            public ObservableSource<Optional<T>> apply(FDResponse<T> tResponse) throws Exception {
+                            public ObservableSource<Optional<T>> apply(@NonNull FDResponse<T> tResponse) {
                                 return flatResponseOptional(tResponse);
                             }
                         });
@@ -323,12 +325,13 @@ public class FDApi {
      */
     public <T> ObservableTransformer<FDResponse<T>, T> applySchedulersNew() {
         return new ObservableTransformer<FDResponse<T>, T>() {
+            @NonNull
             @Override
-            public ObservableSource<T> apply(Observable<FDResponse<T>> upstream) {
+            public ObservableSource<T> apply(@NonNull Observable<FDResponse<T>> upstream) {
                 return upstream.subscribeOn(Schedulers.io())
                         .flatMap(new Function<FDResponse<T>, ObservableSource<T>>() {
                             @Override
-                            public ObservableSource<T> apply(FDResponse<T> tResponse) throws Exception {
+                            public ObservableSource<T> apply(@NonNull FDResponse<T> tResponse) {
                                 return flatResponse(tResponse);
                             }
                         });
@@ -341,12 +344,13 @@ public class FDApi {
      */
     public <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersNewOptional() {
         return new ObservableTransformer<FDResponse<T>, Optional<T>>() {
+            @NonNull
             @Override
-            public ObservableSource<Optional<T>> apply(Observable<FDResponse<T>> upstream) {
+            public ObservableSource<Optional<T>> apply(@NonNull Observable<FDResponse<T>> upstream) {
                 return upstream.subscribeOn(Schedulers.io())
                         .flatMap(new Function<FDResponse<T>, ObservableSource<Optional<T>>>() {
                             @Override
-                            public ObservableSource<Optional<T>> apply(FDResponse<T> tResponse) throws Exception {
+                            public ObservableSource<Optional<T>> apply(@NonNull FDResponse<T> tResponse) {
                                 return flatResponseOptional(tResponse);
                             }
                         });
@@ -359,11 +363,12 @@ public class FDApi {
      */
     public <T> ObservableTransformer<FDResponse<T>, T> applySchedulersFixed() {
         return new ObservableTransformer<FDResponse<T>, T>() {
+            @NonNull
             @Override
-            public ObservableSource<T> apply(Observable<FDResponse<T>> upstream) {
+            public ObservableSource<T> apply(@NonNull Observable<FDResponse<T>> upstream) {
                 return upstream.flatMap(new Function<FDResponse<T>, ObservableSource<T>>() {
                     @Override
-                    public ObservableSource<T> apply(FDResponse<T> tResponse) throws Exception {
+                    public ObservableSource<T> apply(@NonNull FDResponse<T> tResponse) {
                         return flatResponse(tResponse);
                     }
                 });
@@ -376,11 +381,12 @@ public class FDApi {
      */
     public <T> ObservableTransformer<FDResponse<T>, Optional<T>> applySchedulersFixedOptional() {
         return new ObservableTransformer<FDResponse<T>, Optional<T>>() {
+            @NonNull
             @Override
-            public ObservableSource<Optional<T>> apply(Observable<FDResponse<T>> upstream) {
+            public ObservableSource<Optional<T>> apply(@NonNull Observable<FDResponse<T>> upstream) {
                 return upstream.flatMap(new Function<FDResponse<T>, ObservableSource<Optional<T>>>() {
                     @Override
-                    public ObservableSource<Optional<T>> apply(FDResponse<T> tResponse) throws Exception {
+                    public ObservableSource<Optional<T>> apply(@NonNull FDResponse<T> tResponse) {
                         return flatResponseOptional(tResponse);
                     }
                 });
@@ -408,19 +414,19 @@ public class FDApi {
     public <T> Observer<T> subscriber(final String apiTag, final FDApiFinish<T> fdApiFinish) {
         return new Observer<T>() {
             @Override
-            public void onSubscribe(Disposable disposable) {
+            public void onSubscribe(@NonNull Disposable disposable) {
                 if (SHOW_HTTP_LOG) L.v("请求开始 线程：" + Thread.currentThread().getName());
                 if (apiTag != null) requestApi(apiTag, disposable);
                 fdApiFinish.start();
             }
 
             @Override
-            public void onNext(T t) {
+            public void onNext(@NonNull T t) {
                 fdApiFinish.success(t);
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(@NonNull Throwable e) {
                 if (e != null) {
                     if (e instanceof CompositeException) {
                         List<Throwable> exceptions = ((CompositeException) e).getExceptions();
