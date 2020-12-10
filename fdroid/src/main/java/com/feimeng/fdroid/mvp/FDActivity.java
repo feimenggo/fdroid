@@ -114,7 +114,7 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
             mLoading.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    if (mPresenter != null) mPresenter.onDialogDismiss();
+                    if (mPresenter != null) mPresenter.onDialogDismiss(mLoadCount != 0);
                     updateLoadingDialog(null, null);
                     mLoading = null;
                     mLoadCount = 0;

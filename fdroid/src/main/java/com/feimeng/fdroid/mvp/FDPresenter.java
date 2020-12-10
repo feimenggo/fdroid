@@ -3,12 +3,15 @@ package com.feimeng.fdroid.mvp;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 import androidx.fragment.app.FragmentActivity;
 
+import com.feimeng.fdroid.mvp.model.api.FDApi;
 import com.feimeng.fdroid.mvp.model.api.WithoutNetworkException;
+import com.feimeng.fdroid.mvp.model.api.bean.FDApiFinish;
 import com.feimeng.fdroid.utils.FastTask;
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.NetworkUtil;
@@ -16,9 +19,13 @@ import com.trello.rxlifecycle3.LifecycleTransformer;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.android.FragmentEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
 
 /**
  * 控制器基类
@@ -177,9 +184,30 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
         return activity;
     }
 
+    private List<String> mDialogWithApiTag;
+
+    protected FDApi api() {
+        return null;
+    }
+
+    protected <T> Observer<T> subscriber(final FDApiFinish<T> fdApiFinish) {
+        if (api() == null) throw new IllegalArgumentException("请实现bindApi()方法");
+        String apiTag;
+        synchronized (this) {
+            apiTag = String.valueOf(System.currentTimeMillis());
+            if (mDialogWithApiTag == null) mDialogWithApiTag = new ArrayList<>(1);
+            mDialogWithApiTag.add(apiTag);
+        }
+        return api().subscriber(apiTag, fdApiFinish);
+    }
+
     /**
-     * 显示对话框
+     * 显示等待框
      */
+    protected boolean dialogCancelWithFinishActivity() {
+        return false;
+    }
+
     public void showDialog() {
         showDialog(null, true);
     }
@@ -204,7 +232,7 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
     }
 
     /**
-     * 隐藏对话框
+     * 隐藏等待框
      */
     public void hideDialog() {
         if (mView == null) return;
@@ -219,8 +247,27 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
 
     /**
      * 当对话框消失的时候被回调
+     *
+     * @param fromUser 是否来自用户的取消操作
      */
-    public void onDialogDismiss() {
+    @CallSuper
+    public void onDialogDismiss(boolean fromUser) {
+        if (fromUser) {
+            // 判断是否取消Api请求
+            if (mDialogWithApiTag != null) {
+                synchronized (this) {
+                    for (int i = mDialogWithApiTag.size() - 1; i >= 0; i--) {
+                        String apiTag = mDialogWithApiTag.remove(i);
+                        api().cancelApi(apiTag);
+                    }
+                }
+            }
+            // 判断是否销毁Activity
+            if (dialogCancelWithFinishActivity()) {
+                FDActivity activity = getActivity();
+                if (activity != null) activity.finish();
+            }
+        }
     }
 
     /**
@@ -299,7 +346,7 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
         final Observable<T> checkNet = Observable.create(new ObservableOnSubscribe<T>() {
             @SuppressLint("MissingPermission")
             @Override
-            public void subscribe(ObservableEmitter<T> emitter) {
+            public void subscribe(@NonNull ObservableEmitter<T> emitter) {
                 if (!NetworkUtil.isConnectingToInternet(getContext())) {
                     if (isActive() && mView instanceof OnWithoutNetwork) {
                         ((OnWithoutNetwork) mView).withoutNetwork(data);
@@ -323,7 +370,7 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
         final Observable<T> checkNet = Observable.create(new ObservableOnSubscribe<T>() {
             @SuppressLint("MissingPermission")
             @Override
-            public void subscribe(ObservableEmitter<T> emitter) {
+            public void subscribe(@NonNull ObservableEmitter<T> emitter) {
                 if (!NetworkUtil.isConnectingToInternet(getContext())) {
                     if (network != null) network.withoutNetwork(data);
                     emitter.onError(new WithoutNetworkException());

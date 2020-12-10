@@ -1,11 +1,12 @@
 package com.feimeng.fdroid.mvp.model.api;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.config.RxJavaConfig;
-import com.feimeng.fdroid.exception.ApiException;
 import com.feimeng.fdroid.exception.ApiCallException;
+import com.feimeng.fdroid.exception.ApiException;
 import com.feimeng.fdroid.exception.Info;
 import com.feimeng.fdroid.mvp.model.api.bean.FDApiFinish;
 import com.feimeng.fdroid.mvp.model.api.bean.FDResponse;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -34,6 +36,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.Observer;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.CompositeException;
@@ -59,17 +62,27 @@ import static com.feimeng.fdroid.config.FDConfig.SHOW_HTTP_LOG;
  * Description: API操作类
  */
 public class FDApi {
-    private final Map<String, Disposable> mApiTags = new HashMap<>(); // 请求列表
-    private List<HeaderParam> mHeaderParam; // 自定义请求头
-    private Map<String, String> mMockData; // 模拟请求
-    private int[] mResponseCodes = new int[]{}; // 拦截API响应码
-    private ResponseCodeInterceptorListener mResponseCodeInterceptorListener; // 拦截API响应码 拦截器
-    private Gson mGson;
+    protected final Map<String, Disposable> mApiTags = new HashMap<>(); // 请求列表
+    protected int[] mResponseCodes; // 拦截API响应码
+    protected List<HeaderParam> mHeaderParam; // 自定义请求头
+    protected Map<String, String> mMockData; // 模拟请求
+    protected ResponseCodeInterceptorListener mResponseCodeInterceptorListener; // 拦截API响应码 拦截器
+    protected Gson mGson;
+    /**
+     * 请求的线程池(RxJava2)
+     */
+    protected Executor mExecutor;
+    protected Scheduler mScheduler;
 
     public FDApi() {
         this(new Gson());
     }
 
+    /**
+     * 使用特定的Gson进行初始化
+     *
+     * @param gson Gson对象
+     */
     public FDApi(@NonNull Gson gson) {
         mGson = gson;
     }
@@ -81,6 +94,29 @@ public class FDApi {
      */
     public Gson getGson() {
         return mGson;
+    }
+
+    /**
+     * 获取当前的执行的线程池
+     */
+    @Nullable
+    public Executor getExecutor() {
+        return mExecutor;
+    }
+
+    /**
+     * 设置请求执行的线程池
+     *
+     * @param executor 线程池
+     */
+    public void setExecutor(@Nullable Executor executor) {
+        if (executor == null) {
+            mExecutor = null;
+            mScheduler = null;
+        } else {
+            mExecutor = executor;
+            mScheduler = Schedulers.from(mExecutor);
+        }
     }
 
     public Retrofit getRetrofit(String baseUrl) {
@@ -215,10 +251,11 @@ public class FDApi {
      * 响应结果拦截器，根据响应码拦截
      *
      * @param response 响应结果
-     * @return true 拦截 false 不拦截，执行后续流程
+     * @return true 拦截，false 不拦截，执行后续流程
      */
     private boolean responseCodeInterceptor(FDResponse<?> response) {
-        if (mResponseCodeInterceptorListener == null || mResponseCodes.length == 0) return false;
+        if (mResponseCodeInterceptorListener == null || mResponseCodes == null || mResponseCodes.length == 0)
+            return false;
         for (int responseCode : mResponseCodes) {
             if (responseCode == response.getCode()) {
                 return mResponseCodeInterceptorListener.onResponse(response);
@@ -288,7 +325,7 @@ public class FDApi {
             @NonNull
             @Override
             public ObservableSource<T> apply(@NonNull Observable<FDResponse<T>> upstream) {
-                return upstream.subscribeOn(Schedulers.io())
+                return upstream.subscribeOn(mExecutor != null ? mScheduler : Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .flatMap(new Function<FDResponse<T>, ObservableSource<T>>() {
                             @Override
@@ -308,7 +345,7 @@ public class FDApi {
             @NonNull
             @Override
             public ObservableSource<Optional<T>> apply(@NonNull Observable<FDResponse<T>> upstream) {
-                return upstream.subscribeOn(Schedulers.io())
+                return upstream.subscribeOn(mExecutor != null ? mScheduler : Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .flatMap(new Function<FDResponse<T>, ObservableSource<Optional<T>>>() {
                             @Override
@@ -328,7 +365,7 @@ public class FDApi {
             @NonNull
             @Override
             public ObservableSource<T> apply(@NonNull Observable<FDResponse<T>> upstream) {
-                return upstream.subscribeOn(Schedulers.io())
+                return upstream.subscribeOn(mExecutor != null ? mScheduler : Schedulers.io())
                         .flatMap(new Function<FDResponse<T>, ObservableSource<T>>() {
                             @Override
                             public ObservableSource<T> apply(@NonNull FDResponse<T> tResponse) {
@@ -347,7 +384,7 @@ public class FDApi {
             @NonNull
             @Override
             public ObservableSource<Optional<T>> apply(@NonNull Observable<FDResponse<T>> upstream) {
-                return upstream.subscribeOn(Schedulers.io())
+                return upstream.subscribeOn(mExecutor != null ? mScheduler : Schedulers.io())
                         .flatMap(new Function<FDResponse<T>, ObservableSource<Optional<T>>>() {
                             @Override
                             public ObservableSource<Optional<T>> apply(@NonNull FDResponse<T> tResponse) {

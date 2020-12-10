@@ -8,6 +8,7 @@ import com.feimeng.fdroid.mvp.model.api.bean.Optional;
 import com.feimeng.fdroiddemo.data.dto.LoginDto;
 
 import java.net.UnknownHostException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -21,13 +22,15 @@ import static com.feimeng.fdroid.config.FDConfig.SHOW_HTTP_LOG;
  */
 public class ApiWrapper extends FDApi {
     private static final ApiWrapper instance = new ApiWrapper(); // 单例模式
-    private ApiService api;
+    private final ApiService api;
 
     private ApiWrapper() {
         addHttpMockData("user/login", "{\"code\":200,\"info\":\"成功\",\"data\":{\"id\":\"1000\",\"nickname\":\"小飞\",\"token\":\"xxx\"}}");
         addHttpMockData("user/register", "{\"code\":200,\"info\":\"成功\",\"data\":null}");
         addHttpMockData("user/info", "{\"code\":210,\"info\":\"模拟后端登录失败\",\"data\":null}");
         api = getRetrofit("http://www.baidu.com/").create(ApiService.class);
+        // 限制App中并行网络请求的数量
+        setExecutor(Executors.newFixedThreadPool(1));
     }
 
     public static ApiWrapper getInstance() {
