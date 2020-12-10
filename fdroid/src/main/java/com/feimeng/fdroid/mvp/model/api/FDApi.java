@@ -452,18 +452,35 @@ public class FDApi {
         return new Observer<T>() {
             @Override
             public void onSubscribe(@NonNull Disposable disposable) {
-                if (SHOW_HTTP_LOG) L.v("请求开始 线程：" + Thread.currentThread().getName());
-                if (apiTag != null) requestApi(apiTag, disposable);
-                fdApiFinish.start();
+                start(disposable);
             }
 
             @Override
             public void onNext(@NonNull T t) {
-                fdApiFinish.success(t);
+                try {
+                    fdApiFinish.success(t);
+                } catch (Exception e) {
+                    error(e);
+                }
             }
 
             @Override
             public void onError(@NonNull Throwable e) {
+                error(e);
+                stop();
+            }
+
+            @Override
+            public void onComplete() {
+                stop();
+            }
+
+            private void start(@NonNull Disposable disposable) {
+                if (apiTag != null) requestApi(apiTag, disposable);
+                fdApiFinish.start();
+            }
+
+            private void error(@NonNull Throwable e) {
                 if (e != null) {
                     if (e instanceof CompositeException) {
                         List<Throwable> exceptions = ((CompositeException) e).getExceptions();
@@ -495,13 +512,9 @@ public class FDApi {
                         }
                     }
                 }
-                if (apiTag != null) removeApi(apiTag);
-                fdApiFinish.stop();
             }
 
-            @Override
-            public void onComplete() {
-                if (SHOW_HTTP_LOG) L.v("请求结束 线程：" + Thread.currentThread().getName());
+            private void stop() {
                 if (apiTag != null) removeApi(apiTag);
                 fdApiFinish.stop();
             }

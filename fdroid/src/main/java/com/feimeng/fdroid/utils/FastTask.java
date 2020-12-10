@@ -1,5 +1,7 @@
 package com.feimeng.fdroid.utils;
 
+import androidx.annotation.NonNull;
+
 import com.feimeng.fdroid.bean.TaskProgress;
 import com.feimeng.fdroid.config.FDConfig;
 import com.feimeng.fdroid.config.RxJavaConfig;
@@ -37,7 +39,7 @@ public abstract class FastTask<T> {
     public Observable<T> fast() {
         return Observable.create(new ObservableOnSubscribe<T>() {
             @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+            public void subscribe(@NonNull ObservableEmitter<T> emitter) throws Exception {
                 emitter.onNext(task());
                 emitter.onComplete();
             }
@@ -68,13 +70,15 @@ public abstract class FastTask<T> {
     /**
      * 在计算线程执行
      */
-    public void runCalc(Observer<T> observer, FDView fdView) {
+    public void runCalc(Observer<T> observer, FDView<?> fdView) {
         Observable<T> observable = fast();
         if (fdView != null) {
             if (fdView instanceof FDActivity) {
-                observable = observable.compose(((FDActivity) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
+                observable = observable.compose(((FDActivity<?, ?, ?>) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
             } else if (fdView instanceof FDFragment) {
-                observable = observable.compose(((FDFragment) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
+                observable = observable.compose(((FDFragment<?, ?, ?>) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
+            } else if (fdView instanceof FDDialog) {
+                observable = observable.compose(((FDDialog<?, ?, ?>) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
             }
         }
         observable.subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
@@ -111,15 +115,15 @@ public abstract class FastTask<T> {
     /**
      * 在IO线程执行
      */
-    public void runIO(Observer<T> observer, FDView fdView) {
+    public void runIO(Observer<T> observer, FDView<?> fdView) {
         Observable<T> observable = fast();
         if (fdView != null) {
             if (fdView instanceof FDActivity) {
-                observable = observable.compose(((FDActivity) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
+                observable = observable.compose(((FDActivity<?, ?, ?>) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
             } else if (fdView instanceof FDFragment) {
-                observable = observable.compose(((FDFragment) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
+                observable = observable.compose(((FDFragment<?, ?, ?>) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
             } else if (fdView instanceof FDDialog) {
-                observable = observable.compose(((FDDialog) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
+                observable = observable.compose(((FDDialog<?, ?, ?>) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
             }
         }
         observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
@@ -156,15 +160,15 @@ public abstract class FastTask<T> {
     /**
      * 在新线程执行
      */
-    public void runNew(Observer<T> observer, FDView fdView) {
+    public void runNew(Observer<T> observer, FDView<?> fdView) {
         Observable<T> observable = fast();
         if (fdView != null) {
             if (fdView instanceof FDActivity) {
-                observable = observable.compose(((FDActivity) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
+                observable = observable.compose(((FDActivity<?, ?, ?>) fdView).<T>bindUntilEvent(ActivityEvent.DESTROY));
             } else if (fdView instanceof FDFragment) {
-                observable = observable.compose(((FDFragment) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
+                observable = observable.compose(((FDFragment<?, ?, ?>) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
             } else if (fdView instanceof FDDialog) {
-                observable = observable.compose(((FDDialog) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
+                observable = observable.compose(((FDDialog<?, ?, ?>) fdView).<T>bindUntilEvent(FragmentEvent.DESTROY));
             }
         }
         observable.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
@@ -185,42 +189,47 @@ public abstract class FastTask<T> {
 
     public static class Result<R> implements Observer<R>, TaskProgress<R> {
         @Override
-        public void onSubscribe(Disposable d) {
+        public void onSubscribe(@NonNull Disposable d) {
             start();
         }
 
         @Override
-        public void onNext(R r) {
-            success(r);
+        public void onNext(@NonNull R r) {
+            try {
+                success(r);
+            } catch (Exception e) {
+                error(e);
+            }
         }
 
         @Override
-        public void onError(Throwable e) {
-            if (e == null || e.getMessage() == null) {
-                dealError(new NullPointerException(FDConfig.INFO_UNKNOWN));
-            } else if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
-                success(null);
-            } else {
-                dealError(e);
-            }
+        public void onError(@NonNull Throwable e) {
+            error(e);
             stop();
         }
 
-        private void dealError(Throwable throwable) {
-            if (throwable instanceof Info) { // 提示信息
-                info(throwable.getMessage());
-            } else if (throwable instanceof ApiCallException) { // API调用异常
-                fail(throwable, throwable.getMessage());
-            } else if (throwable instanceof ApiException) { // API响应异常
-                // 判断是否请求被{@link ResponseCodeInterceptorListener#onResponse(FDResponse)} 拦截
-                if (((ApiException) throwable).getCode() != ApiException.CODE_RESPONSE_INTERCEPTOR) {
-                    fail(throwable, throwable.getMessage());
-                }
+        private void error(@NonNull Throwable e) {
+            if (e instanceof NullPointerException && e.getMessage().contains("onNext called with null")) {
+                success(null);
             } else {
-                if (RxJavaConfig.interceptor != null && !RxJavaConfig.interceptor.onError(throwable)) {
-                    return;
+                if (e == null || e.getMessage() == null) {
+                    e = new NullPointerException(FDConfig.INFO_UNKNOWN);
                 }
-                fail(throwable, throwable.getMessage());
+                if (e instanceof Info) { // 提示信息
+                    info(e.getMessage());
+                } else if (e instanceof ApiCallException) { // API调用异常
+                    fail(e, e.getMessage());
+                } else if (e instanceof ApiException) { // API响应异常
+                    // 判断是否请求被{@link ResponseCodeInterceptorListener#onResponse(FDResponse)} 拦截
+                    if (((ApiException) e).getCode() != ApiException.CODE_RESPONSE_INTERCEPTOR) {
+                        fail(e, e.getMessage());
+                    }
+                } else {
+                    if (RxJavaConfig.interceptor != null && !RxJavaConfig.interceptor.onError(e)) {
+                        return;
+                    }
+                    fail(e, e.getMessage());
+                }
             }
         }
 
@@ -251,8 +260,8 @@ public abstract class FastTask<T> {
     }
 
     public static class Truck<T, X> {
-        private T data;
-        private X dataExt;
+        private final T data;
+        private final X dataExt;
 
         private Truck(T data, X dataExt) {
             this.data = data;
