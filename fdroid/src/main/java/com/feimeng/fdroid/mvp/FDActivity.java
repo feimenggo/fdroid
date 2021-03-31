@@ -6,11 +6,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.feimeng.fdroid.R;
 import com.feimeng.fdroid.utils.ActivityPageManager;
+import com.feimeng.fdroid.utils.L;
+import com.feimeng.fdroid.utils.RecoverInstanceState;
 import com.feimeng.fdroid.widget.FDLoadingDialog;
 import com.trello.rxlifecycle3.LifecycleTransformer;
 import com.trello.rxlifecycle3.android.ActivityEvent;
@@ -25,7 +28,10 @@ import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
  * @param <D> 初始化结果
  */
 public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D>, D> extends RxAppCompatActivity implements FDView<D> {
-    protected P mPresenter;
+    private boolean mStarted;
+    private boolean waitAfterInit;
+    private Runnable afterInitTask;
+    private Bundle savedInstanceState; // 重建恢复数据
 
     /**
      * 对话框
@@ -36,14 +42,15 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
     /**
      * 实例化控制器
      */
-    protected abstract P initPresenter();
+    protected P mPresenter;
 
-    private boolean mStarted;
+    protected abstract P initPresenter();
 
     @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.savedInstanceState = savedInstanceState;
         ActivityPageManager.getInstance().addActivity(this);
         // 绑定控制器
         if ((mPresenter = initPresenter()) != null) mPresenter.attach((V) this);
@@ -52,23 +59,78 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
-        afterContentView();
+        onContentView();
     }
 
     @Override
     public void setContentView(View view) {
         super.setContentView(view);
-        afterContentView();
+        onContentView();
     }
 
     @Override
     public void setContentView(View view, ViewGroup.LayoutParams params) {
         super.setContentView(view, params);
-        afterContentView();
+        onContentView();
+    }
+
+    protected boolean instanceStateRecoverable() {
+        return false;
+    }
+
+    private void onContentView() {
+        if (savedInstanceState != null && instanceStateRecoverable()) { // 销毁重建
+            waitAfterInit = true;
+            RecoverInstanceState.restore(savedInstanceState, new RecoverInstanceState.SplashTask(this::afterContentView) {
+                @Override
+                public void startSplash() {
+                    startSplashActivity();
+                }
+
+                @Override
+                public void splashFinish() {
+                    super.splashFinish();
+                    waitAfterInit = false;
+                }
+            });
+        } else { // 正常流程
+            afterContentView(); // 初始化页面
+        }
+    }
+
+    protected void postAfterInit(Runnable runnable) {
+        if (waitAfterInit) {
+            afterInitTask = runnable;
+        } else {
+            runnable.run();
+        }
     }
 
     @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        RecoverInstanceState.store(outState);
+        outState.putInt("LoadCount", mLoadCount);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mLoadCount = savedInstanceState.getInt("LoadCount");
+    }
+
+    protected void startSplashActivity() {
+        L.d("nodawang", "startSplashActivity");
+        RecoverInstanceState.tryRecover(null);
+    }
+
+    @Override
+    @CallSuper
     public void init(D initData, Throwable e) {
+        if (afterInitTask != null) {
+            afterInitTask.run();
+            afterInitTask = null;
+        }
     }
 
     /**
@@ -179,18 +241,6 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("LoadCount", mLoadCount);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        mLoadCount = savedInstanceState.getInt("LoadCount");
-    }
-
-    @Override
     protected void onDestroy() {
         if (mLoading != null) {
             mLoading.dismiss();
@@ -209,12 +259,7 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
         if (mPresenter != null) {
             if (mPresenter.isActive()) mPresenter.afterContentView();
         } else {
-            getWindow().getDecorView().post(new Runnable() {
-                @Override
-                public void run() {
-                    init(null, null);
-                }
-            });
+            getWindow().getDecorView().post(() -> init(null, null));
         }
     }
 }

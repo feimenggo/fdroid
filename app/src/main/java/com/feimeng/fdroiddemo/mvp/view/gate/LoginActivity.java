@@ -40,6 +40,7 @@ public class LoginActivity extends BaseActivity<LoginContract.View, LoginContrac
 
     @Override
     public void init(String initData, Throwable e) {
+        super.init(initData, e);
         T.showL(this, initData);
     }
 

@@ -38,12 +38,7 @@ public abstract class FDDialog<V extends FDView<D>, P extends FDPresenter<V, D>,
         if (mPresenter != null) {
             if (mPresenter.isActive()) mPresenter.afterContentView();
         } else {
-            view.post(new Runnable() {
-                @Override
-                public void run() {
-                    init(null, null);
-                }
-            });
+            view.post(() -> init(null, null));
         }
     }
 

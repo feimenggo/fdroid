@@ -76,12 +76,12 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
             }.runIO(new FastTask.Result<D>() {
                 @Override
                 public void success(D initData) {
-                    if (isActive()) postInitView(initData, null);
+                    postInitView(initData, null);
                 }
 
                 @Override
                 public void fail(Throwable error, String info) {
-                    if (isActive()) postInitView(null, error);
+                    postInitView(null, error);
                 }
             }, mView);
         } else {
@@ -100,11 +100,8 @@ public abstract class FDPresenter<V extends FDView<D>, D> {
      * @param throwable 初始化执行时抛出的异常
      */
     protected void postInitView(@Nullable final D initData, @Nullable final Throwable throwable) {
-        requireActivity().getWindow().getDecorView().post(new Runnable() {
-            @Override
-            public void run() {
-                mView.init(initData, throwable);
-            }
+        requireActivity().getWindow().getDecorView().post(() -> {
+            if (isActive()) mView.init(initData, throwable);
         });
     }
 
