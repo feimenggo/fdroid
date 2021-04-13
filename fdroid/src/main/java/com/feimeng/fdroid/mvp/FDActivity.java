@@ -15,7 +15,6 @@ import com.feimeng.fdroid.R;
 import com.feimeng.fdroid.bean.Ignore;
 import com.feimeng.fdroid.utils.ActivityPageManager;
 import com.feimeng.fdroid.utils.FastTask;
-import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.widget.FDLoadingDialog;
 import com.trello.rxlifecycle3.LifecycleTransformer;
 import com.trello.rxlifecycle3.android.ActivityEvent;
@@ -79,7 +78,7 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
                         if (savedInstanceState != null) {
                             long savedStartupId = savedInstanceState.getLong("AppStartupTime");
                             if (savedStartupId != mStartupTime && savedStartupId != mLastStartupId) { // 启动ID不一致，进程销毁重建了，需要执行进程恢复操作
-                                L.d("nodawang", "Application恢复 mStartupTime:" + mStartupTime + " mLastStartupId:" + mLastStartupId + " savedStartupId:" + savedStartupId);
+//                                L.d("nodawang", "Application恢复 mStartupTime:" + mStartupTime + " mLastStartupId:" + mLastStartupId + " savedStartupId:" + savedStartupId);
                                 mLastStartupId = savedStartupId;
                                 // Application被清理
                                 onApplicationCleaned();
@@ -109,14 +108,33 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
         if (mOnResumeFlag) onResumeActivity();
     }
 
+    public boolean isActivityCreated() {
+        return mOnCreateFlag;
+    }
+
+    /**
+     * 判断是否需要初始化Application
+     *
+     * @return true/false
+     */
     protected boolean needInitApp() {
-        return FDCore.needWaitConfigFinish();
+        return FDCore.needWaitConfigFinish(); // 判断是否需要等待异步配置完成
     }
 
+    /**
+     * 初始化Application
+     *
+     * @throws Throwable 异常
+     */
     protected void onInitApp() throws Throwable {
-        FDCore.waitConfigFinish();
+        FDCore.waitConfigFinish(); // 等待异步配置完成
     }
 
+    /**
+     * 初始化Application期间，Activity展示的内容
+     *
+     * @return view
+     */
     protected View onInitView() {
         TextView tv = new TextView(this);
         tv.setText("正在初始化（模拟）");
@@ -125,6 +143,11 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
         return tv;
     }
 
+    /**
+     * 初始化Application失败
+     *
+     * @param error 错误
+     */
     protected void onInitFail(Throwable error) {
         error.printStackTrace();
     }
@@ -135,6 +158,10 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
     protected void onApplicationCleaned() {
     }
 
+    /**
+     * Activity onCreate
+     * Application已完成异步配置
+     */
     protected void onCreateActivity(@Nullable Bundle savedInstanceState) {
     }
 
@@ -149,6 +176,10 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
         mStarted = true;
     }
 
+    /**
+     * Activity onStart
+     * Application已完成异步配置
+     */
     protected void onStartActivity() {
 //        L.d("nodawang", "onStartActivity->mOnStartFlag:" + mOnStartFlag + " class:" + getClass().getSimpleName());
     }
@@ -163,6 +194,10 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
         }
     }
 
+    /**
+     * Activity onResume
+     * Application已完成异步配置
+     */
     protected void onResumeActivity() {
 //        L.d("nodawang", "onResumeActivity->mOnResumeFlag:" + mOnResumeFlag + " class:" + getClass().getSimpleName());
     }
