@@ -1,7 +1,6 @@
 package com.feimeng.fdroiddemo.base;
 
 import android.app.Dialog;
-import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -20,11 +19,6 @@ public abstract class BaseActivity<V extends BaseView<D>, P extends BasePresente
     @Override
     protected Dialog createLoadingDialog(@Nullable String message) {
         return new FDLoadingDialog(this, R.style.DialogTransparent, message);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override

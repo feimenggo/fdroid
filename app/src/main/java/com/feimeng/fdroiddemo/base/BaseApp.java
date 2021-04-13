@@ -38,6 +38,11 @@ public class BaseApp extends FDApp implements Consumer<Throwable> {
 
     @Override
     protected void configAsync(Application application) {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         RxJavaPlugins.setErrorHandler(this); // 处理RxJava取消订阅后抛出的异常
     }
 

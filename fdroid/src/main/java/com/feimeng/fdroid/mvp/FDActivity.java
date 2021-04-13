@@ -3,17 +3,19 @@ package com.feimeng.fdroid.mvp;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.feimeng.fdroid.R;
+import com.feimeng.fdroid.bean.Ignore;
 import com.feimeng.fdroid.utils.ActivityPageManager;
+import com.feimeng.fdroid.utils.FastTask;
 import com.feimeng.fdroid.utils.L;
-import com.feimeng.fdroid.utils.RecoverInstanceState;
 import com.feimeng.fdroid.widget.FDLoadingDialog;
 import com.trello.rxlifecycle3.LifecycleTransformer;
 import com.trello.rxlifecycle3.android.ActivityEvent;
@@ -28,10 +30,10 @@ import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
  * @param <D> 初始化结果
  */
 public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D>, D> extends RxAppCompatActivity implements FDView<D> {
+    protected Bundle savedInstanceState; // 重建恢复数据
+    private static long mLastStartupId = -1L; // 上次应用的启动ID
+    private static final long mStartupTime = System.currentTimeMillis(); // 当前应用的启动ID
     private boolean mStarted;
-    private boolean waitAfterInit;
-    private Runnable afterInitTask;
-    private Bundle savedInstanceState; // 重建恢复数据
 
     /**
      * 对话框
@@ -52,64 +54,103 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
         super.onCreate(savedInstanceState);
         this.savedInstanceState = savedInstanceState;
         ActivityPageManager.getInstance().addActivity(this);
-        // 绑定控制器
-        if ((mPresenter = initPresenter()) != null) mPresenter.attach((V) this);
+        if (needInitApp()) {
+            getDelegate().setContentView(onInitView());
+            new FastTask<Ignore>() {
+                @Override
+                public Ignore task() throws Exception {
+                    try {
+                        onInitApp();
+                    } catch (Throwable throwable) {
+                        throw new Exception((throwable));
+                    }
+                    return Ignore.instance;
+                }
+            }.runIO(new FastTask.Result<Ignore>() {
+                @Override
+                public void success(Ignore data) {
+                    if (!isDestroyed()) {
+                        // 绑定控制器
+                        if ((mPresenter = initPresenter()) != null) {
+                            mPresenter.attach((V) FDActivity.this);
+                        }
+                        // 获取之前的启动ID
+                        if (savedInstanceState != null) {
+                            long savedStartupId = savedInstanceState.getLong("AppStartupTime");
+                            if (savedStartupId != mStartupTime && savedStartupId != mLastStartupId) { // 启动ID不一致，进程销毁重建了，需要执行进程恢复操作
+                                L.d("nodawang", "Application恢复 mStartupTime:" + mStartupTime + " mLastStartupId:" + mLastStartupId + " savedStartupId:" + savedStartupId);
+                                mLastStartupId = savedStartupId;
+                                // Application被清理
+                                onApplicationCleaned();
+                            }
+                        }
+                        onCreateActivity(savedInstanceState);
+                    }
+                }
+
+                @Override
+                public void fail(Throwable error, String info) {
+                    onInitFail(error);
+                }
+            }, this);
+        } else {
+            // 绑定控制器
+            if ((mPresenter = initPresenter()) != null) mPresenter.attach((V) this);
+            onCreateActivity(savedInstanceState);
+        }
+    }
+
+    protected boolean needInitApp() {
+        return FDCore.needWaitConfigFinish();
+    }
+
+    protected void onInitApp() throws Throwable {
+        FDCore.waitConfigFinish();
+    }
+
+    protected View onInitView() {
+        TextView tv = new TextView(this);
+        tv.setText("正在初始化（模拟）");
+        tv.setGravity(Gravity.CENTER);
+        tv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        return tv;
+    }
+
+    protected void onInitFail(Throwable error) {
+        error.printStackTrace();
+    }
+
+    protected abstract void onCreateActivity(@Nullable Bundle savedInstanceState);
+
+    /**
+     * Application被清理时调用
+     */
+    protected void onApplicationCleaned() {
     }
 
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
-        onContentView();
+        afterContentView();
     }
 
     @Override
     public void setContentView(View view) {
         super.setContentView(view);
-        onContentView();
+        afterContentView();
     }
 
     @Override
     public void setContentView(View view, ViewGroup.LayoutParams params) {
         super.setContentView(view, params);
-        onContentView();
-    }
-
-    protected boolean instanceStateRecoverable() {
-        return false;
-    }
-
-    private void onContentView() {
-        if (savedInstanceState != null && instanceStateRecoverable()) { // 销毁重建
-            waitAfterInit = true;
-            RecoverInstanceState.restore(savedInstanceState, new RecoverInstanceState.SplashTask(this::afterContentView) {
-                @Override
-                public void startSplash() {
-                    startSplashActivity();
-                }
-
-                @Override
-                public void splashFinish() {
-                    super.splashFinish();
-                    waitAfterInit = false;
-                }
-            });
-        } else { // 正常流程
-            afterContentView(); // 初始化页面
-        }
-    }
-
-    protected void postAfterInit(Runnable runnable) {
-        if (waitAfterInit) {
-            afterInitTask = runnable;
-        } else {
-            runnable.run();
-        }
+        afterContentView();
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        RecoverInstanceState.store(outState);
+        outState.clear();
+        outState.putLong("AppStartupTime", mStartupTime);
         outState.putInt("LoadCount", mLoadCount);
     }
 
@@ -119,18 +160,8 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
         mLoadCount = savedInstanceState.getInt("LoadCount");
     }
 
-    protected void startSplashActivity() {
-        L.d("nodawang", "startSplashActivity");
-        RecoverInstanceState.tryRecover(null);
-    }
-
     @Override
-    @CallSuper
     public void init(D initData, Throwable e) {
-        if (afterInitTask != null) {
-            afterInitTask.run();
-            afterInitTask = null;
-        }
     }
 
     /**
@@ -242,6 +273,7 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
 
     @Override
     protected void onDestroy() {
+        ActivityPageManager.getInstance().removeActivity(this);
         if (mLoading != null) {
             mLoading.dismiss();
             mLoading = null;
@@ -251,7 +283,6 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
             mPresenter.detach();
             mPresenter = null;
         }
-        ActivityPageManager.getInstance().removeActivity(this);
         super.onDestroy();
     }
 

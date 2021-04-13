@@ -3,6 +3,8 @@ package com.feimeng.fdroiddemo.mvp.view.home;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 import com.feimeng.fdroiddemo.R;
 import com.feimeng.fdroiddemo.base.BaseActivity;
 import com.feimeng.fdroiddemo.base.BasePresenter;
@@ -18,6 +20,10 @@ public class MainActivity extends BaseActivity<BaseView<Object>, BasePresenter<B
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onCreateActivity(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
     }
 

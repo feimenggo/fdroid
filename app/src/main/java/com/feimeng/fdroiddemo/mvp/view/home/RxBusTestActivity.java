@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 import com.feimeng.fdroid.utils.L;
 import com.feimeng.fdroid.utils.RxBus;
 import com.feimeng.fdroiddemo.R;
@@ -31,6 +33,10 @@ public class RxBusTestActivity extends BaseActivity<BaseView<Object>, BasePresen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onCreateActivity(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.activity_rxbus_test);
     }
 

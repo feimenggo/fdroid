@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroiddemo.R;
 import com.feimeng.fdroiddemo.base.BaseActivity;
@@ -26,6 +28,10 @@ public class MvpSampleActivity extends BaseActivity<TestContract.View, TestContr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onCreateActivity(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.activity_test);
     }
 

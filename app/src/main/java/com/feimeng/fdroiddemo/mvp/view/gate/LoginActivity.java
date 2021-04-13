@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import com.feimeng.fdroid.utils.T;
 import com.feimeng.fdroiddemo.R;
 import com.feimeng.fdroiddemo.base.BaseActivity;
@@ -28,6 +30,10 @@ public class LoginActivity extends BaseActivity<LoginContract.View, LoginContrac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onCreateActivity(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.activity_login);
     }
 

@@ -37,6 +37,15 @@ public abstract class FDCore {
     }
 
     /**
+     * 是否需要等待异步配置
+     *
+     * @return true/false
+     */
+    public static boolean needWaitConfigFinish() {
+        return mCoreThread != null && mCoreThread.getState() != Thread.State.TERMINATED;
+    }
+
+    /**
      * 等待异步配置执行完毕
      *
      * @throws Throwable 异步配置抛出异常
