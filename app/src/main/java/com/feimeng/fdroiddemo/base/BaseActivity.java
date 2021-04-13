@@ -1,6 +1,7 @@
 package com.feimeng.fdroiddemo.base;
 
 import android.app.Dialog;
+import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 

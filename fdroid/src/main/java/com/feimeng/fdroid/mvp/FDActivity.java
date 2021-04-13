@@ -34,6 +34,7 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
     private static long mLastStartupId = -1L; // 上次应用的启动ID
     private static final long mStartupTime = System.currentTimeMillis(); // 当前应用的启动ID
     private boolean mStarted;
+    private boolean mOnCreateFlag, mOnStartFlag, mOnResumeFlag;
 
     /**
      * 对话框
@@ -84,7 +85,7 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
                                 onApplicationCleaned();
                             }
                         }
-                        onCreateActivity(savedInstanceState);
+                        callOnCreateActivity();
                     }
                 }
 
@@ -96,8 +97,16 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
         } else {
             // 绑定控制器
             if ((mPresenter = initPresenter()) != null) mPresenter.attach((V) this);
-            onCreateActivity(savedInstanceState);
+            callOnCreateActivity();
         }
+    }
+
+    private void callOnCreateActivity() {
+        mOnCreateFlag = true;
+//        L.d("nodawang", "onCreateActivity->mOnCreateFlag:" + mOnCreateFlag + " class:" + getClass().getSimpleName());
+        onCreateActivity(savedInstanceState);
+        if (mOnStartFlag) onStartActivity();
+        if (mOnResumeFlag) onResumeActivity();
     }
 
     protected boolean needInitApp() {
@@ -120,12 +129,42 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
         error.printStackTrace();
     }
 
-    protected abstract void onCreateActivity(@Nullable Bundle savedInstanceState);
-
     /**
      * Application被清理时调用
      */
     protected void onApplicationCleaned() {
+    }
+
+    protected void onCreateActivity(@Nullable Bundle savedInstanceState) {
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mOnCreateFlag) {
+            onStartActivity();
+        } else {
+            mOnStartFlag = true;
+        }
+        mStarted = true;
+    }
+
+    protected void onStartActivity() {
+//        L.d("nodawang", "onStartActivity->mOnStartFlag:" + mOnStartFlag + " class:" + getClass().getSimpleName());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mOnCreateFlag) {
+            onResumeActivity();
+        } else {
+            mOnResumeFlag = true;
+        }
+    }
+
+    protected void onResumeActivity() {
+//        L.d("nodawang", "onResumeActivity->mOnResumeFlag:" + mOnResumeFlag + " class:" + getClass().getSimpleName());
     }
 
     @Override
@@ -256,15 +295,9 @@ public abstract class FDActivity<V extends FDView<D>, P extends FDPresenter<V, D
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mStarted = true;
-    }
-
-    @Override
     protected void onStop() {
-        super.onStop();
         mStarted = false;
+        super.onStop();
     }
 
     public boolean isStarted() {
